@@ -1,0 +1,5 @@
+name: UltimateModeration
+main: me.xaxis.ultimatemoderation.UltimateModeration
+version: 0.0.1
+api-version: 1.19
+commands: {}
