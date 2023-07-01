@@ -1,33 +1,63 @@
 package me.xaxis.ultimatemoderation.events;
 
-import me.xaxis.ultimatemoderation.UltimateModeration;
+import me.xaxis.ultimatemoderation.UMP;
+import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.UUID;
 
-public class OnPlayerChat implements Listener {
+public class OnPlayerChat extends Utils implements UMPListener {
 
-    private final UltimateModeration plugin;
+    private final UMP plugin;
 
-    public OnPlayerChat(UltimateModeration plugin) {
+    public OnPlayerChat(UMP plugin) {
+        super(plugin);
         this.plugin = plugin;
     }
 
     @EventHandler
     public void playerChat(AsyncPlayerChatEvent event){
-        if(!event.getPlayer().hasPermission(Permissions.STAFF_CHAT.s())) return;
-        if(!event.getMessage().startsWith("*")) return;
-        String msg = Utils.chat("&7<&6Staff Chat&7> &b" + event.getMessage());
-        for(UUID playerUUID : plugin.getStaffChat().getPlayers()){
-            Player target = Bukkit.getPlayer(playerUUID);
-            if(target == null || !target.isOnline()) continue;
-            target.sendMessage(msg);
+
+        if(!hasPermission(event.getPlayer(), Permissions.STAFF_CHAT)) return;
+
+        Player player = event.getPlayer();
+
+        if(event.getMessage().startsWith("*") && !plugin.getStaffChat().contains(player)) {
+
+            event.setCancelled(true);
+
+            String msg = Utils.chat(plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + event.getMessage());
+
+            for (UUID playerUUID : plugin.getStaffChat().getPlayers()) {
+
+                Player target = Bukkit.getPlayer(playerUUID);
+
+                if (target == null || !target.isOnline()) continue;
+
+                target.sendMessage(msg);
+
+            }
+
+            plugin.getStaffChat().add(player);
+
+            message(player, Lang.STAFF_CHAT_TOGGLED);
+
+        }else{
+
+            plugin.getStaffChat().remove(player);
+
+            message(player, Lang.STAFF_CHAT_UNTOGGLED);
+
         }
+    }
+
+    @Override
+    public boolean isDependent() {
+        return false;
     }
 }

@@ -1,6 +1,6 @@
 package me.xaxis.ultimatemoderation.configmanagement;
 
-import me.xaxis.ultimatemoderation.UltimateModeration;
+import me.xaxis.ultimatemoderation.UMP;
 
 public enum Options {
 
@@ -11,9 +11,9 @@ public enum Options {
     }
 
     private final String path;
-    private final UltimateModeration instance;
+    private final UMP instance;
 
-    Options(String path, UltimateModeration instance){
+    Options(String path, UMP instance){
         this.path = path;
         this.instance = instance;
     }

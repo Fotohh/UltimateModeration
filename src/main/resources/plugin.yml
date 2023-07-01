@@ -6,5 +6,10 @@ commands:
   spy:
     description: Spy on a player
     usage: /spy <player_name>
+  staffchat:
+    description: Talk in staff chat
+    usage: /staffchat
+    aliases:
+      - sc
 softdepend:
   - ReportPlus

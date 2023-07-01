@@ -1,17 +1,17 @@
 package me.xaxis.ultimatemoderation.commands;
 
-import me.xaxis.ultimatemoderation.UltimateModeration;
+import me.xaxis.ultimatemoderation.UMP;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerList implements CommandExecutor {
+public class PlayerListCommand implements CommandExecutor {
 
-    private final UltimateModeration instance;
+    private final UMP instance;
 
-    public PlayerList(UltimateModeration instance){
+    public PlayerListCommand(UMP instance){
         this.instance = instance;
     }
 

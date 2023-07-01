@@ -2,7 +2,10 @@ package me.xaxis.ultimatemoderation.configmanagement;
 
 public enum Permissions {
 
-    STAFF_CHAT("um.staff_chat");
+    STAFF_CHAT("ump.staff_chat"),
+    MUTE_BYPASS("ump.mute_bypass"),
+    SPY("ump.spy")
+    ;
 
     private final String permission;
 
