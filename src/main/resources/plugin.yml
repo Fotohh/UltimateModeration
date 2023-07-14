@@ -11,5 +11,3 @@ commands:
     usage: /staffchat
     aliases:
       - sc
-softdepend:
-  - ReportPlus

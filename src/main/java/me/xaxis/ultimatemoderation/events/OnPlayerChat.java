@@ -60,4 +60,10 @@ public class OnPlayerChat extends Utils implements UMPListener {
     public boolean isDependent() {
         return false;
     }
+
+    @Override
+    public String getDependentPlugin(){
+        return null;
+    }
+
 }
