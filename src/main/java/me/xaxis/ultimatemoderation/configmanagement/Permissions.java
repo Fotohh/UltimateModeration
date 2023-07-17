@@ -4,7 +4,8 @@ public enum Permissions {
 
     STAFF_CHAT("ump.staff_chat"),
     MUTE_BYPASS("ump.mute_bypass"),
-    SPY("ump.spy")
+    SPY("ump.spy"),
+    VANISH_BYPASS("ump.vanish.bypass"),
     ;
 
     private final String permission;

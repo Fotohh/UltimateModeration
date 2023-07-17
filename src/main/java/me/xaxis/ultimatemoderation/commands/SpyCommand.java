@@ -5,7 +5,6 @@ import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,14 +30,23 @@ public class SpyCommand extends Utils implements CommandExecutor {
                 return true;
             }
 
-            if(args.length != 1){
+            if(args.length != 2){
                 //message INCORRECT USAGE /HELP
                 return true;
             }
 
-            vanishPlayer(player);
+            Player target = Bukkit.getPlayer(args[1]);
 
+            if(target == null || !target.isOnline()) return true;
 
+            if(main.getSpyManager().containsPlayer(player)){
+                player.teleport(target.getLocation());
+                message(player, "You are now spying on "+target.getDisplayName());
+            }else{
+                main.getSpyManager().addPlayer(player);
+                vanishPlayer(player);
+                message(player, "You are now spying on "+target.getDisplayName());
+            }
 
         }else{
             //message SENDER NOT PLAYER

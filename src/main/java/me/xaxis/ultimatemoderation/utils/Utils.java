@@ -1,6 +1,5 @@
 package me.xaxis.ultimatemoderation.utils;
 
-import com.comphenix.protocol.PacketType;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
@@ -51,6 +50,7 @@ public class Utils {
         player.setFlying(true);
         player.setAllowFlight(true);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
+            if(target.hasPermission(Permissions.VANISH_BYPASS.s()) || !target.canSee(player)) continue;
             target.hidePlayer(main, player);
             message(target, Lang.VANISH_LEAVE_MESSAGE, player.getDisplayName());
         }
@@ -59,6 +59,7 @@ public class Utils {
     public void unvanishPlayer(Player player){
         main.getRollbackManager().restore(player);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
+            if(target.canSee(player)) continue;
             target.showPlayer(main, player);
             message(target, Lang.VANISH_JOIN_MESSAGE, player.getDisplayName());
         }

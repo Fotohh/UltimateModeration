@@ -5,6 +5,8 @@ import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.UMPListener;
 import me.xaxis.ultimatemoderation.file.LangYML;
+import me.xaxis.ultimatemoderation.spy.SpyManager;
+import me.xaxis.ultimatemoderation.updatechecker.UpdateChecker;
 import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +17,8 @@ import java.util.HashMap;
 public class UMP extends JavaPlugin {
 
     private LangYML langYML;
+
+    private SpyManager spyManager;
 
     private StaffChat staffChat;
 
@@ -41,6 +45,19 @@ public class UMP extends JavaPlugin {
 
         registerListeners();
 
+        this.spyManager = new SpyManager(this);
+
+
+
+
+
+
+        new UpdateChecker(this);
+
+    }
+
+    public SpyManager getSpyManager() {
+        return spyManager;
     }
 
     private void registerCommands(){
