@@ -3,6 +3,7 @@ package me.xaxis.ultimatemoderation.commands;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
+import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -43,8 +44,9 @@ public class SpyCommand extends Utils implements CommandExecutor {
                 player.teleport(target.getLocation());
                 message(player, "You are now spying on "+target.getDisplayName());
             }else{
-                main.getSpyManager().addPlayer(player);
-                vanishPlayer(player);
+                main.getSpyManager().addPlayer(player, target, new PlayerRollbackManager().save(player));
+                vanishPlayer(player, false);
+                player.getInventory().setContents(main.getSpyManager().getDefaultContents());
                 message(player, "You are now spying on "+target.getDisplayName());
             }
 

@@ -42,8 +42,9 @@ public class Utils {
         return player.hasPermission(permission.s());
     }
 
-    public void vanishPlayer(Player player){
-        main.getRollbackManager().save(player);
+    public void vanishPlayer(Player player, boolean rollbackManager){
+        if(rollbackManager)
+            main.getRollbackManager().save(player);
         player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().clear();
         player.setCanPickupItems(false);
@@ -56,8 +57,9 @@ public class Utils {
         }
     }
 
-    public void unvanishPlayer(Player player){
-        main.getRollbackManager().restore(player);
+    public void unvanishPlayer(Player player, boolean rollbackManager){
+        if(rollbackManager)
+            main.getRollbackManager().restore(player);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
             if(target.canSee(player)) continue;
             target.showPlayer(main, player);

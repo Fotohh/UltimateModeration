@@ -19,7 +19,7 @@ public class PlayerRollbackManager {
     private final Map<UUID, Integer> previousHungerValue = new HashMap<>();
     private final Map<UUID, Integer> previousLevelMap = new HashMap<>();
 
-    public void save(Player player) {
+    public PlayerRollbackManager save(Player player) {
 
         previousLocationMap.put(player.getUniqueId(), player.getLocation());
         previousGameModeMap.put(player.getUniqueId(), player.getGameMode());
@@ -29,6 +29,8 @@ public class PlayerRollbackManager {
         previousLevelMap.put(player.getUniqueId(), player.getLevel());
         previousCanFlyMap.put(player.getUniqueId(), player.getAllowFlight());
         player.getInventory().clear();
+
+        return this;
 
     }
 
