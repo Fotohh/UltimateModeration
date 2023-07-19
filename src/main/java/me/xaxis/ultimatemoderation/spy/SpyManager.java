@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.spy;
 
 import me.xaxis.ultimatemoderation.UMP;
+import me.xaxis.ultimatemoderation.utils.ItemUtil;
 import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Material;
@@ -8,14 +9,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class SpyManager extends Utils implements Listener{
 
@@ -82,7 +79,16 @@ public class SpyManager extends Utils implements Listener{
 
     public ItemStack[] getDefaultContents() {
 
-        return null;
+        ItemUtil barrier = new ItemUtil(Material.BARRIER);
+        barrier.withTitle("&cExit")
+                .withLore("&7Left or right","&7click to exit!")
+                .build();
+        ItemUtil anvil = new ItemUtil(Material.ANVIL);
+        anvil.withTitle("&4Ban Player")
+                .withLore("&7Left or right","&7click to ban","the player!")
+                .build();
+
+        return new ItemStack[]{barrier, anvil};
     }
 
     //TODO add on interact to quit spying when finished n stuff using items in hot bar
