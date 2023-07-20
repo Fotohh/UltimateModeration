@@ -86,6 +86,8 @@ public class PlayerProfileYML extends File {
         getConfiguration().set(Defaults.PLAYER_NAME.getPath(), player.getName());
         getConfiguration().set(Defaults.PLAYER_DISPLAY_NAME.getPath(), player.getDisplayName());
 
+        save();
+
     }
 
     public int getInt(Defaults path){
@@ -108,7 +110,7 @@ public class PlayerProfileYML extends File {
         try {
             configuration.save(this);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to save Lang.yml!",e);
+            throw new RuntimeException("Unable to save PlayerProfile.yml!",e);
         }
     }
 

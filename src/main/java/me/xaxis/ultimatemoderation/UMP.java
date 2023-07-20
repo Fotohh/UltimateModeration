@@ -5,12 +5,14 @@ import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.UMPListener;
 import me.xaxis.ultimatemoderation.file.LangYML;
+import me.xaxis.ultimatemoderation.mute.MuteManager;
 import me.xaxis.ultimatemoderation.spy.SpyManager;
 import me.xaxis.ultimatemoderation.updatechecker.UpdateChecker;
 import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,6 +27,12 @@ public class UMP extends JavaPlugin {
     private final HashMap<CommandExecutor, String> commands = new HashMap<>();
 
     private PlayerRollbackManager rollbackManager;
+
+    private MuteManager muteManager;
+
+    public MuteManager getMuteManager() {
+        return muteManager;
+    }
 
     private final ArrayList<UMPListener> listeners = new ArrayList<>();
 
@@ -47,9 +55,11 @@ public class UMP extends JavaPlugin {
 
         this.spyManager = new SpyManager(this);
 
-
-
-
+        try {
+            this.muteManager = new MuteManager(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
         new UpdateChecker(this);
@@ -81,6 +91,11 @@ public class UMP extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        try {
+            muteManager.save();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public PlayerRollbackManager getRollbackManager() {

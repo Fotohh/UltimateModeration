@@ -66,23 +66,12 @@ public class PlayerProfile extends PlayerProfileYML {
     }
 
     public int getInfractionAmount(InfractionType type){
-        switch (type){
-            case MUTE, TEMP_MUTE -> {
-                return getInt(Defaults.NUM_OF_MUTES);
-            }
-            case KICK -> {
-                return getInt(Defaults.NUM_OF_KICKS);
-            }
-            case WARNING -> {
-                return getInt(Defaults.NUM_OF_WARNINGS);
-            }
-            case IP_BAN, PERM_BAN, TEMP_BAN -> {
-                return getInt(Defaults.NUM_OF_BANS);
-            }
-            default -> {
-                return 0;
-            }
-        }
+        return switch (type){
+            case MUTE, TEMP_MUTE -> getInt(Defaults.NUM_OF_MUTES);
+            case KICK -> getInt(Defaults.NUM_OF_KICKS);
+            case WARNING -> getInt(Defaults.NUM_OF_WARNINGS);
+            case IP_BAN, PERM_BAN, TEMP_BAN -> getInt(Defaults.NUM_OF_BANS);
+        };
     }
 
     public void deleteProfile(){

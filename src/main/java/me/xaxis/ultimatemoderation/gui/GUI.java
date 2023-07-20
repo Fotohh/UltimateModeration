@@ -2,7 +2,6 @@ package me.xaxis.ultimatemoderation.gui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -55,10 +54,6 @@ public class GUI implements Listener {
         type = t;
         holder = p;
         inventory = Bukkit.createInventory(p,t,s);
-    }
-
-    public void unregister(){
-        HandlerList.unregisterAll(this);
     }
 
 }
