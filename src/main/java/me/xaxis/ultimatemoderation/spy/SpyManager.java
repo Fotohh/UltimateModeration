@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.spy;
 
 import me.xaxis.ultimatemoderation.UMP;
+import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
 import me.xaxis.ultimatemoderation.utils.ItemUtil;
 import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
 import me.xaxis.ultimatemoderation.utils.Utils;
@@ -68,9 +69,7 @@ public class SpyManager extends Utils implements Listener{
 
         switch (event.getItem().getType()){
             case BARRIER -> removePlayer(player);
-            case ANVIL -> {
-                playerSpy.getTarget().ban("L bozo", new Date(System.currentTimeMillis() + 1000000), "nobody", true);
-            }
+            case ANVIL -> new PlayerBanGUI(player, playerSpy.getTarget(), plugin);
         }
 
         event.setCancelled(true);

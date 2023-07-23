@@ -4,6 +4,7 @@ import me.xaxis.ultimatemoderation.chat.StaffChat;
 import me.xaxis.ultimatemoderation.commands.SpyCommand;
 import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
+import me.xaxis.ultimatemoderation.events.OnQuit;
 import me.xaxis.ultimatemoderation.events.PlayerJoin;
 import me.xaxis.ultimatemoderation.file.LangYML;
 import me.xaxis.ultimatemoderation.mute.MuteManager;
@@ -60,7 +61,8 @@ public class UMP extends JavaPlugin {
 
         listeners = new Listener[]{
                 new OnPlayerChat(this),
-                new PlayerJoin(this)
+                new PlayerJoin(this),
+                new OnQuit(this)
         };
 
         registerCommands();
