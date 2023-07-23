@@ -62,7 +62,7 @@ public class PlayerProfileYML extends File {
     private final UMP plugin;
 
     public PlayerProfileYML(String path, @NotNull String child, UMP plugin, Player player) {
-        super(path, child);
+        super(path, child + ".yml");
 
         File folder = new File(path);
 

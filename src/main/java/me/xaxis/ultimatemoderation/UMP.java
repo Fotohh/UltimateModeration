@@ -4,6 +4,7 @@ import me.xaxis.ultimatemoderation.chat.StaffChat;
 import me.xaxis.ultimatemoderation.commands.SpyCommand;
 import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
+import me.xaxis.ultimatemoderation.events.PlayerJoin;
 import me.xaxis.ultimatemoderation.file.LangYML;
 import me.xaxis.ultimatemoderation.mute.MuteManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
@@ -19,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class UMP extends JavaPlugin {
 
@@ -28,7 +30,7 @@ public class UMP extends JavaPlugin {
 
     private StaffChat staffChat;
 
-    private final HashMap<CommandExecutor, String> commands = new HashMap<>();
+    private HashMap<CommandExecutor, String>[] commands;
 
     private PlayerRollbackManager rollbackManager;
 
@@ -40,7 +42,7 @@ public class UMP extends JavaPlugin {
 
     private Metrics metrics;
 
-    private final ArrayList<Listener> listeners = new ArrayList<>();
+    private Listener[] listeners;
 
     @Override
     public void onEnable() {
@@ -51,10 +53,15 @@ public class UMP extends JavaPlugin {
 
         staffChat = new StaffChat(this);
 
-        commands.put(new StaffChatCommand(this), "staffchat");
-        commands.put(new SpyCommand(this), "spy");
+        commands = new HashMap[]{
+                load(new StaffChatCommand(this), "staffchat"),
+                load(new SpyCommand(this), "spy")
+        };
 
-        listeners.add(new OnPlayerChat(this));
+        listeners = new Listener[]{
+                new OnPlayerChat(this),
+                new PlayerJoin(this)
+        };
 
         registerCommands();
 
@@ -76,6 +83,10 @@ public class UMP extends JavaPlugin {
 
     }
 
+    private HashMap<CommandExecutor, String> load(CommandExecutor c, String s){
+        return new HashMap<>(Map.of(c, s));
+    }
+
     public void loadPlayerData(){
         for(Player player : getServer().getOnlinePlayers()){
             new PlayerProfile(player, this);
@@ -87,8 +98,10 @@ public class UMP extends JavaPlugin {
     }
 
     private void registerCommands(){
-        for(CommandExecutor command : commands.keySet()){
-            getCommand(commands.get(command)).setExecutor(command);
+        for(HashMap<CommandExecutor, String> map : commands){
+            for(CommandExecutor command : map.keySet()) {
+                getCommand(map.get(command)).setExecutor(command);
+            }
         }
     }
 
