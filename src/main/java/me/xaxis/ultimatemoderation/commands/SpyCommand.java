@@ -40,15 +40,13 @@ public class SpyCommand extends Utils implements CommandExecutor {
 
             if(target == null || !target.isOnline()) return true;
 
-            if(main.getSpyManager().containsPlayer(player)){
-                player.teleport(target.getLocation());
-                message(player, "You are now spying on "+target.getDisplayName());
-            }else{
+            if (!main.getSpyManager().containsPlayer(player)) {
                 main.getSpyManager().addPlayer(player, target, new PlayerRollbackManager().save(player));
                 vanishPlayer(player, false);
                 player.getInventory().setContents(main.getSpyManager().getDefaultContents());
-                message(player, "You are now spying on "+target.getDisplayName());
             }
+            player.teleport(target.getLocation());
+            message(player, "You are now spying on "+target.getDisplayName());
 
         }else{
             //message SENDER NOT PLAYER

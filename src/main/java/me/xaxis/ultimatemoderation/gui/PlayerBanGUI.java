@@ -30,20 +30,8 @@ public class PlayerBanGUI extends GUI {
         return target;
     }
 
-    public void setBookGUI(GUI bookGUI) {
-        this.bookGUI = bookGUI;
-    }
-
     public void setReasonGUI(GUI reasonGUI) {
         this.reasonGUI = reasonGUI;
-    }
-
-    public void setTimeGUI(GUI timeGUI) {
-        this.timeGUI = timeGUI;
-    }
-
-    public GUI getTimeGUI() {
-        return timeGUI;
     }
 
     private GUI reasonGUI;
@@ -60,10 +48,6 @@ public class PlayerBanGUI extends GUI {
         return reason;
     }
 
-    public GUI getBookGUI() {
-        return bookGUI;
-    }
-
     public Long getTime() {
         return time;
     }
@@ -76,13 +60,13 @@ public class PlayerBanGUI extends GUI {
         return extraNotes;
     }
 
+    public boolean inSetReason = false;
+    public boolean inExtraNotes = false;
+    public boolean inTimeSet = false;
+
     public void setExtraNotes(String extraNotes) {
         this.extraNotes = extraNotes;
     }
-
-    private GUI bookGUI;
-
-    private GUI timeGUI;
 
     public PlayerBanGUI(Player player, Player target, UMP plugin) {
         super("Ban Menu", 9, player);
