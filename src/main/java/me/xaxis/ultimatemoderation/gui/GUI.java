@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class GUI implements Listener {
 
+
     private final Inventory inventory;
     private final String title;
     private int size;

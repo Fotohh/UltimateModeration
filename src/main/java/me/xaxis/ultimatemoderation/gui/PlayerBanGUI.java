@@ -92,6 +92,7 @@ public class PlayerBanGUI extends GUI {
         player.openInventory(getInventory());
     }
 
+
     private void addItems(){
         ItemUtil barrier = new ItemUtil(Material.BARRIER);
         barrier.withTitle("&4Cancel").build();

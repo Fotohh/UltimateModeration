@@ -29,7 +29,6 @@ public class InventoryClick implements Listener {
     @EventHandler
     public void onPlayerClick(InventoryClickEvent event) {
 
-
         Inventory i = event.getClickedInventory();
 
         if (i == null || i.isEmpty()) return;
@@ -46,11 +45,13 @@ public class InventoryClick implements Listener {
 
             ItemStack itemStack = event.getCurrentItem();
 
+
             switch (itemStack.getType()) {
                 case RED_CONCRETE -> {
                     gui.getTarget().ban(gui.getReason(), new Date(gui.getTime()), "null");
                 }
                 case BARRIER -> {
+
                     gui.getHolder().closeInventory();
                 }
                 case BOOK -> {
@@ -64,6 +65,7 @@ public class InventoryClick implements Listener {
                     gui.getHolder().openInventory(gui.getTimeGUI().getInventory());
                 }
                 case PAPER -> {
+
                     gui.setReasonGUI( new GUI("Reason", InventoryType.ANVIL, gui.getHolder()));
                     gui.getReasonGUI().addItem(new ItemUtil(Material.PAPER).withTitle("No reason").build(), 0);
                     gui.getHolder().openInventory(gui.getReasonGUI().getInventory());
@@ -74,12 +76,14 @@ public class InventoryClick implements Listener {
 
             event.setCancelled(true);
 
+
             AnvilInventory inv = (AnvilInventory) gui.getReasonGUI().getInventory();
 
             ItemStack itemStack = event.getCurrentItem();
             if (itemStack == null || itemStack.getType() == Material.AIR) return;
 
             //2 is result
+
 
             if (event.getSlot() == 2 && itemStack.getType() == Material.PAPER || inv.getRenameText() == null) {
                 gui.setReason( inv.getRenameText());
@@ -89,6 +93,7 @@ public class InventoryClick implements Listener {
             event.setCancelled(true);
 
             AnvilInventory inv = (AnvilInventory) gui.getTimeGUI().getInventory();
+
 
             ItemStack itemStack = event.getCurrentItem();
 
@@ -102,6 +107,7 @@ public class InventoryClick implements Listener {
                 //0 y 1 m 2 w 3 d 4 h 5 m 6 s
                 if (values.length != 7) return;
 
+
                 gui.setTime( Utils.fromYears(values[0]) + Utils.fromMonths(values[1]) + Utils.fromWeeks(values[2]) + Utils.fromDays(values[3]) + Utils.fromHours(values[4]) + Utils.fromMinutes(values[5]) + Utils.fromSeconds(values[6]));
 
                 gui.getHolder().openInventory(gui.getInventory());
@@ -109,6 +115,7 @@ public class InventoryClick implements Listener {
 
         } else if (gui.getBookGUI() != null && event.getView().getTitle().equalsIgnoreCase(gui.getBookGUI().getTitle())) {
             event.setCancelled(true);
+
 
             AnvilInventory inv = (AnvilInventory) gui.getBookGUI().getInventory();
             ItemStack item = event.getCurrentItem();
