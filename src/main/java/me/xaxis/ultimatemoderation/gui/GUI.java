@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.gui;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryType;
@@ -29,7 +30,7 @@ public class GUI implements Listener {
     }
 
     public String getTitle() {
-        return title;
+        return ChatColor.stripColor(title);
     }
 
     public int getSize() {

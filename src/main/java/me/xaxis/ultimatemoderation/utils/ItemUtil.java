@@ -9,13 +9,11 @@ import java.util.stream.Collectors;
 
 public class ItemUtil extends ItemStack{
 
-    private final ItemStack i;
     private final ItemMeta im;
 
     public ItemUtil(Material m){
         super(m);
-        this.i = new ItemStack(m);
-        this.im = i.getItemMeta();
+        this.im = getItemMeta();
     }
 
     public ItemUtil withLore(String... l){
@@ -34,7 +32,7 @@ public class ItemUtil extends ItemStack{
     }
 
     public ItemUtil build(){
-        i.setItemMeta(im);
+        setItemMeta(im);
         return this;
     }
 

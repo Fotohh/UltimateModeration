@@ -3,6 +3,7 @@ package me.xaxis.ultimatemoderation;
 import me.xaxis.ultimatemoderation.chat.StaffChat;
 import me.xaxis.ultimatemoderation.commands.SpyCommand;
 import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
+import me.xaxis.ultimatemoderation.events.InventoryClick;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.OnQuit;
 import me.xaxis.ultimatemoderation.events.PlayerJoin;
@@ -62,7 +63,8 @@ public class UMP extends JavaPlugin {
         listeners = new Listener[]{
                 new OnPlayerChat(this),
                 new PlayerJoin(this),
-                new OnQuit(this)
+                new OnQuit(this),
+                new InventoryClick(this)
         };
 
         registerCommands();

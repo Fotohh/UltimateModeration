@@ -5,6 +5,7 @@ import me.xaxis.ultimatemoderation.gui.GUI;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
 import me.xaxis.ultimatemoderation.utils.ItemUtil;
 import me.xaxis.ultimatemoderation.utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +24,6 @@ public class InventoryClick implements Listener {
 
     public InventoryClick(UMP plugin) {
         this.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -35,23 +35,31 @@ public class InventoryClick implements Listener {
 
         PlayerBanGUI gui = PlayerBanGUI.getGUI(UUID.fromString(i.getItem(5).getItemMeta().getLore().get(0)));
 
+        plugin.getLogger().info("1");
+
+        if(gui == null) return;
+
+        plugin.getLogger().info("1");
+
         if(!event.getWhoClicked().getUniqueId().equals(gui.getHolder().getUniqueId())) return;
+
+        plugin.getLogger().info("1");
 
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
 
-        if (event.getView().getTitle().equalsIgnoreCase(gui.getTitle())) {
+        plugin.getLogger().info("1");
+
+        if (ChatColor.stripColor(event.getView().getTitle()).equalsIgnoreCase(gui.getTitle())) {
+
             event.setCancelled(true);
-            //5 player head
 
             ItemStack itemStack = event.getCurrentItem();
-
 
             switch (itemStack.getType()) {
                 case RED_CONCRETE -> {
                     gui.getTarget().ban(gui.getReason(), new Date(gui.getTime()), "null");
                 }
                 case BARRIER -> {
-
                     gui.getHolder().closeInventory();
                 }
                 case BOOK -> {
@@ -65,7 +73,6 @@ public class InventoryClick implements Listener {
                     gui.getHolder().openInventory(gui.getTimeGUI().getInventory());
                 }
                 case PAPER -> {
-
                     gui.setReasonGUI( new GUI("Reason", InventoryType.ANVIL, gui.getHolder()));
                     gui.getReasonGUI().addItem(new ItemUtil(Material.PAPER).withTitle("No reason").build(), 0);
                     gui.getHolder().openInventory(gui.getReasonGUI().getInventory());

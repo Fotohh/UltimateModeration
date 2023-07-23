@@ -87,7 +87,7 @@ public class PlayerBanGUI extends GUI {
         super("Ban Menu", 9, player);
         this.plugin = plugin;
         this.target = target;
-        map.put(target.getUniqueId(), this);
+        map.put(player.getUniqueId(), this);
         addItems();
         player.openInventory(getInventory());
     }
