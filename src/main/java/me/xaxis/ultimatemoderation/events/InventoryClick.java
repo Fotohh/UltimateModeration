@@ -1,22 +1,16 @@
 package me.xaxis.ultimatemoderation.events;
 
 import me.xaxis.ultimatemoderation.UMP;
-import me.xaxis.ultimatemoderation.gui.GUI;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
-import me.xaxis.ultimatemoderation.utils.ItemUtil;
-import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.Date;
 
 public class InventoryClick implements Listener {
@@ -56,6 +50,7 @@ public class InventoryClick implements Listener {
                     gui.removeGUI();
                     if(gui.getTime() == null){
                         gui.getTarget().ban(gui.getReason(), (Date) null, player.getDisplayName());
+                        //get banned players from bukkit .add player then kick with custom message
                     }else {
                         gui.getTarget().ban(gui.getReason(), new Date(gui.getTime()), player.getDisplayName());
                     }

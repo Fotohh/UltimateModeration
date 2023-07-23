@@ -66,7 +66,7 @@ public class OnPlayerChat extends Utils implements Listener {
 
             return;
 
-        }
+        }else
         if (plugin.getMuteManager().getMutedPlayers().contains(event.getPlayer().getUniqueId())) {
 
             Player player = event.getPlayer();
@@ -82,7 +82,7 @@ public class OnPlayerChat extends Utils implements Listener {
 
             player.sendMessage(Utils.chat("&4You are currently muted! Time left: " + Utils.formatDate(mute.getTimestamp())));
 
-        }
+        }else
         if (PlayerBanGUI.getGUI(event.getPlayer().getUniqueId()) != null) {
             PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getPlayer().getUniqueId());
             if (gui.inSetReason) {
@@ -128,7 +128,6 @@ public class OnPlayerChat extends Utils implements Listener {
                 event.setCancelled(true);
 
             } else if (gui.inExtraNotes) {
-
                 String renameText = event.getMessage();
 
                 gui.setExtraNotes(renameText);
