@@ -17,8 +17,9 @@ public class PlayerBanGUI extends GUI {
     public static PlayerBanGUI getGUI(UUID uuid){
         return map.get(uuid);
     }
-    public static void removeGUI(UUID uuid){
-        map.remove(uuid);
+
+    public void removeGUI(){
+        map.remove(getHolder().getUniqueId());
     }
 
     private final UMP plugin;

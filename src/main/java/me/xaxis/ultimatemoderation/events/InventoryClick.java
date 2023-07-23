@@ -33,21 +33,13 @@ public class InventoryClick implements Listener {
 
         if (i == null || i.isEmpty()) return;
 
-        PlayerBanGUI gui = PlayerBanGUI.getGUI(UUID.fromString(i.getItem(5).getItemMeta().getLore().get(0)));
-
-        plugin.getLogger().info("1");
+        PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getWhoClicked().getUniqueId());
 
         if(gui == null) return;
 
-        plugin.getLogger().info("1");
-
         if(!event.getWhoClicked().getUniqueId().equals(gui.getHolder().getUniqueId())) return;
 
-        plugin.getLogger().info("1");
-
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-
-        plugin.getLogger().info("1");
 
         if (ChatColor.stripColor(event.getView().getTitle()).equalsIgnoreCase(gui.getTitle())) {
 
@@ -57,6 +49,7 @@ public class InventoryClick implements Listener {
 
             switch (itemStack.getType()) {
                 case RED_CONCRETE -> {
+                    gui.removeGUI();
                     gui.getTarget().ban(gui.getReason(), new Date(gui.getTime()), "null");
                 }
                 case BARRIER -> {
