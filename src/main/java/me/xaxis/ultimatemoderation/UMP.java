@@ -1,15 +1,19 @@
 package me.xaxis.ultimatemoderation;
 
 import me.xaxis.ultimatemoderation.chat.StaffChat;
+import me.xaxis.ultimatemoderation.commands.SpyCommand;
 import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
-import me.xaxis.ultimatemoderation.events.UMPListener;
 import me.xaxis.ultimatemoderation.file.LangYML;
 import me.xaxis.ultimatemoderation.mute.MuteManager;
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.spy.SpyManager;
 import me.xaxis.ultimatemoderation.updatechecker.UpdateChecker;
 import me.xaxis.ultimatemoderation.utils.PlayerRollbackManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -34,7 +38,9 @@ public class UMP extends JavaPlugin {
         return muteManager;
     }
 
-    private final ArrayList<UMPListener> listeners = new ArrayList<>();
+    private Metrics metrics;
+
+    private final ArrayList<Listener> listeners = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -46,6 +52,7 @@ public class UMP extends JavaPlugin {
         staffChat = new StaffChat(this);
 
         commands.put(new StaffChatCommand(this), "staffchat");
+        commands.put(new SpyCommand(this), "spy");
 
         listeners.add(new OnPlayerChat(this));
 
@@ -61,9 +68,18 @@ public class UMP extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        metrics = new Metrics(this, 19198);
 
         new UpdateChecker(this);
 
+        loadPlayerData();
+
+    }
+
+    public void loadPlayerData(){
+        for(Player player : getServer().getOnlinePlayers()){
+            new PlayerProfile(player, this);
+        }
     }
 
     public SpyManager getSpyManager() {
@@ -77,14 +93,7 @@ public class UMP extends JavaPlugin {
     }
 
     private void registerListeners(){
-        for(UMPListener listener : listeners){
-            if(listener.isDependent()){
-                String dependency = listener.getDependentPlugin();
-                if(getServer().getPluginManager().getPlugin(dependency) == null){
-                    getLogger().severe("Unable to find required dependency: " + dependency);
-                    continue;
-                }
-            }
+        for(Listener listener : listeners){
             getServer().getPluginManager().registerEvents(listener, this);
         }
     }
@@ -96,6 +105,7 @@ public class UMP extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        metrics.shutdown();
     }
 
     public PlayerRollbackManager getRollbackManager() {

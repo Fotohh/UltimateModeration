@@ -28,6 +28,8 @@ public class YMLFile extends File {
     public YMLFile(UMP main, String fileName) throws IOException {
         super(main.getDataFolder(), fileName + ".yml");
 
+        if(!main.getDataFolder().exists()) main.getDataFolder().mkdirs();
+
         if (!exists()) createNewFile();
 
         this.configuration = YamlConfiguration.loadConfiguration(this);

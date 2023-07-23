@@ -17,24 +17,34 @@ public class MuteManager extends YMLFile {
 
     public MuteManager(UMP plugin) throws IOException {
 
-        super(plugin, "Mutes.yml");
+        super(plugin, "Mutes");
 
         this.plugin = plugin;
 
-        section = getConfiguration().getConfigurationSection("muted_players");
+        boolean created = false;
 
-        for(String s : section.getKeys(false)){
-            if(!section.isConfigurationSection(s)) {
-                section.set(s, null);
-            }
-            ConfigurationSection ps = section.getConfigurationSection(s);
-            if(System.currentTimeMillis() >= ps.getLong("timestamp")){
-                section.set(s, null);
-                continue;
-            }
-            mutedPlayers.add(UUID.fromString(ps.getString("muted")));
+        if(getConfiguration().getConfigurationSection("muted_players") == null) {
+            getConfiguration().createSection("muted_players");
+            created = true;
         }
 
+        section = getConfiguration().getConfigurationSection("muted_players");
+
+        if(!created) {
+            for (String s : section.getKeys(false)) {
+                if (!section.isConfigurationSection(s)) {
+                    section.set(s, null);
+                    continue;
+                }
+                ConfigurationSection ps = section.getConfigurationSection(s);
+                if (ps == null) continue;
+                if (System.currentTimeMillis() >= ps.getLong("timestamp")) {
+                    section.set(s, null);
+                    continue;
+                }
+                mutedPlayers.add(UUID.fromString(s));
+            }
+        }
     }
 
     public void removeMutedPlayer(UUID muted){

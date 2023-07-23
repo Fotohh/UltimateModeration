@@ -1,6 +1,6 @@
 name: UltimateModerationPlus
-main: me.xaxis.ultimatemoderation.UltimateModeration
-version: 0.0.1
+main: me.xaxis.ultimatemoderation.UMP
+version: 0.1
 api-version: 1.20
 commands:
   spy:

@@ -12,20 +12,20 @@ public class PlayerProfile extends PlayerProfileYML {
 
     private static final HashMap<UUID, PlayerProfile> map = new HashMap<>();
 
-    public static boolean containsPlayer(Player player){
-        return map.containsKey(player.getUniqueId());
+    public static boolean containsPlayer(UUID playerUUID){
+        return map.containsKey(playerUUID);
     }
 
-    public static void addPlayerProfile(Player player, PlayerProfile profile){
-        map.put(player.getUniqueId(), profile);
+    public static void addPlayerProfile(UUID playerUUID, PlayerProfile profile){
+        map.putIfAbsent(playerUUID, profile);
     }
 
-    public static PlayerProfile getPlayerProfile(Player player){
-        return map.get(player.getUniqueId());
+    public static PlayerProfile getPlayerProfile(UUID playerUUID){
+        return map.get(playerUUID);
     }
 
-    public static void removePlayerProfile(Player player){
-        map.remove(player.getUniqueId());
+    public static void removePlayerProfile(UUID playerUUID){
+        map.remove(playerUUID);
     }
 
     private final UMP plugin;
@@ -36,7 +36,7 @@ public class PlayerProfile extends PlayerProfileYML {
         super(plugin.getDataFolder() + "/player_data", player.getUniqueId().toString(), plugin, player);
         this.plugin = plugin;
         this.player = getPlayer(Defaults.PLAYER_UUID.getPath());
-        PlayerProfile.addPlayerProfile(player, this);
+        PlayerProfile.addPlayerProfile(player.getUniqueId(), this);
     }
 
     public boolean isMuted(){
@@ -75,8 +75,11 @@ public class PlayerProfile extends PlayerProfileYML {
     }
 
     public void deleteProfile(){
-        delete();
-        PlayerProfile.removePlayerProfile(player);
+        if(delete()){
+            PlayerProfile.removePlayerProfile(player.getUniqueId());
+        }else{
+            plugin.getLogger().severe("Unable to delete player profile! UUID: " + player.getUniqueId() + ", File Path: " + getPath());
+        }
     }
 
 }

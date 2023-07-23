@@ -1,11 +1,14 @@
 package me.xaxis.ultimatemoderation.type;
 
 import me.xaxis.ultimatemoderation.UMP;
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-public class Mute {
+public class Mute{
 
     private final UMP plugin;
 
@@ -13,7 +16,7 @@ public class Mute {
 
     public Mute(UMP plugin, String reason, long timestamp, UUID muted, UUID muter) {
         this.plugin = plugin;
-        section = plugin.getMuteManager().getSection().createSection(muted.toString());
+        section = PlayerProfile.getPlayerProfile(muted).getConfiguration().createSection(UUID.randomUUID().toString());
         section.set("reason", reason);
         section.set("timestamp", timestamp);
         section.set("muted", muted.toString());
@@ -33,6 +36,14 @@ public class Mute {
 
     public String getReason() {
         return section.getString("reason");
+    }
+
+    public void setDateOfInfraction(){
+        section.set("date_of_infraction", LocalDateTime.now().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+    }
+
+    public String getDateOfInfraction(){
+        return section.getString("date_of_infraction");
     }
 
     public void setTimestamp(long timestamp) {

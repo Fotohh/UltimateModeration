@@ -8,11 +8,12 @@ import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.UUID;
 
-public class OnPlayerChat extends Utils implements UMPListener {
+public class OnPlayerChat extends Utils implements Listener {
 
     private final UMP plugin;
 
@@ -34,6 +35,8 @@ public class OnPlayerChat extends Utils implements UMPListener {
 
                 String msg = Utils.chat(plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + event.getMessage());
 
+                plugin.getStaffChat().add(player);
+
                 for (UUID playerUUID : plugin.getStaffChat().getPlayers()) {
 
                     Player target = Bukkit.getPlayer(playerUUID);
@@ -43,8 +46,6 @@ public class OnPlayerChat extends Utils implements UMPListener {
                     target.sendMessage(msg);
 
                 }
-
-                plugin.getStaffChat().add(player);
 
                 message(player, Lang.STAFF_CHAT_TOGGLED);
 
@@ -75,16 +76,6 @@ public class OnPlayerChat extends Utils implements UMPListener {
             player.sendMessage(Utils.chat("&4You are currently muted! Time left: " + Utils.formatDate(mute.getTimestamp()) ));
 
         }
-    }
-
-    @Override
-    public boolean isDependent() {
-        return false;
-    }
-
-    @Override
-    public String getDependentPlugin(){
-        return null;
     }
 
 }

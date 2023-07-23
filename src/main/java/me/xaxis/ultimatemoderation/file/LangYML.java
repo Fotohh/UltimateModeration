@@ -19,6 +19,8 @@ public class LangYML extends File {
     public LangYML(@NotNull File path, UMP plugin) {
         super(path, "Lang.yml");
 
+        if(!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdirs();
+
         this.plugin = plugin;
 
         if(!exists()){
