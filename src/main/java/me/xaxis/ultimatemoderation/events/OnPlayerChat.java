@@ -29,13 +29,13 @@ public class OnPlayerChat extends Utils implements Listener {
 
             Player player = event.getPlayer();
 
-            if (event.getMessage().startsWith("*") && !plugin.getStaffChat().contains(player)) {
+            if (event.getMessage().startsWith("*")) {
 
                 event.setCancelled(true);
 
-                String msg = Utils.chat(plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + event.getMessage());
-
-                plugin.getStaffChat().add(player);
+                String msg = Utils.chat(plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + "&7"+player.getDisplayName()+":&b" + event.getMessage()).replace("*", "");
+                if(!plugin.getStaffChat().contains(player))
+                    plugin.getStaffChat().add(player);
 
                 for (UUID playerUUID : plugin.getStaffChat().getPlayers()) {
 

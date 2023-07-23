@@ -115,8 +115,9 @@ public class Utils {
         player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().clear();
         player.setCanPickupItems(false);
-        player.setFlying(true);
         player.setAllowFlight(true);
+        if(!player.isFlying())
+            player.setFlying(true);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
             if(target.hasPermission(Permissions.VANISH_BYPASS.s()) || !target.canSee(player)) continue;
             target.hidePlayer(main, player);

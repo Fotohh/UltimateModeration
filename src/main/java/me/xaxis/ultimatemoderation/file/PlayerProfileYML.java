@@ -82,7 +82,7 @@ public class PlayerProfileYML extends File {
 
         checkDefaults();
 
-        getConfiguration().set(Defaults.PLAYER_UUID.getPath(), player.getUniqueId());
+        getConfiguration().set(Defaults.PLAYER_UUID.getPath(), player.getUniqueId().toString());
         getConfiguration().set(Defaults.PLAYER_NAME.getPath(), player.getName());
         getConfiguration().set(Defaults.PLAYER_DISPLAY_NAME.getPath(), player.getDisplayName());
 
@@ -132,7 +132,6 @@ public class PlayerProfileYML extends File {
      * @return The player or else null if the {@link String path} or UUID is invalid.
      */
     public Player getPlayer(@NotNull String path){
-
         return Bukkit.getPlayer(UUID.fromString(getConfiguration().getString(path)));
     }
 

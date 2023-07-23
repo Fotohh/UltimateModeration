@@ -31,12 +31,12 @@ public class SpyCommand extends Utils implements CommandExecutor {
                 return true;
             }
 
-            if(args.length != 2){
+            if(args.length != 1){
                 //message INCORRECT USAGE /HELP
                 return true;
             }
 
-            Player target = Bukkit.getPlayer(args[1]);
+            Player target = Bukkit.getPlayer(args[0]);
 
             if(target == null || !target.isOnline()) return true;
 
