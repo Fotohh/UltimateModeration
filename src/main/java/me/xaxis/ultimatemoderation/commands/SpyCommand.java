@@ -46,7 +46,7 @@ public class SpyCommand extends Utils implements CommandExecutor {
                 player.getInventory().setContents(main.getSpyManager().getDefaultContents());
             }
             player.teleport(target.getLocation());
-            message(player, "You are now spying on "+target.getDisplayName());
+            //spy message
 
         }else{
             //message SENDER NOT PLAYER

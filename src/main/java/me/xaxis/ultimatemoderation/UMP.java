@@ -1,7 +1,5 @@
 package me.xaxis.ultimatemoderation;
 
-import com.github.fotohh.GeneralSpigotHelperAPI;
-import com.github.fotohh.gui.GUIManager;
 import me.xaxis.ultimatemoderation.chat.StaffChat;
 import me.xaxis.ultimatemoderation.commands.SpyCommand;
 import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
@@ -55,7 +53,7 @@ public class UMP extends JavaPlugin {
 
         langYML = new LangYML(getDataFolder(), this);
 
-        staffChat = new StaffChat(this);
+        staffChat = new StaffChat();
 
         commands = new HashMap[]{
                 load(new StaffChatCommand(this), "staffchat"),

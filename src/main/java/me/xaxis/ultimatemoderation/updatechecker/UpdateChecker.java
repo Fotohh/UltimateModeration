@@ -19,8 +19,8 @@ public class UpdateChecker {
 
     private static final String SPIGET_API_URL = "https://api.spiget.org/v2/resources/%d/versions?size=1&sort=-releaseDate";
 
+    //from spigot page
     private static final String RESOURCE_LINK = "";
-
 
     public UpdateChecker(UMP ump) {
 

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class YMLFile extends File {
 
-    private final FileConfiguration configuration;
+    private final YamlConfiguration configuration;
 
     /**
      * Constructs a new YMLFile object representing a YAML file.

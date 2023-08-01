@@ -34,6 +34,7 @@ public class StaffChatCommand extends Utils implements CommandExecutor {
                         message(player,Lang.STAFF_CHAT_TOGGLED);
                     }
                 }else{
+
                     StringBuilder sb = new StringBuilder();
                     for (String arg : args) {
                         sb.append(arg).append(" ");
