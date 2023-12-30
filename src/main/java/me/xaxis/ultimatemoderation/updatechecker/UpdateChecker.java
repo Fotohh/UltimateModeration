@@ -9,6 +9,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 
 public class UpdateChecker {
@@ -79,7 +80,7 @@ public class UpdateChecker {
 
         try {
 
-            url = new URL(apiURL);
+            url = URI.create(apiURL).toURL();
 
             connection = (HttpsURLConnection) url.openConnection();
 

@@ -2,34 +2,13 @@ package me.xaxis.ultimatemoderation.type;
 
 import java.util.UUID;
 
-public class Kick implements Infraction{
-    @Override
-    public String getDateOfInfraction() {
-        return null;
+public class Kick extends Infraction {
+    public Kick(String reason, UUID punisher, UUID punished, long date) {
+        super(reason, punisher, punished, date);
     }
 
     @Override
-    public void setDateOfInfraction() {
-
-    }
-
-    @Override
-    public String getReason() {
-        return null;
-    }
-
-    @Override
-    public UUID getPunisher() {
-        return null;
-    }
-
-    @Override
-    public UUID getPunished() {
-        return null;
-    }
-
-    @Override
-    public InfractionType getInfractionType() {
+    InfractionType getInfractionType() {
         return null;
     }
 }
