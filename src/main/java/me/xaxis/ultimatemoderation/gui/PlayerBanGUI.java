@@ -60,9 +60,9 @@ public class PlayerBanGUI extends GUI {
         return extraNotes;
     }
 
-    public boolean inSetReason = true;
-    public boolean inExtraNotes = true;
-    public boolean inTimeSet = true;
+    public boolean inSetReason = false;
+    public boolean inExtraNotes = false;
+    public boolean inTimeSet = false;
 
     public void setExtraNotes(String extraNotes) {
         this.extraNotes = extraNotes;

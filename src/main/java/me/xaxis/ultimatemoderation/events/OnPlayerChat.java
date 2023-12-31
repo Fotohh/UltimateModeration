@@ -64,8 +64,6 @@ public class OnPlayerChat extends Utils implements Listener {
 
             }
 
-            return;
-
         }else
         if (plugin.getMuteManager().getMutedPlayers().contains(event.getPlayer().getUniqueId())) {
 

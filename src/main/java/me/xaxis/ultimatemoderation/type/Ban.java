@@ -3,8 +3,8 @@ package me.xaxis.ultimatemoderation.type;
 import java.util.UUID;
 
 public class Ban extends Infraction {
-    public Ban(String reason, UUID punisher, UUID punished, long date) {
-        super(reason, punisher, punished, date);
+    public Ban(String reason, UUID punisher, UUID punished) {
+        super(reason, punisher, punished);
     }
 
     @Override

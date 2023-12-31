@@ -30,8 +30,10 @@ public class StaffChatCommand extends Utils implements CommandExecutor {
                 if(args.length == 0){
                     if(plugin.getStaffChat().contains(player)){
                         message(player,Lang.STAFF_CHAT_UNTOGGLED);
+                        plugin.getStaffChat().remove(player);
                     }else{
                         message(player,Lang.STAFF_CHAT_TOGGLED);
+                        plugin.getStaffChat().add(player);
                     }
                 }else{
 
