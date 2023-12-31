@@ -10,6 +10,6 @@ public class Warning extends Infraction {
 
     @Override
     InfractionType getInfractionType() {
-        return null;
+        return InfractionType.WARNING;
     }
 }
