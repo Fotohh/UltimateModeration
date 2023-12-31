@@ -7,10 +7,6 @@ import java.util.UUID;
 
 public abstract class Infraction {
 
-    private final String reason;
-    private final UUID punisher;
-    private final UUID punished;
-    private final long date;
     private final ConfigurationSection section;
     private final UUID infractionUUID;
 
@@ -22,34 +18,29 @@ public abstract class Infraction {
         return section;
     }
 
-    public Infraction(String reason, UUID punisher, UUID punished, long date) {
+    public Infraction(String reason, UUID punisher, UUID punished) {
         this.infractionUUID = UUID.randomUUID();
         this.section = PlayerProfile.getPlayerProfile(punished).getConfiguration().createSection(this.infractionUUID.toString());
-        this.reason = reason;
-        this.punisher = punisher;
-        this.punished = punished;
-        this.date = date;
-
-    }
-
-    public long getDateOfInfraction(){
-        return date;
+        section.set("reason", reason);
+        section.set("punisher", punisher);
+        section.set("punished", punished);
+        section.set("date", System.currentTimeMillis());
     }
 
     public String getReason() {
-        return reason;
+        return section.getString("reason");
     }
 
     public long getDate() {
-        return date;
+        return section.getLong("date");
     }
 
     public UUID getPunished() {
-        return punished;
+        return UUID.fromString(section.getString("punished"));
     }
 
     public UUID getPunisher() {
-        return punisher;
+        return UUID.fromString(section.getString("punisher"));
     }
 
     abstract InfractionType getInfractionType();
