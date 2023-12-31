@@ -14,8 +14,8 @@ public class Mute{
 
     private final ConfigurationSection section;
 
-    public Mute(UMP plugin, String reason, long timestamp, UUID muted, UUID muter) {
-        this.plugin = plugin;
+    public Mute(String reason, long timestamp, UUID muted, UUID muter) {
+        this.plugin = UMP.instance;
         section = PlayerProfile.getPlayerProfile(muted).getConfiguration().createSection(UUID.randomUUID().toString());
         section.set("reason", reason);
         section.set("timestamp", timestamp);

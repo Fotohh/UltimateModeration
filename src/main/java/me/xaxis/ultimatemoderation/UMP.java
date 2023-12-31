@@ -25,6 +25,8 @@ import java.util.Map;
 
 public class UMP extends JavaPlugin {
 
+    public static UMP instance;
+
     private LangYML langYML;
 
     private SpyManager spyManager;
@@ -48,6 +50,8 @@ public class UMP extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        UMP.instance = this;
 
         rollbackManager = new PlayerRollbackManager();
 
