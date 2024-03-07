@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class Kick extends Infraction {
     public Kick(String reason, UUID punisher, UUID punished) {
-        super(reason, punisher, punished);
+        super(reason, punisher, punished, 0);
     }
 
     @Override

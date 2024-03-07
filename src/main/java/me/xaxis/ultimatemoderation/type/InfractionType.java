@@ -8,7 +8,6 @@ public enum InfractionType {
     PERM_BAN,
     KICK,
     WARNING,
-    ;
 
 
 }
