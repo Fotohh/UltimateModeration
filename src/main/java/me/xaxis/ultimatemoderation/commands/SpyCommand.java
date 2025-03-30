@@ -32,21 +32,27 @@ public class SpyCommand extends Utils implements CommandExecutor {
             }
 
             if(args.length != 1){
-                //message INCORRECT USAGE /HELP
+                player.sendMessage(chat("&c&lIncorrect command usage! /spy <username>"));
                 return true;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
 
-            if(target == null || !target.isOnline()) return true;
+            if(target == null || !target.isOnline()) {
+                player.sendMessage(chat("&c&lThat player is either offline or does not exist!"));
+                return true;
+            }
 
             if (!main.getSpyManager().containsPlayer(player)) {
                 main.getSpyManager().addPlayer(player, target, new PlayerRollbackManager().save(player));
                 vanishPlayer(player, false);
                 player.getInventory().setContents(main.getSpyManager().getDefaultContents());
+            }else{
+                player.sendMessage(chat("&c&lYou are already spying on someone!"));
+                return true;
             }
             player.teleport(target.getLocation());
-            //spy message
+            player.sendMessage(chat("&aYou are now spying on " + target.getName()));
 
         }else{
             //message SENDER NOT PLAYER

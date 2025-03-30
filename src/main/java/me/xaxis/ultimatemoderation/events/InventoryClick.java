@@ -2,6 +2,9 @@ package me.xaxis.ultimatemoderation.events;
 
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
+import me.xaxis.ultimatemoderation.type.Ban;
+import me.xaxis.ultimatemoderation.type.InfractionType;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,23 +26,19 @@ public class InventoryClick implements Listener {
     @EventHandler
     public void onPlayerClick(InventoryClickEvent event) {
 
-        if(!(event.getWhoClicked() instanceof Player)) return;
+        if(!(event.getWhoClicked() instanceof Player player)) return;
 
         Inventory i = event.getClickedInventory();
 
         if (i == null || i.isEmpty()) return;
 
-        PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getWhoClicked().getUniqueId());
+        PlayerBanGUI gui = PlayerBanGUI.getGUI(player.getUniqueId());
 
         if(gui == null) return;
-
-        if(!event.getWhoClicked().getUniqueId().equals(gui.getHolder().getUniqueId())) return;
 
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
 
         if (ChatColor.stripColor(event.getView().getTitle()).equalsIgnoreCase(gui.getTitle())) {
-
-            Player player = (Player) event.getWhoClicked();
 
             event.setCancelled(true);
 
@@ -48,29 +47,39 @@ public class InventoryClick implements Listener {
             switch (itemStack.getType()) {
                 case RED_CONCRETE -> {
                     gui.removeGUI();
-                    if(gui.getTime() == null){
-                        gui.getTarget().ban(gui.getReason(), (Date) null, player.getDisplayName());
-                        //get banned players from bukkit .add player then kick with custom message
-                    }else {
-                        gui.getTarget().ban(gui.getReason(), new Date(gui.getTime()), player.getDisplayName());
-                    }
+                    PlayerProfile prof = PlayerProfile.getPlayerProfile(gui.getTarget().getUniqueId());
+                    new Ban(gui.getReason(), player.getUniqueId(), gui.getTarget().getUniqueId(),
+                            gui.getTime(), gui.isIpBan());
+                    InfractionType type;
+                    if(gui.getTime() == -1) type = InfractionType.PERM_BAN; else type = InfractionType.TEMP_BAN;
+                    if(gui.isIpBan()) type = InfractionType.IP_BAN;
+                    prof.addInfraction(type);
                 }
-                case BARRIER -> gui.getHolder().closeInventory();
+                case BARRIER -> player.closeInventory();
                 case BOOK -> {
-                    gui.getHolder().closeInventory();
+                    player.closeInventory();
                     gui.inExtraNotes = true;
                     player.sendMessage("Enter extra notes here or enter in \"null\" to continue!");
                 }
                 case COMPASS -> {
-                    gui.getHolder().closeInventory();
+                    player.closeInventory();
                     gui.inTimeSet = true;
-                    player.sendMessage("Enter time here or enter in \"null\" to continue! \nFormat: years/months/weeks/days/hours/minutes/seconds");
+                    player.sendMessage("Enter time here or enter in \"null\" to continue! \nFormat y/m/w/d/h/m/s");
                 }
                 case PAPER -> {
-                    gui.getHolder().closeInventory();
+                    player.closeInventory();
                     gui.inSetReason = true;
                     player.sendMessage("Enter reason here or enter in \"null\" to continue!");
                 }
+                case BLACK_CONCRETE -> {
+                    gui.setIpBan(!gui.isIpBan());
+                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanDisabled());
+                }
+                case GREEN_CONCRETE -> {
+                    gui.setIpBan(!gui.isIpBan());
+                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanEnabled());
+                }
+
             }
 
         }

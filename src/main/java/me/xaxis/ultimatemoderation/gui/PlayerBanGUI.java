@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.gui;
 
+import com.github.fotohh.itemutil.ItemBuilder;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.utils.ItemUtil;
 import org.bukkit.Material;
@@ -77,6 +78,30 @@ public class PlayerBanGUI extends GUI {
         player.openInventory(getInventory());
     }
 
+    private boolean ipBan = false;
+
+    public void setIpBan(boolean ipBan) {
+        this.ipBan = ipBan;
+    }
+
+    public boolean isIpBan() {
+        return ipBan;
+    }
+
+    public ItemStack getIpBanEnabled() {
+        return ipBanEnabled;
+    }
+
+    private final ItemStack ipBanEnabled = new ItemBuilder(Material.BLACK_CONCRETE)
+            .withTitle("&7IP Ban &aEnabled")
+            .build();
+    private final ItemStack ipBanDisabled = new ItemBuilder(Material.BLACK_CONCRETE)
+            .withTitle("&7IP Ban &cDisabled")
+            .build();
+
+    public ItemStack getIpBanDisabled() {
+        return ipBanDisabled;
+    }
 
     private void addItems(){
         ItemUtil barrier = new ItemUtil(Material.BARRIER);
@@ -99,6 +124,7 @@ public class PlayerBanGUI extends GUI {
         getInventory().setItem(0, barrier);
         getInventory().setItem(1, b);
         getInventory().setItem(3, c);
+        getInventory().setItem(4, ipBanEnabled);
         getInventory().setItem(5, h);
         getInventory().setItem(7, p);
         getInventory().setItem(8, rc);
@@ -113,7 +139,7 @@ public class PlayerBanGUI extends GUI {
 
     }
 
-    private Long time = null;
+    private long time = -1;
 
     private String reason = "No reason";
 

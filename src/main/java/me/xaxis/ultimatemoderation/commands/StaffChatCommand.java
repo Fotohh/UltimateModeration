@@ -31,18 +31,15 @@ public class StaffChatCommand extends Utils implements CommandExecutor {
                     if(plugin.getStaffChat().contains(player)){
                         message(player,Lang.STAFF_CHAT_UNTOGGLED);
                         plugin.getStaffChat().remove(player);
-                    }else{
-                        message(player,Lang.STAFF_CHAT_TOGGLED);
-                        plugin.getStaffChat().add(player);
                     }
                 }else{
-
+                    if(!plugin.getStaffChat().contains(player)) plugin.getStaffChat().add(player);
                     StringBuilder sb = new StringBuilder();
                     for (String arg : args) {
                         sb.append(arg).append(" ");
                     }
 
-                    sb.insert(0,plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX));
+                    sb.insert(0,plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + "&7" + player.getDisplayName() + ":&b ");
 
                     String msg = chat(sb.toString());
 

@@ -64,7 +64,9 @@ public class OnPlayerChat extends Utils implements Listener {
 
             }
 
-        }else
+            return;
+
+        }
         if (plugin.getMuteManager().getMutedPlayers().contains(event.getPlayer().getUniqueId())) {
 
             Player player = event.getPlayer();
@@ -79,8 +81,8 @@ public class OnPlayerChat extends Utils implements Listener {
             event.setCancelled(true);
 
             player.sendMessage(Utils.chat("&4You are currently muted! Time left: " + Utils.formatDate(mute.getTimestamp())));
-
-        }else
+            return;
+        }
         if (PlayerBanGUI.getGUI(event.getPlayer().getUniqueId()) != null) {
             PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getPlayer().getUniqueId());
             if (gui.inSetReason) {
@@ -106,7 +108,7 @@ public class OnPlayerChat extends Utils implements Listener {
                     try {
                         values = Arrays.stream(renameText.split("/")).mapToLong(Long::parseLong).toArray();
                     }catch (Exception e){
-                        event.getPlayer().sendMessage("Incorrect formatted! y/m/w/d/h/m/s | Or enter \"null\" to continue!");
+                        event.getPlayer().sendMessage("Incorrectly formatted! y/m/w/d/h/m/s | Or enter \"null\" to continue!");
                         return;
                     }
                     //0 y 1 m 2 w 3 d 4 h 5 m 6 s

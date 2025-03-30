@@ -2,6 +2,7 @@ package me.xaxis.ultimatemoderation.player;
 
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.file.PlayerProfileYML;
+import me.xaxis.ultimatemoderation.type.Infraction;
 import me.xaxis.ultimatemoderation.type.InfractionType;
 import org.bukkit.entity.Player;
 
@@ -54,6 +55,10 @@ public class PlayerProfile extends PlayerProfileYML {
             case WARNING -> set(Defaults.NUM_OF_WARNINGS, getInt(Defaults.NUM_OF_WARNINGS) + 1);
             case IP_BAN,PERM_BAN,TEMP_BAN -> set(Defaults.NUM_OF_BANS, getInt(Defaults.NUM_OF_BANS) + 1);
         }
+    }
+
+    public void addInfraction(Infraction infraction) {
+
     }
 
     public void setInfractionAmount(InfractionType type, int amount){

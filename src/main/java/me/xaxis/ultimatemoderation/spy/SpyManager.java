@@ -61,7 +61,7 @@ public class SpyManager extends Utils implements Listener{
 
         Player player = event.getPlayer();
 
-        if(!spyHashMap.containsKey(player.getUniqueId()) && !containsPlayer(player)) return;
+        if(!spyHashMap.containsKey(player.getUniqueId())) return;
 
         if(event.getItem() == null || event.getItem().getType() == Material.AIR) return;
 
