@@ -1,7 +1,6 @@
 package me.xaxis.ultimatemoderation.gui;
 
 import com.github.fotohh.itemutil.ItemBuilder;
-import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.utils.ItemUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,8 +21,6 @@ public class PlayerBanGUI extends GUI {
     public void removeGUI(){
         map.remove(getHolder().getUniqueId());
     }
-
-    private final UMP plugin;
 
     private final Player target;
 
@@ -69,9 +66,8 @@ public class PlayerBanGUI extends GUI {
         this.extraNotes = extraNotes;
     }
 
-    public PlayerBanGUI(Player player, Player target, UMP plugin) {
+    public PlayerBanGUI(Player player, Player target) {
         super("Ban Menu", 9, player);
-        this.plugin = plugin;
         this.target = target;
         map.put(player.getUniqueId(), this);
         addItems();

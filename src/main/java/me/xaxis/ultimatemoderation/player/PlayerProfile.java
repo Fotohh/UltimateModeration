@@ -4,6 +4,7 @@ import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.file.PlayerProfileYML;
 import me.xaxis.ultimatemoderation.type.Infraction;
 import me.xaxis.ultimatemoderation.type.InfractionType;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -40,12 +41,22 @@ public class PlayerProfile extends PlayerProfileYML {
         PlayerProfile.addPlayerProfile(player.getUniqueId(), this);
     }
 
+    public static void saveAll() {
+        for (PlayerProfile profile : map.values()) {
+            profile.save();
+        }
+    }
+
     public boolean isMuted(){
         return getBoolean(Defaults.IS_MUTED);
     }
 
     public boolean isBanned(){
         return getBoolean(Defaults.IS_BANNED);
+    }
+
+    public void setLastJoinDate(long date){
+        set(Defaults.LAST_JOIN_DATE, date);
     }
 
     public void addInfraction(InfractionType type){
@@ -55,10 +66,6 @@ public class PlayerProfile extends PlayerProfileYML {
             case WARNING -> set(Defaults.NUM_OF_WARNINGS, getInt(Defaults.NUM_OF_WARNINGS) + 1);
             case IP_BAN,PERM_BAN,TEMP_BAN -> set(Defaults.NUM_OF_BANS, getInt(Defaults.NUM_OF_BANS) + 1);
         }
-    }
-
-    public void addInfraction(Infraction infraction) {
-
     }
 
     public void setInfractionAmount(InfractionType type, int amount){
@@ -75,7 +82,7 @@ public class PlayerProfile extends PlayerProfileYML {
             case MUTE, TEMP_MUTE -> getInt(Defaults.NUM_OF_MUTES);
             case KICK -> getInt(Defaults.NUM_OF_KICKS);
             case WARNING -> getInt(Defaults.NUM_OF_WARNINGS);
-            case IP_BAN, PERM_BAN, TEMP_BAN -> getInt(Defaults.NUM_OF_BANS);
+            case IP_BAN, PERM_BAN, TEMP_BAN, BAN -> getInt(Defaults.NUM_OF_BANS);
         };
     }
 

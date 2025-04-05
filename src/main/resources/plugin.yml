@@ -11,3 +11,20 @@ commands:
     usage: /staffchat
     aliases:
       - sc
+  mute:
+    description: Mute a player
+    usage: /mute <player_name>
+  unmute:
+      description: Unmute a player
+      usage: /unmute <player_name>
+  kick:
+      description: Kick a player
+      usage: /kick <player_name> <reason>
+  warn:
+      description: Warn a player
+      usage: /warn <player_name> <reason>
+  settings:
+    description: adjust settings
+  tempmute:
+    description: Temporarily mute a player
+    usage: /tempmute <player_name> <duration> <reason>

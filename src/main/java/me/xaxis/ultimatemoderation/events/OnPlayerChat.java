@@ -4,20 +4,14 @@ import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
-import me.xaxis.ultimatemoderation.spy.PlayerSpy;
-import me.xaxis.ultimatemoderation.spy.SpyManager;
 import me.xaxis.ultimatemoderation.type.Mute;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 public class OnPlayerChat extends Utils implements Listener {
@@ -31,46 +25,97 @@ public class OnPlayerChat extends Utils implements Listener {
 
     @EventHandler
     public void playerChat(AsyncPlayerChatEvent event) {
-
         if (hasPermission(event.getPlayer(), Permissions.STAFF_CHAT)) {
-
             Player player = event.getPlayer();
-
             if (event.getMessage().startsWith("*")) {
-
                 event.setCancelled(true);
-
                 String msg = Utils.chat(plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + "&7" + player.getDisplayName() + ":&b" + event.getMessage()).replace("*", "");
-                if (!plugin.getStaffChat().contains(player))
-                    plugin.getStaffChat().add(player);
-
-                for (UUID playerUUID : plugin.getStaffChat().getPlayers()) {
-
-                    Player target = Bukkit.getPlayer(playerUUID);
-
-                    if (target == null || !target.isOnline()) continue;
-
-                    target.sendMessage(msg);
-
+                if (!plugin.getStaffChat().isInChat(player)) {
+                    plugin.getStaffChat().setInChat(player, true);
+                    message(player, Lang.STAFF_CHAT_TOGGLED);
                 }
 
-                message(player, Lang.STAFF_CHAT_TOGGLED);
-
-            } else if(!event.getMessage().startsWith("*") && plugin.getStaffChat().contains(player)) {
-
-                plugin.getStaffChat().remove(player);
-
-                message(player, Lang.STAFF_CHAT_UNTOGGLED);
-
+                for (UUID playerUUID : plugin.getStaffChat().getPlayers().keySet()) {
+                    if (!plugin.getStaffChat().chatIsVisible(player)) continue;
+                    Player target = Bukkit.getPlayer(playerUUID);
+                    if (target == null || !target.isOnline()) continue;
+                    target.sendMessage(msg);
+                }
+            } else if (!event.getMessage().startsWith("*") && plugin.getStaffChat().isInChat(player)) {
+                plugin.getStaffChat().setInChat(player, false);
             }
+        }
+    }
 
-            return;
+    @EventHandler
+    public void banGUI(AsyncPlayerChatEvent event) {
+        if (PlayerBanGUI.getGUI(event.getPlayer().getUniqueId()) == null) return;
+        PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getPlayer().getUniqueId());
+        String renameText = event.getMessage();
+        if (gui.inSetReason) {
+
+            gui.setReason(renameText);
+            event.getPlayer().sendMessage("Set reason to: " + gui.getReason());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> event.getPlayer().openInventory(gui.getInventory()), 1L);
+            gui.inSetReason = false;
+            event.setCancelled(true);
+
+        } else if (gui.inTimeSet) {
+            char currentTimeChar = '`';
+            long time = 0;
+
+            for (int i = 0; i < renameText.length(); i++) {
+                if (!Character.isDigit(renameText.charAt(i))) {
+                    currentTimeChar = renameText.charAt(i);
+                }
+            }
+            for (int i = 0; i < renameText.length(); i++) {
+                if (Character.isDigit(renameText.charAt(i))) {
+                    long digit = Long.parseLong(String.valueOf(renameText.charAt(i)));
+                    time = time * 10 + digit;
+                }
+            }
+            if (currentTimeChar == '`') {
+                event.getPlayer().sendMessage(Utils.chat("&cPlease enter a valid time!"));
+                return;
+            }
+            time = switch (currentTimeChar) {
+                case 's' -> Utils.fromSeconds(time);
+                case 'm' -> Utils.fromMinutes(time);
+                case 'h' -> Utils.fromHours(time);
+                case 'd' -> Utils.fromDays(time);
+                case 'w' -> Utils.fromWeeks(time);
+                case 'M' -> Utils.fromMonths(time);
+                case 'y' -> Utils.fromYears(time);
+                default -> {
+                    event.getPlayer().sendMessage(Utils.chat("&cPlease enter a valid time!"));
+                    yield -1;
+                }
+            };
+
+            gui.setTime(time);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> event.getPlayer().openInventory(gui.getInventory()), 1L);
+
+            event.getPlayer().sendMessage("Set time to: " + gui.getTime());
+
+            gui.inTimeSet = false;
+            event.setCancelled(true);
+        } else if (gui.inExtraNotes) {
+            gui.setExtraNotes(renameText);
+            event.getPlayer().sendMessage("Set extra notes to: " + gui.getExtraNotes());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> event.getPlayer().openInventory(gui.getInventory()), 1L);
+            gui.inExtraNotes = false;
+            event.setCancelled(true);
 
         }
+    }
+
+    @EventHandler
+    public void muteChat(AsyncPlayerChatEvent event) {
         if (plugin.getMuteManager().getMutedPlayers().contains(event.getPlayer().getUniqueId())) {
 
             Player player = event.getPlayer();
-
             Mute mute = new Mute(plugin, plugin.getMuteManager().getSection().getConfigurationSection(player.getUniqueId().toString()));
 
             if (System.currentTimeMillis() >= mute.getTimestamp()) {
@@ -79,65 +124,7 @@ public class OnPlayerChat extends Utils implements Listener {
             }
 
             event.setCancelled(true);
-
             player.sendMessage(Utils.chat("&4You are currently muted! Time left: " + Utils.formatDate(mute.getTimestamp())));
-            return;
-        }
-        if (PlayerBanGUI.getGUI(event.getPlayer().getUniqueId()) != null) {
-            PlayerBanGUI gui = PlayerBanGUI.getGUI(event.getPlayer().getUniqueId());
-            if (gui.inSetReason) {
-
-                String renameText = event.getMessage();
-
-                gui.setReason(renameText);
-
-                event.getPlayer().openInventory(gui.getInventory());
-
-                gui.inSetReason = false;
-
-                event.setCancelled(true);
-
-            } else if (gui.inTimeSet) {
-
-                String renameText = event.getMessage();
-
-                if(!renameText.equalsIgnoreCase("null")) {
-
-                    long[] values;
-
-                    try {
-                        values = Arrays.stream(renameText.split("/")).mapToLong(Long::parseLong).toArray();
-                    }catch (Exception e){
-                        event.getPlayer().sendMessage("Incorrectly formatted! y/m/w/d/h/m/s | Or enter \"null\" to continue!");
-                        return;
-                    }
-                    //0 y 1 m 2 w 3 d 4 h 5 m 6 s
-                    if (values.length != 7) {
-                        event.getPlayer().sendMessage("Incorrect amount of arguments! y/m/w/d/h/m/s | Or enter \"null\" to continue!");
-                        return;
-                    }
-
-                    gui.setTime(Utils.fromYears(values[0]) + Utils.fromMonths(values[1]) + Utils.fromWeeks(values[2]) + Utils.fromDays(values[3]) + Utils.fromHours(values[4]) + Utils.fromMinutes(values[5]) + Utils.fromSeconds(values[6]));
-
-                }
-
-                event.getPlayer().openInventory(gui.getInventory());
-
-                gui.inTimeSet = false;
-
-                event.setCancelled(true);
-
-            } else if (gui.inExtraNotes) {
-                String renameText = event.getMessage();
-
-                gui.setExtraNotes(renameText);
-
-                event.getPlayer().openInventory(gui.getInventory());
-
-                gui.inExtraNotes = false;
-
-                event.setCancelled(true);
-            }
         }
     }
 }

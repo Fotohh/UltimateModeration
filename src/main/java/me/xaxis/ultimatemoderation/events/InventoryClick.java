@@ -14,8 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Date;
-
 public class InventoryClick implements Listener {
     private final UMP plugin;
 
@@ -25,25 +23,15 @@ public class InventoryClick implements Listener {
 
     @EventHandler
     public void onPlayerClick(InventoryClickEvent event) {
-
         if(!(event.getWhoClicked() instanceof Player player)) return;
-
         Inventory i = event.getClickedInventory();
-
         if (i == null || i.isEmpty()) return;
-
         PlayerBanGUI gui = PlayerBanGUI.getGUI(player.getUniqueId());
-
         if(gui == null) return;
-
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-
         if (ChatColor.stripColor(event.getView().getTitle()).equalsIgnoreCase(gui.getTitle())) {
-
             event.setCancelled(true);
-
             ItemStack itemStack = event.getCurrentItem();
-
             switch (itemStack.getType()) {
                 case RED_CONCRETE -> {
                     gui.removeGUI();
@@ -53,7 +41,7 @@ public class InventoryClick implements Listener {
                     InfractionType type;
                     if(gui.getTime() == -1) type = InfractionType.PERM_BAN; else type = InfractionType.TEMP_BAN;
                     if(gui.isIpBan()) type = InfractionType.IP_BAN;
-                    prof.addInfraction(type);
+                    prof.addInfraction(type); //TODO change how infractions are handled, include notes, time of ban, ect.
                 }
                 case BARRIER -> player.closeInventory();
                 case BOOK -> {
@@ -79,9 +67,7 @@ public class InventoryClick implements Listener {
                     gui.setIpBan(!gui.isIpBan());
                     gui.getInventory().setItem(event.getSlot(), gui.getIpBanEnabled());
                 }
-
             }
-
         }
     }
 }

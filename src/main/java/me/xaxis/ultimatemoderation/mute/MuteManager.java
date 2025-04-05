@@ -3,6 +3,7 @@ package me.xaxis.ultimatemoderation.mute;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.file.YMLFile;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,4 +68,7 @@ public class MuteManager extends YMLFile {
 
     private final List<UUID> mutedPlayers = new ArrayList<>();
 
+    public boolean isMuted(Player target) {
+        return mutedPlayers.contains(target.getUniqueId());
+    }
 }

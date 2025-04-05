@@ -4,6 +4,7 @@ import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -21,13 +22,24 @@ public class Mute{
         section.set("timestamp", timestamp);
         section.set("muted", muted.toString());
         section.set("muter", muter.toString());
+        section.set("infraction_type", InfractionType.MUTE.toString());
+        section.set("date_of_infraction", System.currentTimeMillis());
 
         plugin.getMuteManager().addMutedPlayer(muted);
+        PlayerProfile.getPlayerProfile(muter).save();
     }
 
     public Mute(UMP plugin, ConfigurationSection section){
         this.plugin = plugin;
         this.section = section;
+    }
+
+    public InfractionType getInfractionType() {
+        return InfractionType.valueOf(section.getString("infraction_type"));
+    }
+
+    public long getDateOfInfraction() {
+        return section.getLong("date_of_infraction");
     }
 
     public void setReason(String reason) {
@@ -36,14 +48,6 @@ public class Mute{
 
     public String getReason() {
         return section.getString("reason");
-    }
-
-    public void setDateOfInfraction(){
-        section.set("date_of_infraction", LocalDateTime.now().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-    }
-
-    public String getDateOfInfraction(){
-        return section.getString("date_of_infraction");
     }
 
     public void setTimestamp(long timestamp) {

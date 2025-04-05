@@ -22,41 +22,29 @@ public class StaffChatCommand extends Utils implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-
-        if(sender instanceof Player player){
-
-            if(hasPermission(player, Permissions.STAFF_CHAT)){
-
-                if(args.length == 0){
-                    if(plugin.getStaffChat().contains(player)){
-                        message(player,Lang.STAFF_CHAT_UNTOGGLED);
-                        plugin.getStaffChat().remove(player);
-                    }
-                }else{
-                    if(!plugin.getStaffChat().contains(player)) plugin.getStaffChat().add(player);
+        if (sender instanceof Player player) {
+            if (hasPermission(player, Permissions.STAFF_CHAT)) {
+                if (args.length == 0) {
+                    player.sendMessage("&cUsage: /staffchat <message>");
+                    return true;
+                } else {
                     StringBuilder sb = new StringBuilder();
                     for (String arg : args) {
                         sb.append(arg).append(" ");
                     }
-
-                    sb.insert(0,plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + "&7" + player.getDisplayName() + ":&b ");
-
-                    String msg = chat(sb.toString());
-
-                    plugin.getStaffChat().getPlayers().forEach(p ->{
-                        Bukkit.getPlayer(p).sendMessage(msg);
+                    sb.insert(0, plugin.getLangYML().getString(Lang.STAFF_CHAT_PREFIX) + "&7" + player.getDisplayName() + ":&b ");
+                    plugin.getStaffChat().getPlayers().forEach((p, value) -> {
+                        if (Bukkit.getPlayer(p) != null && Bukkit.getPlayer(p).isOnline() && value.getRight()) {
+                            Bukkit.getPlayer(p).sendMessage(chat(sb.toString()));
+                        }
                     });
-
                 }
-
-            }else{
+            } else {
                 message(player, Lang.NO_PERMISSION);
             }
-
-        }else{
-            //message SENDER NOT PLAYER
+        } else {
+            sender.sendMessage("This command can only be used by players.");
         }
-
         return true;
     }
 }

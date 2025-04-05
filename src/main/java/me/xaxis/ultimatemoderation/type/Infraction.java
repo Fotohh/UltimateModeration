@@ -18,14 +18,16 @@ public abstract class Infraction {
         return section;
     }
 
-    public Infraction(String reason, UUID punisher, UUID punished, long time) {
+    public Infraction(String reason, UUID punisher, UUID punished, long time, InfractionType type) {
         this.infractionUUID = UUID.randomUUID();
         this.section = PlayerProfile.getPlayerProfile(punished).getConfiguration().createSection(this.infractionUUID.toString());
         section.set("reason", reason);
-        section.set("punisher", punisher);
-        section.set("punished", punished);
+        section.set("punisher", punisher.toString());
+        section.set("punished", punished.toString());
         section.set("date", System.currentTimeMillis());
         section.set("time", time);
+        section.set("infraction_type", type.toString());
+        PlayerProfile.getPlayerProfile(punished).save();
     }
 
     public long getTime(){
@@ -46,6 +48,10 @@ public abstract class Infraction {
 
     public UUID getPunisher() {
         return UUID.fromString(section.getString("punisher"));
+    }
+
+    public InfractionType getType() {
+        return InfractionType.valueOf(section.getString("infraction_type"));
     }
 
     abstract InfractionType getInfractionType();

@@ -49,22 +49,22 @@ public class Utils {
         return seconds * 1000;
     }
     public static long fromMinutes(long minutes){
-        return minutes * 60000L;
+        return minutes * 1000 * 60;
     }
     public static long fromHours(long hours){
-        return hours * 3600000L;
+        return hours * 1000 * 60 * 60;
     }
     public static long fromDays(long days){
-        return days * 86400000L;
+        return days * 1000 * 60 * 60 * 24;
     }
     public static long fromWeeks(long weeks){
-        return weeks * 604800000L;
+        return weeks * 1000 * 60 * 60 * 24 * 7;
     }
     public static long fromMonths(long months){
-        return months * 2629746000L;
+        return months * 1000 * 60 * 60 * 24 * 30;
     }
     public static long fromYears(long years){
-        return years * 31556926000L;
+        return years * 1000 * 60 * 60 * 24 * 365;
     }
 
     /**
@@ -105,7 +105,7 @@ public class Utils {
         if (days > 0) resultBuilder.append(days).append(" days, ");
         if (hours > 0) resultBuilder.append(hours).append(" hours, ");
         if (minutes > 0) resultBuilder.append(minutes).append(" minutes, ");
-        if (seconds > 0 || resultBuilder.length() == 0) resultBuilder.append(seconds).append(" seconds");
+        if (seconds > 0 || resultBuilder.isEmpty()) resultBuilder.append(seconds).append(" seconds");
 
         return resultBuilder.toString();
     }
@@ -127,6 +127,7 @@ public class Utils {
     }
 
     public void unvanishPlayer(Player player, boolean rollbackManager){
+        player.setCanPickupItems(true);
         if(rollbackManager)
             main.getRollbackManager().restore(player);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){

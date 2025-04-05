@@ -1,8 +1,7 @@
 package me.xaxis.ultimatemoderation;
 
 import me.xaxis.ultimatemoderation.chat.StaffChat;
-import me.xaxis.ultimatemoderation.commands.SpyCommand;
-import me.xaxis.ultimatemoderation.commands.StaffChatCommand;
+import me.xaxis.ultimatemoderation.commands.*;
 import me.xaxis.ultimatemoderation.events.InventoryClick;
 import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.OnQuit;
@@ -33,7 +32,7 @@ public class UMP extends JavaPlugin {
 
     private StaffChat staffChat;
 
-    private HashMap<CommandExecutor, String>[] commands;
+    private HashMap[] commands;
 
     private PlayerRollbackManager rollbackManager;
 
@@ -43,6 +42,15 @@ public class UMP extends JavaPlugin {
         return muteManager;
     }
 
+    //TODO finish ban
+    //TODO finish unban
+    //TODO finish tempban
+    //TODO finish untempban
+    //todo finish settings gui and command
+    //TODO finish player data gui
+    //todo finish player list
+    //todo cleanup gui and add more stuff
+
 
     private Metrics metrics;
 
@@ -50,45 +58,37 @@ public class UMP extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
         UMP.instance = this;
-
         rollbackManager = new PlayerRollbackManager();
-
         langYML = new LangYML(getDataFolder(), this);
-
         staffChat = new StaffChat();
-
         commands = new HashMap[]{
                 load(new StaffChatCommand(this), "staffchat"),
-                load(new SpyCommand(this), "spy")
+                load(new SpyCommand(this), "spy"),
+                load(new MuteCommand(this), "mute"),
+                load(new UnmuteCommand(this), "unmute"),
+                load(new TempMute(this), "tempmute"),
+                load(new SettingsCommand(this), "settings"),
+                load(new WarnCommand(this), "warn"),
+                load(new KickCommand(this), "kick"),
         };
-
         listeners = new Listener[]{
                 new OnPlayerChat(this),
                 new PlayerJoin(this),
                 new OnQuit(this),
                 new InventoryClick(this)
         };
-
         registerCommands();
-
         registerListeners();
-
         this.spyManager = new SpyManager(this);
-
         try {
             this.muteManager = new MuteManager(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         metrics = new Metrics(this, 19198);
-
         new UpdateChecker(this);
-
         loadPlayerData();
-
     }
 
     private HashMap<CommandExecutor, String> load(CommandExecutor c, String s){
@@ -127,6 +127,7 @@ public class UMP extends JavaPlugin {
             throw new RuntimeException(e);
         }
         metrics.shutdown();
+        PlayerProfile.saveAll();
     }
 
     public PlayerRollbackManager getRollbackManager() {

@@ -7,7 +7,7 @@ public enum InfractionType {
     IP_BAN,
     PERM_BAN,
     KICK,
-    WARNING,
+    WARNING, BAN,
 
 
 }

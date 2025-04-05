@@ -50,9 +50,8 @@ public class SpyManager extends Utils implements Listener{
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
-        Player player = event.getPlayer();
-        if(containsPlayer(player)){
-            removePlayer(player);
+        if(containsPlayer(event.getPlayer())){
+            removePlayer(event.getPlayer());
         }
     }
 
@@ -69,7 +68,7 @@ public class SpyManager extends Utils implements Listener{
 
         switch (event.getItem().getType()){
             case BARRIER -> removePlayer(player);
-            case ANVIL -> new PlayerBanGUI(player, playerSpy.getTarget(), plugin);
+            case ANVIL -> new PlayerBanGUI(player, playerSpy.getTarget());
         }
 
         event.setCancelled(true);
@@ -89,7 +88,5 @@ public class SpyManager extends Utils implements Listener{
 
         return new ItemStack[]{barrier, anvil};
     }
-
-    //TODO add on interact to quit spying when finished n stuff using items in hot bar
 
 }
