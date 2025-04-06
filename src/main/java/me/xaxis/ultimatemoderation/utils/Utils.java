@@ -6,6 +6,7 @@ import me.xaxis.ultimatemoderation.configmanagement.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.time.*;
@@ -82,8 +83,8 @@ public class Utils {
      %c – Character
      %b/%B – Boolean
      %a/%A – Floating-point hexadecimal
+     %.nf – Floating-point with n decimal places
      */
-
     public static String formatDate(long l){
 
         LocalDateTime targetDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
@@ -114,6 +115,8 @@ public class Utils {
         if(rollbackManager)
             main.getRollbackManager().save(player);
         player.setGameMode(GameMode.ADVENTURE);
+        player.setInvisible(true);
+        player.setInvulnerable(true);
         player.getInventory().clear();
         player.setCanPickupItems(false);
         player.setAllowFlight(true);
@@ -128,6 +131,8 @@ public class Utils {
 
     public void unvanishPlayer(Player player, boolean rollbackManager){
         player.setCanPickupItems(true);
+        player.setInvisible(false);
+        player.setInvulnerable(false);
         if(rollbackManager)
             main.getRollbackManager().restore(player);
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
