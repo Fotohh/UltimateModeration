@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.spy;
 
+import com.github.fotohh.itemutil.ItemBuilder;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
 import me.xaxis.ultimatemoderation.utils.ItemUtil;
@@ -8,8 +9,6 @@ import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,6 +75,11 @@ public class SpyManager extends Utils implements Listener{
         }
     }
 
+    private final ItemBuilder item = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
+            .withLore(" ")
+            .withLore(" ")
+            .build();
+
     private void handleInventory(InventoryInteractEvent event){
         Player player = (Player) event.getWhoClicked();
         UUID uuid = player.getUniqueId();
@@ -94,6 +98,11 @@ public class SpyManager extends Utils implements Listener{
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        if(event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
+        if(event.getCurrentItem().equals(item)) {
+            event.setCancelled(true);
+            return;
+        }
         handleInventory(event);
     }
 
@@ -116,15 +125,24 @@ public class SpyManager extends Utils implements Listener{
                 Inventory fakeInv = Bukkit.createInventory(null, target.getEnderChest().getSize(), "Chest");
                 fakeInv.setContents(target.getEnderChest().getContents());
                 chestMap.put(event.getPlayer().getUniqueId(), block);
+                fillEmptySlots(fakeInv, target.getEnderChest().getSize());
                 player.openInventory(fakeInv);
             }
             return;
         }
         event.setCancelled(true);
-        Inventory fakeInv = Bukkit.createInventory(null, Math.max(holder.getInventory().getSize(), 9), "Chest");
+        Inventory fakeInv = Bukkit.createInventory(null, Math.max(holder.getInventory().getSize(), 9), "Chest"); //TODO might not work
         fakeInv.setContents(holder.getInventory().getContents());
         chestMap.put(event.getPlayer().getUniqueId(), block);
+        fillEmptySlots(fakeInv, holder.getInventory().getSize());
         player.openInventory(fakeInv);
+    }
+
+    private void fillEmptySlots(Inventory inv, int size){
+        for(int i = size; i < inv.getSize(); i++){
+            if(inv.getItem(i) == null || inv.getItem(i).getType() == Material.AIR)
+                inv.setItem(i, item);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

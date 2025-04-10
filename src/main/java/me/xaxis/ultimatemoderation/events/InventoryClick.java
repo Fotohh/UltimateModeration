@@ -2,9 +2,11 @@ package me.xaxis.ultimatemoderation.events;
 
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
+import me.xaxis.ultimatemoderation.gui.PlayerListGUI;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.type.Ban;
 import me.xaxis.ultimatemoderation.type.InfractionType;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,6 +16,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 public class InventoryClick implements Listener {
     private final UMP plugin;
 
@@ -21,8 +25,30 @@ public class InventoryClick implements Listener {
         this.plugin = plugin;
     }
 
+    private void handlePlayerListGUI(InventoryClickEvent event) {
+        PlayerListGUI gui = (PlayerListGUI) event.getInventory().getHolder();
+        if (gui == null) return;
+        Player player = (Player) event.getWhoClicked();
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
+        if (event.getCurrentItem().getType() == Material.PLAYER_HEAD) {
+            //lore 0 - Click to view profile lore 1 - uuid
+            Player target = Bukkit.getPlayer(UUID.fromString(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(1))));
+            if (target == null) {
+                player.sendMessage("Player not found");
+                return;
+            }
+            switch (event.getCurrentItem().getType()) {
+
+            }
+        }
+    }
+
     @EventHandler
     public void onPlayerClick(InventoryClickEvent event) {
+        if(event.getInventory().getHolder() instanceof PlayerBanGUI) {
+            event.setCancelled(true);
+            handlePlayerListGUI(event);
+        }
         if(!(event.getWhoClicked() instanceof Player player)) return;
         Inventory i = event.getClickedInventory();
         if (i == null || i.isEmpty()) return;

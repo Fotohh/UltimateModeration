@@ -7,6 +7,7 @@ import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.OnQuit;
 import me.xaxis.ultimatemoderation.events.PlayerJoin;
 import me.xaxis.ultimatemoderation.file.LangYML;
+import me.xaxis.ultimatemoderation.gui.SearchBarGUI;
 import me.xaxis.ultimatemoderation.mute.MuteManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.spy.SpyManager;
@@ -76,7 +77,8 @@ public class UMP extends JavaPlugin {
                 new OnPlayerChat(this),
                 new PlayerJoin(this),
                 new OnQuit(this),
-                new InventoryClick(this)
+                new InventoryClick(this),
+                new SearchBarGUI(this),
         };
         registerCommands();
         registerListeners();
