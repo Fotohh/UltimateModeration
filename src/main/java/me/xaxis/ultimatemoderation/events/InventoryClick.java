@@ -9,6 +9,7 @@ import me.xaxis.ultimatemoderation.type.InfractionType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,16 +31,32 @@ public class InventoryClick implements Listener {
         if (gui == null) return;
         Player player = (Player) event.getWhoClicked();
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-        if (event.getCurrentItem().getType() == Material.PLAYER_HEAD) {
-            //lore 0 - Click to view profile lore 1 - uuid
-            Player target = Bukkit.getPlayer(UUID.fromString(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(1))));
-            if (target == null) {
-                player.sendMessage("Player not found");
-                return;
-            }
-            switch (event.getCurrentItem().getType()) {
+        switch (event.getCurrentItem().getType()) {
+                case PLAYER_HEAD -> {
+                    //lore 0 - Click to view profile lore 1 - uuid
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(UUID.fromString(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(1))));
+                    if (target == null) {
+                        player.sendMessage("Player not found");
+                        //TODO play sound or something
+                        return;
+                    }
+                }
 
-            }
+                case ARROW -> {
+                    if(event.getRawSlot() == gui.prevPageSlot()) {
+                        if(gui.getPage() == 0) break;
+                        gui.setPage(gui.getPage() - 1);
+                        gui.update();
+                    }else if(event.getRawSlot() == gui.nextPageSlot()) {
+                        if(!gui.canGoToNextPage()) break;
+                        gui.setPage(gui.getPage() + 1);
+                        gui.update();
+                    }
+                }
+                case SPYGLASS -> {
+                    plugin.getSearchBarGUI().open(player);
+                    gui = null;
+                }
         }
     }
 

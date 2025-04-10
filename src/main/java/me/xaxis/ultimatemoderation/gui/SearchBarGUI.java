@@ -2,7 +2,7 @@ package me.xaxis.ultimatemoderation.gui;
 
 import com.github.fotohh.itemutil.ItemBuilder;
 import me.xaxis.ultimatemoderation.UMP;
-import org.apache.commons.lang3.tuple.Triple;
+//import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -111,7 +111,7 @@ public class SearchBarGUI implements Listener {
                 event.getView().setTitle("Search: " + search);
             }
             case STRUCTURE_VOID -> {
-                //open gui with search filter
+                new PlayerListGUI((Player)event.getWhoClicked());
                 searchBarMap.remove(event.getWhoClicked().getUniqueId());
             }
             case BOOK -> event.getWhoClicked().openInventory(createSearchHistory(triple.getRight()));
