@@ -120,7 +120,7 @@ public class PlayerBanGUI extends GUI {
         getInventory().setItem(0, barrier);
         getInventory().setItem(1, b);
         getInventory().setItem(3, c);
-        getInventory().setItem(4, ipBanEnabled);
+        getInventory().setItem(4, ipBanDisabled);
         getInventory().setItem(5, h);
         getInventory().setItem(7, p);
         getInventory().setItem(8, rc);

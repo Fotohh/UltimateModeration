@@ -33,13 +33,13 @@ public class InventoryClick implements Listener {
     public void onPlayerClick(InventoryClickEvent event) {
         if(event.getInventory().getHolder() instanceof PlayerListGUI gui) {
             event.setCancelled(true);
-            PlayerListGUI.handleClick(event, gui);
+            gui.handleClick(event);
             return;
         }
 
         if(event.getInventory().getHolder() instanceof SearchBarGUI searchBar) {
             event.setCancelled(true);
-            handleSearchClick(event, searchBar);
+            searchBar.handleClick(event);
             return;
         }
 
@@ -94,9 +94,5 @@ public class InventoryClick implements Listener {
                 }
             }
         }
-    }
-
-    private void handleSearchClick(InventoryClickEvent event, SearchBarGUI searchBar) {
-        searchBar.handleClick(event);
     }
 }
