@@ -1,7 +1,9 @@
 package me.xaxis.ultimatemoderation.file;
 
 import me.xaxis.ultimatemoderation.UMP;
+import me.xaxis.ultimatemoderation.utils.Tuple;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -9,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerProfileYML extends File {
@@ -96,8 +100,28 @@ public class PlayerProfileYML extends File {
         return getConfiguration().getBoolean(path.getPath());
     }
 
+    public long getLong(Defaults path){
+        return getConfiguration().getLong(path.getPath());
+    }
+
     public String getString(Defaults path){
         return getConfiguration().getString(path.getPath());
+    }
+
+    public List<String> getStringList(Defaults path){
+        return getConfiguration().getStringList(path.getPath());
+    }
+
+    public <L, R> List<Tuple<L, R>> getTupleList(String path){
+        List<Tuple<L, R>> list = new ArrayList<>();
+        ConfigurationSection section = getConfiguration().getConfigurationSection(path);
+        for(String key : section.getKeys(false)){
+            ConfigurationSection subSection = section.getConfigurationSection(key);
+            L left = (L) subSection.get("left");
+            R right = (R) subSection.get("right");
+            list.add(Tuple.of(left, right));
+        }
+        return list;
     }
 
     public void set(Defaults path, Object value){

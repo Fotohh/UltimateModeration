@@ -4,6 +4,7 @@ import com.github.fotohh.itemutil.ItemBuilder;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
 import me.xaxis.ultimatemoderation.gui.PlayerListGUI;
+import me.xaxis.ultimatemoderation.gui.ProfileGUI;
 import me.xaxis.ultimatemoderation.gui.SearchBarGUI;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.type.Ban;
@@ -84,6 +85,12 @@ public class InventoryClick implements Listener {
         if(event.getInventory().getHolder() instanceof SearchBarGUI searchBar) {
             event.setCancelled(true);
             handleSearchClick(event, searchBar);
+            return;
+        }
+
+        if(event.getInventory().getHolder() instanceof ProfileGUI gui) {
+            event.setCancelled(true);
+            gui.handleClick(event);
             return;
         }
         if(!(event.getWhoClicked() instanceof Player player)) return;

@@ -4,10 +4,12 @@ import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.file.PlayerProfileYML;
 import me.xaxis.ultimatemoderation.type.Infraction;
 import me.xaxis.ultimatemoderation.type.InfractionType;
+import me.xaxis.ultimatemoderation.utils.Tuple;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerProfile extends PlayerProfileYML {
@@ -59,6 +61,10 @@ public class PlayerProfile extends PlayerProfileYML {
         set(Defaults.LAST_JOIN_DATE, date);
     }
 
+    public long getLastJoinDate(){
+        return getLong(Defaults.LAST_JOIN_DATE);
+    }
+
     public void addInfraction(InfractionType type){
         switch (type) {
             case MUTE, TEMP_MUTE -> set(Defaults.NUM_OF_MUTES, getInt(Defaults.NUM_OF_MUTES) + 1);
@@ -66,6 +72,30 @@ public class PlayerProfile extends PlayerProfileYML {
             case WARNING -> set(Defaults.NUM_OF_WARNINGS, getInt(Defaults.NUM_OF_WARNINGS) + 1);
             case IP_BAN,PERM_BAN,TEMP_BAN -> set(Defaults.NUM_OF_BANS, getInt(Defaults.NUM_OF_BANS) + 1);
         }
+    }
+
+    public List<Tuple<Long, String>> getNotes(){
+        if(getConfiguration().getConfigurationSection("additional_notes") == null) {
+            getConfiguration().createSection("additional_notes");
+            save();
+            return List.of();
+        }
+        return getTupleList("additional_notes");
+    }
+
+    public void addNote(String note){
+        long time = System.currentTimeMillis();
+        List<Tuple<Long, String>> notes = getNotes();
+        notes.add(new Tuple<>(System.currentTimeMillis(), note));
+        int i = 0;
+        for(String key : getConfiguration().getConfigurationSection("additional_notes").getKeys(false)){
+            i = Integer.parseInt(key);
+        }
+        i++;
+
+        getConfiguration().set("additional_notes."+ i +".right", note);
+        getConfiguration().set("additional_notes."+ i +".left", time);
+        notes.add(new Tuple<>(time, note));
     }
 
     public void setInfractionAmount(InfractionType type, int amount){

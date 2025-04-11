@@ -68,6 +68,19 @@ public class Utils {
         return years * 1000 * 60 * 60 * 24 * 365;
     }
 
+    public static String formatDate2(long l) {
+        //will be formatted like so 04/11/2025 12:00 AM/PM
+        LocalDateTime targetDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
+        StringBuilder result = new StringBuilder();
+        result.append(targetDateTime.getDayOfMonth()).append("/").append(targetDateTime.getMonthValue()).append("/").append(targetDateTime.getYear()).append(" ");
+        if(targetDateTime.getHour() > 12) {
+            result.append(targetDateTime.getHour() - 12).append(":").append(targetDateTime.getMinute()).append(" PM");
+        } else {
+            result.append(targetDateTime.getHour()).append(":").append(targetDateTime.getMinute()).append(" AM");
+        }
+        return result.toString();
+    }
+
     /**
      %% – Inserts a “%” sign
      %x/%X – Integer hexadecimal

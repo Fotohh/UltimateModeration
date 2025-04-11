@@ -27,14 +27,11 @@ public class PlayerListGUI implements InventoryHolder {
         clearPage();
         int counter = 0;
         for(int i = lowerBound; i < higherBound - 1; i++) {
-            if(items.size() - 1 < i) break;
+            if(items.size() < i) break;
             inventory.setItem(counter, items.get(i));
             counter++;
         }
     }
-    //TODO goes from 42 to 44 when switching to next page, skipping 1 number
-    //TODO slot 44 is empty, supposed to be player head
-    //TODO player 100 is missing
 
     public boolean canGoToNextPage() {
         int higherBound = pageSize * (page + 1);
@@ -69,7 +66,6 @@ public class PlayerListGUI implements InventoryHolder {
 
     public PlayerListGUI(Player player) {
         this.player = player;
-        this.searchQuery = null;
         this.items = new ArrayList<>(Bukkit.getOnlinePlayers().stream().map(p ->
                 new ItemBuilder(Material.PLAYER_HEAD)
                 .withTitle(p.getName())
@@ -81,15 +77,30 @@ public class PlayerListGUI implements InventoryHolder {
         setItems();
     }
 
-    private final String searchQuery;
-
     private final ArrayList<ItemBuilder> items;
+
+    public boolean partiallyMatches(String searchQuery, String other) {
+
+        searchQuery = searchQuery.replaceAll(" ", "");
+        other = other.replaceAll(" ", "");
+
+        if(searchQuery.length() > other.length()) {
+            searchQuery = searchQuery.substring(0, other.length());
+        }else if(other.length() > searchQuery.length()) {
+            other = other.substring(0, searchQuery.length());
+        }
+
+        for(int i = 0; i < other.length(); i++) {
+            if(other.toLowerCase().charAt(i) != searchQuery.toLowerCase().charAt(i)) return false;
+        }
+        return true;
+
+    }
 
     public PlayerListGUI(Player player, String searchQuery) {
         this.player = player;
-        this.searchQuery = searchQuery;
         this.items = new ArrayList<>(Bukkit.getOnlinePlayers().stream()
-                .filter(p -> p.getName().toLowerCase().contains(searchQuery.toLowerCase()))
+                .filter(p -> partiallyMatches(p.getName(), searchQuery))
                 .map(p -> new ItemBuilder(Material.PLAYER_HEAD)
                         .withTitle(p.getName())
                         .withLore("Click to view details", p.getUniqueId().toString())

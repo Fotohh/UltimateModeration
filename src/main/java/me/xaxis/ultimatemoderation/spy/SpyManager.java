@@ -131,7 +131,7 @@ public class SpyManager extends Utils implements Listener{
             return;
         }
         event.setCancelled(true);
-        Inventory fakeInv = Bukkit.createInventory(null, Math.max(holder.getInventory().getSize(), 9), "Chest"); //TODO might not work
+        Inventory fakeInv = Bukkit.createInventory(null, Math.max(holder.getInventory().getSize(), 9), "Chest");
         fakeInv.setContents(holder.getInventory().getContents());
         chestMap.put(event.getPlayer().getUniqueId(), block);
         fillEmptySlots(fakeInv, holder.getInventory().getSize());
