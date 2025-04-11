@@ -1,10 +1,15 @@
 package me.xaxis.ultimatemoderation.gui;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -26,8 +31,8 @@ public class PlayerListGUI implements InventoryHolder {
         if(items.size() <= lowerBound) return;
         clearPage();
         int counter = 0;
-        for(int i = lowerBound; i < higherBound - 1; i++) {
-            if(items.size() < i) break;
+        for(int i = lowerBound; i < higherBound; i++) {
+            if(items.size() - 1 < i) break;
             inventory.setItem(counter, items.get(i));
             counter++;
         }
@@ -39,7 +44,7 @@ public class PlayerListGUI implements InventoryHolder {
     }
 
     private void clearPage() {
-        for(int i = 0; i < pageSize - 1; i++) {
+        for(int i = 0; i < pageSize; i++) {
             inventory.setItem(i, new ItemStack(Material.AIR));
         }
     }
@@ -80,21 +85,12 @@ public class PlayerListGUI implements InventoryHolder {
     private final ArrayList<ItemBuilder> items;
 
     public boolean partiallyMatches(String searchQuery, String other) {
-
-        searchQuery = searchQuery.replaceAll(" ", "");
-        other = other.replaceAll(" ", "");
-
-        if(searchQuery.length() > other.length()) {
-            searchQuery = searchQuery.substring(0, other.length());
-        }else if(other.length() > searchQuery.length()) {
-            other = other.substring(0, searchQuery.length());
-        }
-
-        for(int i = 0; i < other.length(); i++) {
-            if(other.toLowerCase().charAt(i) != searchQuery.toLowerCase().charAt(i)) return false;
-        }
-        return true;
-
+        if (searchQuery == null || other == null) return false;
+        String cleanedQuery = searchQuery.replaceAll(" ", "").toLowerCase();
+        String cleanedOther = other.replaceAll(" ", "").toLowerCase();
+        Bukkit.getLogger().info("Search query: " + cleanedQuery);
+        Bukkit.getLogger().info("Other: " + cleanedOther);
+        return cleanedQuery.contains(cleanedOther);
     }
 
     public PlayerListGUI(Player player, String searchQuery) {
@@ -107,7 +103,9 @@ public class PlayerListGUI implements InventoryHolder {
                         .build())
                 .toList());
         for(int i = 0; i < 100; i++) {
-            items.add(new ItemBuilder(Material.PLAYER_HEAD).withTitle("Player " + i).withLore("Click to view details", "fake-uuid").build());
+            String title = "Player " + i;
+            if(partiallyMatches(title, searchQuery))
+                items.add(new ItemBuilder(Material.PLAYER_HEAD).withTitle("Player " + i).withLore("Click to view details", "fake-uuid").build());
         }
         inventory = Bukkit.createInventory(this, maxSize, "Player List | Search: " + searchQuery);
         setItems();
@@ -119,6 +117,50 @@ public class PlayerListGUI implements InventoryHolder {
         inventory.setItem(49, new ItemBuilder(Material.SPYGLASS).withTitle("Search").withLore(" ").build());
         inventory.setItem(48, new ItemBuilder(Material.BARRIER).withTitle("Clear Search").withLore(" ").build());
         inventory.setItem(50, new ItemBuilder(Material.PAPER).withTitle("Page: " + (page + 1)).withLore(" ").build());
+    }
+
+    public static void handleClick(InventoryClickEvent event, PlayerListGUI gui) {
+        Player player = (Player) event.getWhoClicked();
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
+        switch (event.getCurrentItem().getType()) {
+            case PLAYER_HEAD -> {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(1)));
+                } catch (IllegalArgumentException e) {
+                    player.sendMessage("Invalid player entry found! Removing entry...");
+                    gui.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
+                    return;
+                }
+                OfflinePlayer target = Bukkit.getOfflinePlayer(uuid);
+
+                PlayerProfile profile = PlayerProfile.getPlayerProfile(target.getUniqueId());
+                if(profile == null) {
+                    player.sendMessage("Invalid player entry found! Removing entry...");
+                    gui.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
+                    return;
+                }
+
+                new ProfileGUI(player, target.getUniqueId()).open();
+
+            }
+
+            case ARROW -> {
+                if(event.getRawSlot() == gui.prevPageSlot()) {
+                    if(gui.getPage() == 0) break;
+                    gui.setPage(gui.getPage() - 1);
+                    gui.update();
+                    gui.getInventory().setItem(50, new ItemBuilder(Material.PAPER).withTitle("Page: " + gui.getPage()).withLore(" ").build());
+                }else if(event.getRawSlot() == gui.nextPageSlot()) {
+                    if(!gui.canGoToNextPage()) break;
+                    gui.setPage(gui.getPage() + 1);
+                    gui.update();
+                    gui.getInventory().setItem(50, new ItemBuilder(Material.PAPER).withTitle("Page: " + gui.getPage()).withLore(" ").build());
+                }
+            }
+            case SPYGLASS -> new SearchBarGUI(player).open();
+            case BARRIER -> new PlayerListGUI(player).openGUI();
+        }
     }
 
 

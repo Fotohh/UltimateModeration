@@ -4,6 +4,8 @@ import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
 import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
+import me.xaxis.ultimatemoderation.gui.ProfileGUI;
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.type.Mute;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.Bukkit;
@@ -21,6 +23,27 @@ public class OnPlayerChat extends Utils implements Listener {
     public OnPlayerChat(UMP plugin) {
         super(plugin);
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void notes(AsyncPlayerChatEvent event){
+        Player player = event.getPlayer();
+        if(!ProfileGUI.getNotePrompts().containsKey(player.getUniqueId())) return;
+        String message = event.getMessage();
+        event.setCancelled(true);
+        if(message.isEmpty()) return;
+        if(message.length() > 245) {
+            player.sendMessage("Message is too long! (max 245 characters)");
+            return;
+        }
+        UUID target = ProfileGUI.getNotePrompts().get(player.getUniqueId());
+        PlayerProfile profile = PlayerProfile.getPlayerProfile(target);
+        profile.addNote(message);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            player.sendMessage("Note added: " + message +" \nTimestamp: " + Utils.formatDate2(System.currentTimeMillis()));
+            new ProfileGUI(player, target).open();
+        });
+        ProfileGUI.getNotePrompts().remove(player.getUniqueId());
     }
 
     @EventHandler

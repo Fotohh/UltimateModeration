@@ -29,56 +29,11 @@ public class InventoryClick implements Listener {
         this.plugin = plugin;
     }
 
-    private void handlePlayerListGUI(InventoryClickEvent event, PlayerListGUI gui) {
-        Player player = (Player) event.getWhoClicked();
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-        switch (event.getCurrentItem().getType()) {
-                case PLAYER_HEAD -> {
-                    //lore 0 - Click to view profile lore 1 - uuid
-                    UUID uuid;
-                    try {
-                        uuid = UUID.fromString(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(1)));
-                    } catch (IllegalArgumentException e) {
-                        player.sendMessage("Invalid player entry found! Removing entry...");
-                        gui.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
-                        return;
-                    }
-                    OfflinePlayer target = Bukkit.getOfflinePlayer(uuid);
-
-                    PlayerProfile profile = PlayerProfile.getPlayerProfile(target.getUniqueId());
-                    if(profile == null) {
-                        player.sendMessage("Invalid player entry found! Removing entry...");
-                        gui.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
-                        return;
-                    }
-
-                    //TODO open profile gui
-
-                }
-
-                case ARROW -> {
-                    if(event.getRawSlot() == gui.prevPageSlot()) {
-                        if(gui.getPage() == 0) break;
-                        gui.setPage(gui.getPage() - 1);
-                        gui.update();
-                        gui.getInventory().setItem(50, new ItemBuilder(Material.PAPER).withTitle("Page: " + gui.getPage()).withLore(" ").build());
-                    }else if(event.getRawSlot() == gui.nextPageSlot()) {
-                        if(!gui.canGoToNextPage()) break;
-                        gui.setPage(gui.getPage() + 1);
-                        gui.update();
-                        gui.getInventory().setItem(50, new ItemBuilder(Material.PAPER).withTitle("Page: " + gui.getPage()).withLore(" ").build());
-                    }
-                }
-                case SPYGLASS -> new SearchBarGUI(player).open();
-                case BARRIER -> new PlayerListGUI(player).openGUI();
-        }
-    }
-
     @EventHandler
     public void onPlayerClick(InventoryClickEvent event) {
         if(event.getInventory().getHolder() instanceof PlayerListGUI gui) {
             event.setCancelled(true);
-            handlePlayerListGUI(event, gui);
+            PlayerListGUI.handleClick(event, gui);
             return;
         }
 

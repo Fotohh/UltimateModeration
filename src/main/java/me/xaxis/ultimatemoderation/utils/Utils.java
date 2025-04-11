@@ -69,48 +69,34 @@ public class Utils {
     }
 
     public static String formatDate2(long l) {
-        //will be formatted like so 04/11/2025 12:00 AM/PM
-        LocalDateTime targetDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
-        StringBuilder result = new StringBuilder();
-        result.append(targetDateTime.getDayOfMonth()).append("/").append(targetDateTime.getMonthValue()).append("/").append(targetDateTime.getYear()).append(" ");
-        if(targetDateTime.getHour() > 12) {
-            result.append(targetDateTime.getHour() - 12).append(":").append(targetDateTime.getMinute()).append(" PM");
-        } else {
-            result.append(targetDateTime.getHour()).append(":").append(targetDateTime.getMinute()).append(" AM");
-        }
-        return result.toString();
+        LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
+
+        int hour = dt.getHour();
+        String amPm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 == 0 ? 12 : hour % 12;
+
+        return String.format("%02d/%02d/%d %02d:%02d %s",
+                dt.getMonthValue(),
+                dt.getDayOfMonth(),
+                dt.getYear(),
+                hour,
+                dt.getMinute(),
+                amPm);
     }
 
-    /**
-     %% – Inserts a “%” sign
-     %x/%X – Integer hexadecimal
-     %t/%T – Time and Date
-     %s/%S – String
-     %n – Inserts a newline character
-     %o – Octal integer
-     %f – Decimal floating-point
-     %e/%E – Scientific notation
-     %g – Causes Formatter to use either %f or %e, whichever is shorter
-     %h/%H – Hash code of the argument
-     %d – Decimal integer
-     %c – Character
-     %b/%B – Boolean
-     %a/%A – Floating-point hexadecimal
-     %.nf – Floating-point with n decimal places
-     */
     public static String formatDate(long l){
 
         LocalDateTime targetDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault());
 
         Period period = Period.between(LocalDate.now(), targetDateTime.toLocalDate());
 
-        int years = period.getYears();
-        int months = period.getMonths();
-        long weeks = ChronoUnit.WEEKS.between(LocalDate.now(), targetDateTime.toLocalDate());
-        long days = ChronoUnit.DAYS.between(LocalDate.now(), targetDateTime.toLocalDate()) % 7;
-        long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), targetDateTime) % 24;
-        long minutes = ChronoUnit.MINUTES.between(LocalDateTime.now(), targetDateTime) % 60;
-        long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), targetDateTime) % 60;
+        int years = Math.abs(period.getYears());
+        int months = Math.abs(period.getMonths());
+        long weeks = Math.abs(ChronoUnit.WEEKS.between(LocalDate.now(), targetDateTime.toLocalDate()));
+        long days = Math.abs(ChronoUnit.DAYS.between(LocalDate.now(), targetDateTime.toLocalDate()) % 7);
+        long hours = Math.abs(ChronoUnit.HOURS.between(LocalDateTime.now(), targetDateTime) % 24);
+        long minutes = Math.abs(ChronoUnit.MINUTES.between(LocalDateTime.now(), targetDateTime) % 60);
+        long seconds = Math.abs(ChronoUnit.SECONDS.between(LocalDateTime.now(), targetDateTime) % 60);
 
         StringBuilder resultBuilder = new StringBuilder();
         if(years > 0) resultBuilder.append(years).append(" years, ");

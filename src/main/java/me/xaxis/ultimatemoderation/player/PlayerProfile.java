@@ -96,6 +96,7 @@ public class PlayerProfile extends PlayerProfileYML {
         getConfiguration().set("additional_notes."+ i +".right", note);
         getConfiguration().set("additional_notes."+ i +".left", time);
         notes.add(new Tuple<>(time, note));
+        save();
     }
 
     public void setInfractionAmount(InfractionType type, int amount){
