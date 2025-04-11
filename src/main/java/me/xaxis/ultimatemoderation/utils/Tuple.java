@@ -31,7 +31,7 @@ public class Tuple<L, R>{
 
     @Override
     public String toString() {
-        return "Touple: " + left + ", " + right;
+        return "Tuple: " + left + ", " + right;
     }
 
     @Override

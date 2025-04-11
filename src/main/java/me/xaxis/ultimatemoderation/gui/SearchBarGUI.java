@@ -1,45 +1,58 @@
 package me.xaxis.ultimatemoderation.gui;
 
 import com.github.fotohh.itemutil.ItemBuilder;
-import me.xaxis.ultimatemoderation.UMP;
-//import org.apache.commons.lang3.tuple.Triple;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class SearchBarGUI implements Listener {
+public class SearchBarGUI implements InventoryHolder {
 
-    private final UMP plugin;
-    private final static Map<UUID, Triple<StringBuilder, Inventory, ArrayList<String>>> searchBarMap = new HashMap<>();
+    private final Player player;
+    private final static Map<UUID, ArrayList<String>> searchHistory = new HashMap<>();
+    private final StringBuilder search = new StringBuilder();
+    private boolean inHistory = false;
+    private final Inventory inventory;
+
     private final static String[] ALPHABET = {
             "A", "B", "C", "D", "E", "F", "G", "H", "I",
             "J", "K", "L", "M", "N", "O", "P", "Q", "R",
-            "S", "T", "U", "V", "W", "X", "Y", "Z"
+            "S", "T", "U", "V", "W", "X", "Y", "Z", " "
     };
     private final static String[] NUMBERS = {
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
     };
 
-    public SearchBarGUI(UMP plugin) {
-        this.plugin = plugin;
+    public SearchBarGUI(Player player) {
+        this.player = player;
+        inventory = Bukkit.getServer().createInventory(this, 9 * 6, "Search Bar");
+        setSearchContents();
     }
 
-    private Inventory createSearchHistory(ArrayList<String> history) {
-        Inventory inventory = plugin.getServer().createInventory(null, 9 * 6, "Search History");
-
-        for(String s : history) {
+    private void setSearchHistoryContents() {
+        inventory.clear();
+        inventory.setItem(9*6-1, new ItemBuilder(Material.ARROW).withTitle("Back").withLore(" ").build());
+        List<String> sh = searchHistory.get(player.getUniqueId());
+        if(sh.isEmpty()) {
+            inventory.setItem(0, new ItemBuilder(Material.PAPER).withTitle("No search history").withLore(" ").build());
+            return;
+        }
+        if(sh.size() - 1 > 9*6-2) {
+            sh = sh.subList(0, 9*6-1);
+        }
+        for(String s : sh) {
             inventory.addItem(new ItemBuilder(Material.BOOK).withTitle(s).withLore("Left click to select", "Right click to delete").build());
         }
-        return inventory;
     }
 
-    private Inventory createContents(Inventory inventory) {
+    private void setSearchContents() {
         inventory.clear();
         for(String s : ALPHABET) {
             inventory.addItem(new ItemBuilder(Material.PAPER).withTitle(s).withLore(" ").build());
@@ -47,85 +60,87 @@ public class SearchBarGUI implements Listener {
         for(String s : NUMBERS) {
             inventory.addItem(new ItemBuilder(Material.PAPER).withTitle(s).withLore(" ").build());
         }
+        inventory.addItem(new ItemBuilder(Material.ANVIL).withTitle("Backspace").withLore(" ").build());
         inventory.addItem(new ItemBuilder(Material.BARRIER).withTitle("Clear").withLore(" ").build());
         inventory.addItem(new ItemBuilder(Material.STRUCTURE_VOID).withTitle("Search").withLore(" ").build());
         inventory.addItem(new ItemBuilder(Material.BOOK).withTitle("Search History").withLore(" ").build());
+        inventory.setItem(53, new ItemBuilder(Material.ARROW).withTitle("Back").withLore(" ").build());
 
         for(int i = 0; i < inventory.getSize(); i++) {
             if(inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) {
                 inventory.setItem(i, new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).withLore(" ").withTitle(" ").build());
             }
         }
-        return inventory;
+    }
+
+    public void handleClick(InventoryClickEvent event) {
+        if(inHistory) handleHistory(event);
+        else handleSearch(event);
     }
 
     private void handleHistory(InventoryClickEvent event) {
         if(event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
         if(event.getCurrentItem().getType() == Material.BOOK) {
-            Triple<StringBuilder, Inventory, ArrayList<String>> triple = searchBarMap.get(event.getWhoClicked().getUniqueId());
-            ArrayList<String> history = triple.getRight();
-            StringBuilder search = triple.getLeft();
+            ArrayList<String> history = searchHistory.get(event.getWhoClicked().getUniqueId());
             if(event.isLeftClick()) {
-                search.delete(0, search.length() - 1);
-                search.append(event.getCurrentItem().getItemMeta().getDisplayName());
-                event.getView().setTitle("CLOSED");
-                event.getWhoClicked().openInventory(createContents(plugin.getServer().createInventory(null, 9 * 6, "Search Bar")));
+                search.delete(0, search.length());
+                search.append(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
+                event.getView().setTitle("Search: " + search);
+                setSearchContents();
+                inHistory = false;
             } else if(event.isRightClick()) {
                 history.remove(event.getCurrentItem().getItemMeta().getDisplayName());
-                event.getWhoClicked().openInventory(createSearchHistory(history));
+                inventory.setItem(event.getSlot(), new ItemStack(Material.AIR));
             }
+        }else if(event.getCurrentItem().getType() == Material.ARROW) {
+            inHistory = false;
+            event.getView().setTitle("Search Bar");
+            setSearchContents();
         }
     }
 
-    private void onInvClose(InventoryCloseEvent event) {
-        if(!searchBarMap.containsKey(event.getPlayer().getUniqueId())) return;
-        if(event.getView().getTitle().equals("Search History")) searchBarMap.remove(event.getPlayer().getUniqueId());
-    }
-
-    @EventHandler
-    public void onInvClick(InventoryClickEvent event) {
-
-        if(event.getClickedInventory() == null) return;
-        if(!searchBarMap.containsKey(event.getWhoClicked().getUniqueId())) return;
-
-        Triple<StringBuilder, Inventory, ArrayList<String>> triple = searchBarMap.get(event.getWhoClicked().getUniqueId());
-        Inventory inventory = triple.getMiddle();
-        if(!triple.getMiddle().equals(event.getClickedInventory())) return;
-        event.setCancelled(true);
+    private void handleSearch(InventoryClickEvent event) {
         if(event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-
-        if(event.getView().getTitle().equals("Search History")) {
-            handleHistory(event);
-            return;
-        }
-
-        StringBuilder search = triple.getLeft();
-
         switch (event.getCurrentItem().getType()) {
             case PAPER -> {
                 search.append(event.getCurrentItem().getItemMeta().getDisplayName());
                 event.getView().setTitle("Search: " + search);
             }
+            case ANVIL -> {
+                if(search.isEmpty()) return;
+                search.deleteCharAt(search.length() - 1);
+                event.getView().setTitle("Search: " + search);
+            }
+            case ARROW -> new PlayerListGUI(player).openGUI();
             case BARRIER -> {
-                search.delete(0, search.length() - 1);
+                search.delete(0, search.length());
                 event.getView().setTitle("Search: " + search);
             }
             case STRUCTURE_VOID -> {
-                new PlayerListGUI((Player)event.getWhoClicked());
-                searchBarMap.remove(event.getWhoClicked().getUniqueId());
+                String searchString = search.toString();
+                if(searchString.isBlank()) {
+                    new PlayerListGUI((Player)event.getWhoClicked()).openGUI();
+                    return;
+                }
+                if(!searchHistory.get(player.getUniqueId()).contains(searchString)) {
+                    searchHistory.get(player.getUniqueId()).add(searchString);
+                }
+                new PlayerListGUI((Player)event.getWhoClicked(), searchString).openGUI();
             }
-            case BOOK -> event.getWhoClicked().openInventory(createSearchHistory(triple.getRight()));
+            case BOOK -> {
+                inHistory = true;
+                setSearchHistoryContents();
+            }
         }
-
     }
 
-    public void open(Player player) {
-        searchBarMap.put(player.getUniqueId(),
-                Triple.of(new StringBuilder(), createContents(plugin.getServer().createInventory(null, 9 * 6, "Search Bar")), new ArrayList<>()));
+    public void open() {
+        searchHistory.putIfAbsent(player.getUniqueId(), new ArrayList<>());
+        player.openInventory(inventory);
     }
 
-    public Inventory getGUI(Player player) {
-        return searchBarMap.get(player.getUniqueId()).getMiddle();
+    @Override
+    public @NotNull Inventory getInventory() {
+        return inventory;
     }
-
 }

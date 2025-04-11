@@ -11,7 +11,9 @@ public enum Permissions {
     TEMP_MUTE("ump.temp_mute"),
     SETTINGS("ump.settings"),
     KICK("ump.kick"),
-    WARN("ump.warn"),;
+    WARN("ump.warn"),
+    PLAYER_LIST("ump.playerlist"),
+    ;
 
     private final String permission;
 

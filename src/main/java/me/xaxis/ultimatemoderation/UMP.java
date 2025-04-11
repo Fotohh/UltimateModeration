@@ -56,11 +56,6 @@ public class UMP extends JavaPlugin {
     private Metrics metrics;
 
     private Listener[] listeners;
-    private SearchBarGUI searchBarGUI;
-
-    public SearchBarGUI getSearchBarGUI() {
-        return searchBarGUI;
-    }
 
     @Override
     public void onEnable() {
@@ -68,7 +63,6 @@ public class UMP extends JavaPlugin {
         rollbackManager = new PlayerRollbackManager();
         langYML = new LangYML(getDataFolder(), this);
         staffChat = new StaffChat();
-        searchBarGUI = new SearchBarGUI(this);
         
         commands = new HashMap[]{
                 load(new StaffChatCommand(this), "staffchat"),
@@ -79,13 +73,13 @@ public class UMP extends JavaPlugin {
                 load(new SettingsCommand(this), "settings"),
                 load(new WarnCommand(this), "warn"),
                 load(new KickCommand(this), "kick"),
+                load(new PlayerListCommand(this), "playerlist"),
         };
         listeners = new Listener[]{
                 new OnPlayerChat(this),
                 new PlayerJoin(this),
                 new OnQuit(this),
                 new InventoryClick(this),
-                new SearchBarGUI(this),
         };
         registerCommands();
         registerListeners();

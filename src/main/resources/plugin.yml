@@ -28,3 +28,6 @@ commands:
   tempmute:
     description: Temporarily mute a player
     usage: /tempmute <player_name> <duration> <reason>
+  playerlist:
+    description: List all players
+    usage: /playerlist
