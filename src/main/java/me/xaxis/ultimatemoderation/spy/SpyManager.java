@@ -75,8 +75,8 @@ public class SpyManager extends Utils implements Listener{
         }
     }
 
-    private final ItemBuilder item = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
-            .withLore(" ")
+    private final ItemBuilder item = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
+            .withTitle(" ")
             .withLore(" ")
             .build();
 
@@ -131,7 +131,7 @@ public class SpyManager extends Utils implements Listener{
             return;
         }
         event.setCancelled(true);
-        Inventory fakeInv = Bukkit.createInventory(null, Math.max(holder.getInventory().getSize(), 9), "Chest");
+        Inventory fakeInv = Bukkit.createInventory(null, 9*6, "Chest");
         fakeInv.setContents(holder.getInventory().getContents());
         chestMap.put(event.getPlayer().getUniqueId(), block);
         fillEmptySlots(fakeInv, holder.getInventory().getSize());
@@ -149,14 +149,22 @@ public class SpyManager extends Utils implements Listener{
     public void onPlayerInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
         if(!containsPlayer(player)) return;
-        if(!event.hasItem() || event.getItem() == null || event.getItem().getType() == Material.AIR) return;
+        if(player.getInventory().getItemInMainHand().getType() == Material.AIR) return;
         PlayerSpy playerSpy = spyHashMap.get(player.getUniqueId());
         switch (event.getPlayer().getInventory().getItemInMainHand().getType()){
-            case BARRIER -> removePlayer(player);
-            case ANVIL -> new PlayerBanGUI(player, playerSpy.getTarget());
-            case CHEST -> player.openInventory(playerSpy.getTarget().getInventory());
+            case BARRIER -> {
+                removePlayer(player);
+                event.setCancelled(true);
+            }
+            case ANVIL -> {
+                new PlayerBanGUI(player, playerSpy.getTarget());
+                event.setCancelled(true);
+            }
+            case CHEST -> {
+                player.openInventory(playerSpy.getTarget().getInventory());
+                event.setCancelled(true);
+            }
         }
-        event.setCancelled(true);
     }
 
     public ItemStack[] getDefaultContents() {

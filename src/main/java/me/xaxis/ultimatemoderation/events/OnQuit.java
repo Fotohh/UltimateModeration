@@ -17,7 +17,7 @@ public class OnQuit implements Listener {
     public void leave(PlayerQuitEvent event){
         if(plugin.getSpyManager().containsPlayer(event.getPlayer())){
             PlayerSpy spy = plugin.getSpyManager().getSpyHashMap().get(event.getPlayer().getUniqueId());
-            spy.setLeft(false);
+            spy.setLeft(true);
         }
     }
 }
