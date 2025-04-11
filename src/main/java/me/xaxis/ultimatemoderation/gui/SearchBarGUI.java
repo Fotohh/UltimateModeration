@@ -78,6 +78,8 @@ public class SearchBarGUI implements InventoryHolder {
         else handleSearch(event);
     }
 
+    //TODO search isnt filtering numbers???...
+
     private void handleHistory(InventoryClickEvent event) {
         if(event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
         if(event.getCurrentItem().getType() == Material.BOOK) {

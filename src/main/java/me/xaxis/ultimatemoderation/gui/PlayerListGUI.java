@@ -1,6 +1,6 @@
 package me.xaxis.ultimatemoderation.gui;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,11 +25,16 @@ public class PlayerListGUI implements InventoryHolder {
         int higherBound = pageSize * (page + 1);
         if(items.size() <= lowerBound) return;
         clearPage();
+        int counter = 0;
         for(int i = lowerBound; i < higherBound - 1; i++) {
             if(items.size() - 1 < i) break;
-            inventory.setItem(i, items.get(i));
+            inventory.setItem(counter, items.get(i));
+            counter++;
         }
     }
+    //TODO goes from 42 to 44 when switching to next page, skipping 1 number
+    //TODO slot 44 is empty, supposed to be player head
+    //TODO player 100 is missing
 
     public boolean canGoToNextPage() {
         int higherBound = pageSize * (page + 1);
@@ -47,47 +52,49 @@ public class PlayerListGUI implements InventoryHolder {
     }
 
     public int prevPageSlot() {
-        return maxSize - 8;
+        return 45;
     }
 
     public int nextPageSlot() {
-        return maxSize;
+        return 53;
     }
 
     public int getPage() {
         return page;
     }
 
-    public List<ItemBuilder> getItems() {
+    public ArrayList<ItemBuilder> getItems() {
         return items;
     }
 
     public PlayerListGUI(Player player) {
         this.player = player;
         this.searchQuery = null;
-        this.items = Bukkit.getOnlinePlayers().stream().map(p ->
+        this.items = new ArrayList<>(Bukkit.getOnlinePlayers().stream().map(p ->
                 new ItemBuilder(Material.PLAYER_HEAD)
                 .withTitle(p.getName())
-                .withLore("Click to view details", p.getUniqueId().toString()).build()).toList();
+                .withLore("Click to view details", p.getUniqueId().toString()).build()).toList());
+        for(int i = 0; i < 100; i++) {
+            items.add(new ItemBuilder(Material.PLAYER_HEAD).withTitle("Player " + i).withLore("Click to view details", "fake-uuid").build());
+        }
         inventory = Bukkit.createInventory(this, maxSize, "Player List");
         setItems();
     }
 
     private final String searchQuery;
 
-    private List<ItemBuilder> items;
+    private final ArrayList<ItemBuilder> items;
 
     public PlayerListGUI(Player player, String searchQuery) {
         this.player = player;
         this.searchQuery = searchQuery;
-        this.items = Bukkit.getOnlinePlayers().stream()
+        this.items = new ArrayList<>(Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.getName().toLowerCase().contains(searchQuery.toLowerCase()))
                 .map(p -> new ItemBuilder(Material.PLAYER_HEAD)
                         .withTitle(p.getName())
                         .withLore("Click to view details", p.getUniqueId().toString())
                         .build())
-                .toList();
-        //adding 100 fake players
+                .toList());
         for(int i = 0; i < 100; i++) {
             items.add(new ItemBuilder(Material.PLAYER_HEAD).withTitle("Player " + i).withLore("Click to view details", "fake-uuid").build());
         }
