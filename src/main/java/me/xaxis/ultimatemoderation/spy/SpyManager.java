@@ -67,6 +67,7 @@ public class SpyManager extends Utils implements Listener{
         if (chestMap.containsKey(uuid)) {
             Block block = chestMap.remove(uuid);
             if (block.getState() instanceof InventoryHolder holder) {
+                //TODO save contents that are from 0 - holder size. is saving the whole inventory to inventories which size is less than 54
                 holder.getInventory().setContents(event.getInventory().getContents());
             }else if(block.getType() == Material.ENDER_CHEST){
                 Player target = spyHashMap.get(uuid).getTarget();
@@ -99,7 +100,7 @@ public class SpyManager extends Utils implements Listener{
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if(event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-        if(event.getCurrentItem().equals(item)) {
+        if(event.getCurrentItem().isSimilar(item)) {
             event.setCancelled(true);
             return;
         }
@@ -146,7 +147,7 @@ public class SpyManager extends Utils implements Listener{
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event){
+    public void onPlayerInteract(PlayerInteractEvent event){ //TODO this only runs if the player clicks a block, should run if they click air too
         Player player = event.getPlayer();
         if(!containsPlayer(player)) return;
         if(player.getInventory().getItemInMainHand().getType() == Material.AIR) return;
@@ -161,7 +162,7 @@ public class SpyManager extends Utils implements Listener{
                 event.setCancelled(true);
             }
             case CHEST -> {
-                player.openInventory(playerSpy.getTarget().getInventory());
+                player.openInventory(playerSpy.getTarget().getInventory()); //TODO add armor contents, and fix layout
                 event.setCancelled(true);
             }
         }
