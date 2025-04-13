@@ -114,7 +114,7 @@ public class Utils {
         if(rollbackManager)
             main.getRollbackManager().save(player);
         player.setGameMode(GameMode.ADVENTURE);
-        player.setInvisible(true);
+        //player.setInvisible(true);
         player.setInvulnerable(true);
         player.getInventory().clear();
         player.setCanPickupItems(false);
@@ -130,7 +130,7 @@ public class Utils {
 
     public void unvanishPlayer(Player player, boolean rollbackManager){
         player.setCanPickupItems(true);
-        player.setInvisible(false);
+        //player.setInvisible(false);
         player.setInvulnerable(false);
         if(rollbackManager)
             main.getRollbackManager().restore(player);

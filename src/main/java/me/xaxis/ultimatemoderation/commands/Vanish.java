@@ -22,12 +22,10 @@ public class Vanish extends Utils implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if(!(sender instanceof Player)) {
+        if(!(sender instanceof Player player)) {
             sender.sendMessage("You must be a player to use this command.");
             return true;
         }
-
-        Player player = (Player) sender;
 
         if(!hasPermission(player, Permissions.VANISH)) {
             message(player, "&cYou do not have permission to use this command.");
@@ -50,7 +48,7 @@ public class Vanish extends Utils implements CommandExecutor {
         }
 
         player.sendMessage(chat("&cUsage: /vanish"));
-        
+
         return false;
     }
 }

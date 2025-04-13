@@ -35,7 +35,7 @@ public class SettingsCommand extends Utils implements CommandExecutor {
         }
 
         if(strings.length == 0) {
-            new SettingsGUI(player, main);
+            new SettingsGUI(player, main).openGUI();
             return true;
         }
 
