@@ -125,4 +125,19 @@ public class PlayerProfile extends PlayerProfileYML {
         }
     }
 
+    public boolean isJoinVanishEnabled() {
+        return getBoolean(Defaults.JOIN_VANISH);
+    }
+
+    public void setJoinVanish(boolean joinVanish) {
+        set(Defaults.JOIN_VANISH, joinVanish);
+    }
+
+    public void setVanished(boolean val) {
+        set(Defaults.VANISHED, val);
+    }
+
+    public boolean isVanished() {
+        return getBoolean(Defaults.VANISHED);
+    }
 }

@@ -114,13 +114,14 @@ public class PlayerBanGUI extends GUI {
         h.withTitle(target.getDisplayName()).withLore(target.getUniqueId().toString()).build();
         SkullMeta m = (SkullMeta) h.getItemMeta();
         if(m == null) return;
+        m.setOwnerProfile(target.getPlayerProfile());
         m.setOwningPlayer(target);
         h.setItemMeta(m);
 
         getInventory().setItem(0, barrier);
         getInventory().setItem(1, b);
         getInventory().setItem(3, c);
-        getInventory().setItem(4, ipBanDisabled);
+        getInventory().setItem(4, ipBan ? ipBanEnabled : ipBanDisabled);
         getInventory().setItem(5, h);
         getInventory().setItem(7, p);
         getInventory().setItem(8, rc);

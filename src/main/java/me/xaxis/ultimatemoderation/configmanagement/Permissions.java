@@ -13,7 +13,7 @@ public enum Permissions {
     KICK("ump.kick"),
     WARN("ump.warn"),
     PLAYER_LIST("ump.playerlist"),
-    ;
+    VANISH("ump.vanish");
 
     private final String permission;
 

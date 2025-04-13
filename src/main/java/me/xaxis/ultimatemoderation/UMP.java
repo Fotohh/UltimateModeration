@@ -7,7 +7,6 @@ import me.xaxis.ultimatemoderation.events.OnPlayerChat;
 import me.xaxis.ultimatemoderation.events.OnQuit;
 import me.xaxis.ultimatemoderation.events.PlayerJoin;
 import me.xaxis.ultimatemoderation.file.LangYML;
-import me.xaxis.ultimatemoderation.gui.SearchBarGUI;
 import me.xaxis.ultimatemoderation.mute.MuteManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.spy.SpyManager;
@@ -33,7 +32,7 @@ public class UMP extends JavaPlugin {
 
     private StaffChat staffChat;
 
-    private HashMap[] commands;
+    private HashMap<CommandExecutor, String>[] commands;
 
     private PlayerRollbackManager rollbackManager;
 
@@ -46,11 +45,10 @@ public class UMP extends JavaPlugin {
     //TODO finish ban
     //TODO finish unban
     //TODO finish tempban
-    //TODO finish untempban
-    //todo finish settings gui and command
     //TODO finish player data gui
     //todo finish player list
     //todo cleanup gui and add more stuff
+    //todo moderation alerts
 
 
     private Metrics metrics;
@@ -90,7 +88,7 @@ public class UMP extends JavaPlugin {
             throw new RuntimeException(e);
         }
         metrics = new Metrics(this, 19198);
-        new UpdateChecker(this);
+        new UpdateChecker(12345, "https://www.spigotmc.org/resources/ultimate-moderation-plugin.12345/", this, "UMP UpdateChecker");
         loadPlayerData();
     }
 

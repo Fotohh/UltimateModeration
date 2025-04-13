@@ -3,6 +3,8 @@ package me.xaxis.ultimatemoderation.commands;
 import me.xaxis.ultimatemoderation.UMP;
 import me.xaxis.ultimatemoderation.configmanagement.Lang;
 import me.xaxis.ultimatemoderation.configmanagement.Permissions;
+import me.xaxis.ultimatemoderation.gui.SettingsGUI;
+import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,7 +35,7 @@ public class SettingsCommand extends Utils implements CommandExecutor {
         }
 
         if(strings.length == 0) {
-            //TODO gui
+            new SettingsGUI(player, main);
             return true;
         }
 
@@ -46,6 +48,18 @@ public class SettingsCommand extends Utils implements CommandExecutor {
             }
             return true;
         }
+        if(strings[0].equalsIgnoreCase("togglevanish") || strings[0].equalsIgnoreCase("vanish")) {
+            PlayerProfile profile = PlayerProfile.getPlayerProfile(player.getUniqueId());
+            profile.setJoinVanish(!profile.isJoinVanishEnabled());
+            if (profile.isJoinVanishEnabled()) {
+                player.sendMessage(chat("&7Join vanish &aenabled"));
+            } else {
+                player.sendMessage(chat("&7Join vanish &cdisabled"));
+            }
+            return true;
+        }
+
+        player.sendMessage(chat("&Invalid command usage! Use /settings"));
 
         return false;
     }

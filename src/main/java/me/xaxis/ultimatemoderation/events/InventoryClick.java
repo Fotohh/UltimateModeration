@@ -1,26 +1,18 @@
 package me.xaxis.ultimatemoderation.events;
 
-import com.github.fotohh.itemutil.ItemBuilder;
 import me.xaxis.ultimatemoderation.UMP;
-import me.xaxis.ultimatemoderation.gui.PlayerBanGUI;
-import me.xaxis.ultimatemoderation.gui.PlayerListGUI;
-import me.xaxis.ultimatemoderation.gui.ProfileGUI;
-import me.xaxis.ultimatemoderation.gui.SearchBarGUI;
+import me.xaxis.ultimatemoderation.gui.*;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.type.Ban;
 import me.xaxis.ultimatemoderation.type.InfractionType;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public class InventoryClick implements Listener {
     private final UMP plugin;
@@ -46,6 +38,12 @@ public class InventoryClick implements Listener {
         if(event.getInventory().getHolder() instanceof ProfileGUI gui) {
             event.setCancelled(true);
             gui.handleClick(event);
+            return;
+        }
+
+        if(event.getInventory().getHolder() instanceof SettingsGUI settings) {
+            event.setCancelled(true);
+            settings.handleClick(event);
             return;
         }
         if(!(event.getWhoClicked() instanceof Player player)) return;

@@ -1,9 +1,9 @@
 package me.xaxis.ultimatemoderation.updatechecker;
 
-import me.xaxis.ultimatemoderation.UMP;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -11,92 +11,96 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 public class UpdateChecker {
 
-    private final UMP ump;
+    private final int resourceID;
+    private final String pluginVersion;
+    private final JavaPlugin plugin;
+    private final Logger logger;
+    private static final String apiUrl = "https://api.spiget.org/v2/resources/%d/versions/latest";
+    private final String upToDatePluginMessage;
+    private final String outdatedPluginMessage;
 
-    private double webVersion;
-
-    private static final String SPIGET_API_URL = "https://api.spiget.org/v2/resources/%d/versions?size=1&sort=-releaseDate";
-
-    //from spigot page
-    private static final String RESOURCE_LINK = "";
-
-    public UpdateChecker(UMP ump) {
-
-        this.ump = ump;
-
-        double version = Double.parseDouble(ump.getDescription().getVersion());
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                fetchResourceVersion();
-            }
-        }.runTaskAsynchronously(ump);
-
-        if(version < webVersion){
-            ump.getLogger().warning("You are not running the latest version!\n Please download the latest version from here: " + RESOURCE_LINK);
-        }
-
+    public UpdateChecker(int resourceID, String resourceURL, JavaPlugin plugin, String loggerName) {
+        this.resourceID = resourceID;
+        this.pluginVersion = plugin.getDescription().getVersion();
+        this.plugin = plugin;
+        upToDatePluginMessage = plugin.getName() + " is up to date";
+        outdatedPluginMessage = plugin.getName() + " is outdated! Download the new update from " + resourceURL;
+        logger = Logger.getLogger(Objects.requireNonNullElseGet(loggerName, () -> plugin.getName() + " UpdateChecker"));
+        runAsync();
     }
 
-    private void fetchResourceVersion() {
-        try {
-            // Create the API URL with the resource ID
-            int resourceId = 12345;
-            String apiUrl = String.format(SPIGET_API_URL, resourceId);
-
-            // Create a connection to the Spiget API
-            HttpsURLConnection connection = createConnection(apiUrl);
-
-            // Read the response from the API
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+    public void runAsync() {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String webVersion;
+            try {
+                webVersion = requestServerVersion(fetchURL());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            reader.close();
-
-            JSONArray versions = new JSONArray(response.toString());
-            if (!versions.isEmpty()) {
-                JSONObject latestVersion = versions.getJSONObject(0);
-                webVersion = Double.parseDouble(latestVersion.getString("name"));
+            if (isUpToDate(parseVersion(pluginVersion), parseVersion(webVersion))) {
+                logger.info(upToDatePluginMessage);
             } else {
-                ump.getLogger().info("No versions found for the resource.");
+                logger.warning(outdatedPluginMessage);
             }
-        } catch (Exception e) {
-            ump.getLogger().severe("Failed to fetch resource version: " + e.getMessage());
-        }
+        });
     }
 
-    private HttpsURLConnection createConnection(String apiURL){
+    public List<Integer> parseVersion(String version) {
+        List<Integer> list = new ArrayList<>();
 
-        URL url;
-
-        HttpsURLConnection connection;
-
-        try {
-
-            url = URI.create(apiURL).toURL();
-
-            connection = (HttpsURLConnection) url.openConnection();
-
-            connection.setRequestMethod("GET");
-
-        } catch (IOException e) {
-
-            throw new RuntimeException(e);
-
+        String[] values = null;
+        if(version.contains(".")) values = version.split("\\.");
+        if(values == null) {
+            int num = Integer.parseInt(version);
+            list.add(num);
+            return list;
         }
+        for (String val : values) {
+            int num = Integer.parseInt(val);
+            list.add(num);
+        }
+        return list;
+    }
 
-        connection.setDoOutput(true);
+    public boolean isUpToDate(List<Integer> parsedPluginVersion, List<Integer> parsedWebVersion) {
+        if(parsedWebVersion.size() > parsedPluginVersion.size()) {
+            int diff = parsedWebVersion.size() - parsedPluginVersion.size();
+            for (int i = 0; i < diff; i++) {
+                parsedPluginVersion.add(0);
+            }
+        }else if(parsedWebVersion.size() < parsedPluginVersion.size()) {
+            int diff = parsedPluginVersion.size() - parsedWebVersion.size();
+            for (int i = 0; i < diff; i++) {
+                parsedWebVersion.add(0);
+            }
+        }
+        for (int i = 0; i < parsedWebVersion.size(); i++) {
+            if (parsedWebVersion.get(i) > parsedPluginVersion.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    public HttpsURLConnection fetchURL() throws IOException {
+        URL url = URI.create(String.format(apiUrl, resourceID)).toURL();
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
         return connection;
-
     }
 
+    public String requestServerVersion(HttpsURLConnection connection) throws IOException {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            JsonObject response = JsonParser.parseReader(in).getAsJsonObject();
+            return response.get("name").getAsString();
+        }
+    }
 
 }

@@ -39,7 +39,11 @@ public class PlayerProfileYML extends File {
 
         NUM_OF_KICKS("kick_settings.times_kicked", 0),
 
-        ADDITIONAL_NOTES("additional_notes", "null");
+        ADDITIONAL_NOTES("additional_notes", "null"),
+
+        JOIN_VANISH("join_vanish", false),
+
+        VANISHED("vanished", false);
 
         private final String path;
         private final Object defaultValue;

@@ -67,8 +67,9 @@ public class SpyManager extends Utils implements Listener{
         if (chestMap.containsKey(uuid)) {
             Block block = chestMap.remove(uuid);
             if (block.getState() instanceof InventoryHolder holder) {
-                //TODO save contents that are from 0 - holder size. is saving the whole inventory to inventories which size is less than 54
-                holder.getInventory().setContents(event.getInventory().getContents());
+                ItemStack[] contents = new ItemStack[holder.getInventory().getSize()];
+                System.arraycopy(event.getInventory().getContents(), 0, contents, 0, holder.getInventory().getSize());
+                holder.getInventory().setContents(contents);
             }else if(block.getType() == Material.ENDER_CHEST){
                 Player target = spyHashMap.get(uuid).getTarget();
                 target.getEnderChest().setContents(event.getInventory().getContents());
@@ -112,8 +113,28 @@ public class SpyManager extends Utils implements Listener{
         handleInventory(event);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void playerInteractOnBlock(PlayerInteractEvent event) {
+    private void handlePlayerInteractOnItem(PlayerInteractEvent event) { //TODO this only runs if the player clicks a block, should run if they click air too
+        Player player = event.getPlayer();
+        if(!containsPlayer(player)) return;
+        if(player.getInventory().getItemInMainHand().getType() == Material.AIR) return;
+        PlayerSpy playerSpy = spyHashMap.get(player.getUniqueId());
+        switch (event.getPlayer().getInventory().getItemInMainHand().getType()){
+            case BARRIER -> {
+                removePlayer(player);
+                event.setCancelled(true);
+            }
+            case ANVIL -> {
+                new PlayerBanGUI(player, playerSpy.getTarget());
+                event.setCancelled(true);
+            }
+            case CHEST -> {
+                player.openInventory(playerSpy.getTarget().getInventory()); //TODO add armor contents, and fix layout
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    private void handlePlayerInteractOnBlock(PlayerInteractEvent event){
         Player player = event.getPlayer();
         if (!containsPlayer(player)) return;
         if (!event.hasBlock() && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -139,32 +160,16 @@ public class SpyManager extends Utils implements Listener{
         player.openInventory(fakeInv);
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void playerInteractOnBlock(PlayerInteractEvent event) {
+        handlePlayerInteractOnBlock(event);
+        handlePlayerInteractOnItem(event);
+    }
+
     private void fillEmptySlots(Inventory inv, int size){
         for(int i = size; i < inv.getSize(); i++){
             if(inv.getItem(i) == null || inv.getItem(i).getType() == Material.AIR)
                 inv.setItem(i, item);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event){ //TODO this only runs if the player clicks a block, should run if they click air too
-        Player player = event.getPlayer();
-        if(!containsPlayer(player)) return;
-        if(player.getInventory().getItemInMainHand().getType() == Material.AIR) return;
-        PlayerSpy playerSpy = spyHashMap.get(player.getUniqueId());
-        switch (event.getPlayer().getInventory().getItemInMainHand().getType()){
-            case BARRIER -> {
-                removePlayer(player);
-                event.setCancelled(true);
-            }
-            case ANVIL -> {
-                new PlayerBanGUI(player, playerSpy.getTarget());
-                event.setCancelled(true);
-            }
-            case CHEST -> {
-                player.openInventory(playerSpy.getTarget().getInventory()); //TODO add armor contents, and fix layout
-                event.setCancelled(true);
-            }
         }
     }
 
