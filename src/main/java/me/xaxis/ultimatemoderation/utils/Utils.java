@@ -111,12 +111,11 @@ public class Utils {
     }
 
     public void vanishPlayer(Player player, boolean rollbackManager){
-        if(rollbackManager)
+        if(rollbackManager) {
             main.getRollbackManager().save(player);
-        player.setGameMode(GameMode.ADVENTURE);
-        //player.setInvisible(true);
+            player.getInventory().clear();
+        }
         player.setInvulnerable(true);
-        player.getInventory().clear();
         player.setCanPickupItems(false);
         player.setAllowFlight(true);
         if(!player.isFlying())
@@ -130,10 +129,11 @@ public class Utils {
 
     public void unvanishPlayer(Player player, boolean rollbackManager){
         player.setCanPickupItems(true);
-        //player.setInvisible(false);
         player.setInvulnerable(false);
-        if(rollbackManager)
+        if(rollbackManager) {
+            player.getInventory().clear();
             main.getRollbackManager().restore(player);
+        }
         for(Player target : Bukkit.getServer().getOnlinePlayers()){
             if(target.canSee(player)) continue;
             target.showPlayer(main, player);

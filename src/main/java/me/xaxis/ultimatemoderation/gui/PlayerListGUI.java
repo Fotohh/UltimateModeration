@@ -88,8 +88,6 @@ public class PlayerListGUI implements InventoryHolder {
         if (searchQuery == null || other == null) return false;
         String cleanedQuery = searchQuery.replaceAll(" ", "").toLowerCase();
         String cleanedOther = other.replaceAll(" ", "").toLowerCase();
-        Bukkit.getLogger().info("Search query: " + cleanedQuery);
-        Bukkit.getLogger().info("Other: " + cleanedOther);
         return cleanedQuery.contains(cleanedOther);
     }
 

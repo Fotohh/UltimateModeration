@@ -37,7 +37,7 @@ public class Vanish extends Utils implements CommandExecutor {
         if(args.length == 0) {
             if(profile.isVanished()) {
                 profile.setVanished(false);
-                vanishPlayer(player, false);
+                unvanishPlayer(player, false);
                 message(player, "&7You are now &cvisible&7.");
             } else {
                 profile.setVanished(true);

@@ -31,18 +31,6 @@ public class SettingsGUI implements InventoryHolder {
         this.joinVanished = profile.isJoinVanishEnabled();
     }
 
-    public int getToggleStaffChat() {
-        return 0;
-    }
-
-    public int getJoinVanish() {
-        return 1;
-    }
-
-    public int getClose() {
-        return 2;
-    }
-
     public void toggleStaffChat() {
         staffChatToggled = !staffChatToggled;
         UMP.instance.getStaffChat().setVisibility(player, staffChatToggled);

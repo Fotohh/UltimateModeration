@@ -57,6 +57,7 @@ public class UMP extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         UMP.instance = this;
         rollbackManager = new PlayerRollbackManager();
         langYML = new LangYML(getDataFolder(), this);
@@ -72,6 +73,7 @@ public class UMP extends JavaPlugin {
                 load(new WarnCommand(this), "warn"),
                 load(new KickCommand(this), "kick"),
                 load(new PlayerListCommand(this), "playerlist"),
+                load(new Vanish(this), "vanish"),
         };
         listeners = new Listener[]{
                 new OnPlayerChat(this),

@@ -31,3 +31,6 @@ commands:
   playerlist:
     description: List all players
     usage: /playerlist
+  vanish:
+    description: Vanish from all players
+    usage: /vanish

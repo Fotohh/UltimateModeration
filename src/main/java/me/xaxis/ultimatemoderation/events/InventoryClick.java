@@ -84,11 +84,11 @@ public class InventoryClick implements Listener {
                 }
                 case BLACK_CONCRETE -> {
                     gui.setIpBan(!gui.isIpBan());
-                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanDisabled());
+                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanEnabled());
                 }
                 case GREEN_CONCRETE -> {
                     gui.setIpBan(!gui.isIpBan());
-                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanEnabled());
+                    gui.getInventory().setItem(event.getSlot(), gui.getIpBanDisabled());
                 }
             }
         }

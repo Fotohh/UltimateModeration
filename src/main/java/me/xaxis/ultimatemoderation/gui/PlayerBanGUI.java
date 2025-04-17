@@ -88,7 +88,7 @@ public class PlayerBanGUI extends GUI {
         return ipBanEnabled;
     }
 
-    private final ItemStack ipBanEnabled = new ItemBuilder(Material.BLACK_CONCRETE)
+    private final ItemStack ipBanEnabled = new ItemBuilder(Material.GREEN_CONCRETE)
             .withTitle("&7IP Ban &aEnabled")
             .build();
     private final ItemStack ipBanDisabled = new ItemBuilder(Material.BLACK_CONCRETE)

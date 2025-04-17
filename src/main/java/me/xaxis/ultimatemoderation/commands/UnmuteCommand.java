@@ -22,11 +22,11 @@ public class UnmuteCommand extends Utils implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
 
         if(!(commandSender instanceof Player player)){
-            commandSender.sendMessage("&cYou must be a player to use this command!");
+            commandSender.sendMessage("You must be a player to use this command!");
             return true;
         }
 
-        if (hasPermission(player, Permissions.UNMUTE)) {
+        if (!hasPermission(player, Permissions.UNMUTE)) {
             player.sendMessage(chat("&cYou do not have permission to use this command."));
             return true;
         }

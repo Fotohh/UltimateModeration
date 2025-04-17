@@ -25,7 +25,7 @@ public class StaffChatCommand extends Utils implements CommandExecutor {
         if (sender instanceof Player player) {
             if (hasPermission(player, Permissions.STAFF_CHAT)) {
                 if (args.length == 0) {
-                    player.sendMessage("&cUsage: /staffchat <message>");
+                    player.sendMessage(chat("&cUsage: /staffchat <message>"));
                     return true;
                 } else {
                     StringBuilder sb = new StringBuilder();
