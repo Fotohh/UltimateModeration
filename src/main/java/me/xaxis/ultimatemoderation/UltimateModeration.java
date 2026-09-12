@@ -1,6 +1,6 @@
 package me.xaxis.ultimatemoderation;
 
-import me.xaxis.ultimatemoderation.config.ConfigValidation;
+import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -9,7 +9,8 @@ public class UltimateModeration extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if(!getDataFolder().exists()){
+
+        if(!getDataFolder().exists()) {
             if(!getDataFolder().mkdirs()) {
                 getLogger().severe("Failed to create the necessary directories!");
                 getPluginLoader().disablePlugin(this);
@@ -19,13 +20,20 @@ public class UltimateModeration extends JavaPlugin {
 
         saveDefaultConfig();
 
-        ConfigValidation configValidation = new ConfigValidation(getDataFolder().toPath().resolve("config.yml"), getConfig());
+        MainConfigValidation configValidation =
+                new MainConfigValidation(
+                        getDataFolder().toPath().resolve("config.yml"),
+                        getConfig()
+                );
+
         List<String> errors = configValidation.validate();
+
         if(!errors.isEmpty()) {
-            errors.forEach(error -> getLogger().severe(error));
+            errors.forEach(getLogger()::severe);
             getPluginLoader().disablePlugin(this);
             return;
         }
+
 
     }
 

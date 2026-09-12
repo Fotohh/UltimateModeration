@@ -12,7 +12,7 @@
     <name>UltimateModeration</name>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spigot.version>1.21.10-R0.1-SNAPSHOT</spigot.version>
     </properties>
