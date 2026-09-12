@@ -1,7 +1,7 @@
 name: UltimateModerationPlus
 main: me.xaxis.ultimatemoderation.UMP
-version: 0.1
-api-version: 1.20
+version: 1
+api-version: 1.21
 commands:
   spy:
     description: Spy on a player
@@ -25,6 +25,7 @@ commands:
       usage: /warn <player_name> <reason>
   settings:
     description: adjust settings
+    usage: /settings
   tempmute:
     description: Temporarily mute a player
     usage: /tempmute <player_name> <duration> <reason>
@@ -34,3 +35,10 @@ commands:
   vanish:
     description: Vanish from all players
     usage: /vanish
+  ban:
+    description: Permanently ban a player
+    usage: /ban <player_name> <reason>
+  tempban:
+    description: Temporarily ban a player
+    usage: /ban <player_name> <duration> <reason>
+
