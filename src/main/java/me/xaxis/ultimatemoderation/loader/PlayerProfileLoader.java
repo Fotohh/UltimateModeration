@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.loader;
 
+import me.xaxis.ultimatemoderation.file.AtomicWrite;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.validation.PlayerProfileYmlValidation;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -13,10 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PlayerProfileLoader {
+public class PlayerProfileLoader implements AutoCloseable{
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private static final String UNKNOWN_PLAYER_NAME = "unknown";
 
@@ -37,7 +44,7 @@ public class PlayerProfileLoader {
         );
     }
 
-    public List<PlayerProfile> loadProfiles() {
+    private List<PlayerProfile> loadProfiles() {
         List<PlayerProfile> profiles = new ArrayList<>();
 
         File parentFolder = parentFolderPath.toFile();
@@ -76,6 +83,13 @@ public class PlayerProfileLoader {
         return profiles;
     }
 
+    public CompletableFuture<List<PlayerProfile>> loadProfilesAsync() {
+        return CompletableFuture.supplyAsync(
+                this::loadProfiles,
+                executor
+        );
+    }
+
     private YamlConfiguration createFreshProfile(File file, UUID uuid) throws IOException {
 
         YamlConfiguration configuration = new YamlConfiguration();
@@ -85,7 +99,7 @@ public class PlayerProfileLoader {
         configuration.set("player-name", UNKNOWN_PLAYER_NAME);
         configuration.set("notes", List.of());
 
-        configuration.save(file); // todo get ur atomic write system setup so we can avoid this
+        AtomicWrite.save(file.toPath(), configuration.saveToString());
 
         return configuration;
     }
@@ -171,4 +185,21 @@ public class PlayerProfileLoader {
     }
 
 
+    @Override
+    public void close() {
+        executor.shutdown();
+
+        try {
+            if(!executor.awaitTermination(
+                    10,
+                    TimeUnit.SECONDS
+            )) {
+                executor.shutdownNow();
+            }
+        } catch(InterruptedException e) {
+            logger.log(Level.SEVERE, "Failed to shutdown PlayerProfileLoader thread!", e);
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
 }
