@@ -1,1 +1,3 @@
+# NEVER edit config-version, it is used to check if the file is up to date.
 config-version: 1
+

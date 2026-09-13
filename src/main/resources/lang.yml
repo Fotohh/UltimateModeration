@@ -1,0 +1,10 @@
+# NEVER edit config-version, it is used to check if the file is up to date.
+config-version: 1
+
+# Placeholders used in messages:
+# {player} - The name of the player.
+# {time} - The time in seconds for cooldowns.
+
+messages:
+  prefix: '&7[&cUltimateModeration&7] &r'
+  no-permission: '&cYou do not have permission to perform this command.'

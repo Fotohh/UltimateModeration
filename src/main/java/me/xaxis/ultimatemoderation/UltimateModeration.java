@@ -1,10 +1,14 @@
 package me.xaxis.ultimatemoderation;
 
+import me.xaxis.ultimatemoderation.lang.LangManager;
+import me.xaxis.ultimatemoderation.lang.LangValidator;
+import me.xaxis.ultimatemoderation.lang.LangYml;
 import me.xaxis.ultimatemoderation.loader.PlayerProfileLoader;
 import me.xaxis.ultimatemoderation.manager.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -15,6 +19,7 @@ public class UltimateModeration extends JavaPlugin {
 
     private PlayerProfileLoader playerProfileLoader;
     private PlayerProfileManager playerProfileManager;
+    private LangManager langManager;
 
     @Override
     public void onEnable() {
@@ -74,6 +79,25 @@ public class UltimateModeration extends JavaPlugin {
         );
         playerProfileManager = new PlayerProfileManager(profiles, playerProfileStorage, getLogger());
         //resume rest of initialization
+
+        saveResource("lang.yml", false);
+        YamlConfiguration langConfiguration = YamlConfiguration.loadConfiguration(
+                getDataFolder().toPath().resolve("lang.yml").toFile()
+        );
+        LangValidator langValidator = new LangValidator(
+                getDataFolder().toPath().resolve("lang.yml"),
+                langConfiguration
+        );
+        List<String> langErrors = langValidator.validate();
+
+        if(!langErrors.isEmpty()) {
+            langErrors.forEach(getLogger()::severe);
+            getPluginLoader().disablePlugin(this);
+            return;
+        }
+
+        LangYml langYml = new LangYml(langConfiguration);
+        langManager = new LangManager(langYml);
 
 
     }

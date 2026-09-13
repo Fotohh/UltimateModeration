@@ -37,7 +37,7 @@ public class AtomicWrite {
 
             try(FileChannel channel = FileChannel.open(
                     temp,
-                    StandardOpenOption.WRITE
+                    StandardOpenOption.SYNC
             )) {
                 channel.force(true);
             }
