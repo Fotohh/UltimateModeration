@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.storage;
 
+import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.file.AtomicWrite;
 import me.xaxis.ultimatemoderation.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,7 +38,7 @@ public class PlayerProfileStorage implements AutoCloseable {
 
         YamlConfiguration configuration = new YamlConfiguration();
 
-        configuration.set("config-version", 1);
+        configuration.set(ConfigConstants.CONFIG_VERSION_PATH, ConfigConstants.PLAYER_PROFILE.currentVersion());
         configuration.set("player-id", profile.playerID().toString());
         configuration.set("player-name", profile.playerName());
         configuration.set("notes", profile.notes());

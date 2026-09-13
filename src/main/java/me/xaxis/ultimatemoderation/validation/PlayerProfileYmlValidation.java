@@ -12,7 +12,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     private static final Pattern PLAYER_NAME_PATTERN =
             Pattern.compile("^[A-Za-z0-9_]{3,16}$");
 
-    private static final int CURRENT_CONFIG_VERSION = 1;
+    public static final int CURRENT_CONFIG_VERSION = 1;
 
     private static final String PLAYER_ID_PATH = "player-id";
     private static final String PLAYER_NAME_PATH = "player-name";

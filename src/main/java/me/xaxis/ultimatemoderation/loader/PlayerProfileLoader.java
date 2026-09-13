@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.loader;
 
+import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.file.AtomicWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
@@ -92,7 +93,7 @@ public class PlayerProfileLoader implements AutoCloseable{
 
         YamlConfiguration configuration = new YamlConfiguration();
 
-        configuration.set("config-version", 1); //todo keep this in mind
+        configuration.set(ConfigConstants.CONFIG_VERSION_PATH, ConfigConstants.PLAYER_PROFILE.currentVersion());
         configuration.set("player-id", uuid.toString());
         configuration.set("player-name", UNKNOWN_PLAYER_NAME);
         configuration.set("notes", List.of());

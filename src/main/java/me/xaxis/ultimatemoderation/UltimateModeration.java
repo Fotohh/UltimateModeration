@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderation;
 
 import me.xaxis.ultimatemoderation.lang.LangManager;
-import me.xaxis.ultimatemoderation.lang.LangValidator;
+import me.xaxis.ultimatemoderation.validation.LangValidator;
 import me.xaxis.ultimatemoderation.lang.LangYml;
 import me.xaxis.ultimatemoderation.listener.PlayerJoin;
 import me.xaxis.ultimatemoderation.loader.PlayerProfileLoader;
@@ -10,10 +10,12 @@ import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -85,7 +87,6 @@ public class UltimateModeration extends JavaPlugin {
                 getLogger()
         );
         playerProfileManager = new PlayerProfileManager(profiles, playerProfileStorage, getLogger());
-        //resume rest of initialization
 
         saveResource("lang.yml", false);
         YamlConfiguration langConfiguration = YamlConfiguration.loadConfiguration(
@@ -106,8 +107,15 @@ public class UltimateModeration extends JavaPlugin {
         LangYml langYml = new LangYml(langConfiguration);
         langManager = new LangManager(langYml);
 
-        getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
         profileSaveTask = getServer().getScheduler().runTaskTimer(this, () -> playerProfileManager.saveAll(), 0L, 20L * 60 * 5);
+        for(Player player : getServer().getOnlinePlayers()) {
+            if(!playerProfileManager.hasPlayerProfile(player.getUniqueId())) {
+                playerProfileManager.addPlayerProfile(
+                        new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>())
+                );
+            }
+        }
+        getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
     }
 
     @Override

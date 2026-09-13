@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.validation;
 
+import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
@@ -9,8 +10,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class YamlValidator {
-
-    protected static final String CONFIG_VERSION_PATH = "config-version";
 
     protected final Path path;
     protected final FileConfiguration configuration;
@@ -70,28 +69,28 @@ public class YamlValidator {
 
     private void validateConfigVersion(List<String> errors) {
 
-        if(!configuration.contains(CONFIG_VERSION_PATH)) {
+        if(!configuration.contains(ConfigConstants.CONFIG_VERSION_PATH)) {
             errors.add(
-                    "Missing config-version in "
+                    "Missing " + ConfigConstants.CONFIG_VERSION_PATH + " in "
                             + path.getFileName()
             );
             return;
         }
 
-        if(!configuration.isInt(CONFIG_VERSION_PATH)) {
+        if(!configuration.isInt(ConfigConstants.CONFIG_VERSION_PATH)) {
             errors.add(
-                    "config-version must be an integer in "
+                    ConfigConstants.CONFIG_VERSION_PATH + " must be an integer in "
                             + path.getFileName()
             );
             return;
         }
 
         int version =
-                configuration.getInt(CONFIG_VERSION_PATH);
+                configuration.getInt(ConfigConstants.CONFIG_VERSION_PATH);
 
         if(version != expectedVersion) {
             errors.add(
-                    "Expected config version "
+                    "Expected " + ConfigConstants.CONFIG_VERSION_PATH + ": "
                             + expectedVersion
                             + ", found "
                             + version

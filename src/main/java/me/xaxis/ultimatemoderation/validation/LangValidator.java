@@ -1,6 +1,7 @@
-package me.xaxis.ultimatemoderation.lang;
+package me.xaxis.ultimatemoderation.validation;
 
-import me.xaxis.ultimatemoderation.validation.YamlValidator;
+import me.xaxis.ultimatemoderation.constants.ConfigConstants;
+import me.xaxis.ultimatemoderation.lang.LangKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.nio.file.Path;
@@ -8,10 +9,8 @@ import java.util.List;
 
 public class LangValidator extends YamlValidator {
 
-    private static final int CONFIG_VERSION = 1;
-
     public LangValidator(Path path, YamlConfiguration configuration) {
-        super(path, configuration, CONFIG_VERSION);
+        super(path, configuration, ConfigConstants.LANG.currentVersion());
 
         addValidation(this::validateMessages);
     }
