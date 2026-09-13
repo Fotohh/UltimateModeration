@@ -2,12 +2,14 @@ package me.xaxis.ultimatemoderation.validation;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
+import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
+import me.xaxis.ultimatemoderation.player.Note;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
-import java.util.regex.Pattern;
+
 
 public final class PlayerProfileYmlValidation extends YamlValidator {
 
@@ -16,7 +18,6 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     private static final String NOTES_PATH = "notes";
 
     private final UUID expectedPlayerId;
-
 
     public PlayerProfileYmlValidation(
             Path path,
@@ -29,21 +30,17 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                 ConfigConstants.PLAYER_PROFILE.currentVersion()
         );
 
-        if(configuration.getInt("config-version") > ConfigConstants.PLAYER_PROFILE.currentVersion()) {
-            throw new IllegalStateException(
-                    "Config version is too new for this plugin version in "
-                            + path.getFileName()
-            );
-        }
-
         this.expectedPlayerId = Objects.requireNonNull(
                 expectedPlayerId,
                 "Expected player ID cannot be null"
         );
+    }
 
-        addValidation(this::validatePlayerId);
-        addValidation(this::validatePlayerName);
-        addValidation(this::validateNotes);
+    @Override
+    protected void validateFile(List<String> errors) {
+        validatePlayerId(errors);
+        validatePlayerName(errors);
+        validateNotes(errors);
     }
 
     private void validatePlayerId(List<String> errors) {
@@ -226,11 +223,27 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
     private void validateNoteEntry(String field, Object value, List<String> errors, int index) {
 
-        switch (field) {
-            case "content" -> validateNoteContent(field, value, index, errors);
-            case "timestamp" -> validateNoteTimestamp(field, value, index, errors);
-            case "author-id" -> validateNoteAuthorId(field, value, index, errors);
-            case "author-name" -> validateNoteAuthorName(field, value, index, errors);
+        switch(field) {
+            case PlayerProfileSchema.NOTE_CONTENT ->
+                    validateNoteContent(
+                            field, value, index, errors
+                    );
+
+            case PlayerProfileSchema.NOTE_TIMESTAMP ->
+                    validateNoteTimestamp(
+                            field, value, index, errors
+                    );
+
+            case PlayerProfileSchema.NOTE_AUTHOR_ID ->
+                    validateNoteAuthorId(
+                            field, value, index, errors
+                    );
+
+            case PlayerProfileSchema.NOTE_AUTHOR_NAME ->
+                    validateNoteAuthorName(
+                            field, value, index, errors
+                    );
+
             default -> errors.add(
                     "Unknown note entry path: "
                             + field
@@ -271,14 +284,11 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(content.length() > MAX_NOTE_LENGTH) { // Arbitrary limit to prevent abuse
+        if(content.length() > Note.MAX_CONTENT_LENGTH) {
             errors.add(
-                    "Note content exceeds maximum length for "
-                            + path
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                    "Note content exceeds maximum length of "
+                            + Note.MAX_CONTENT_LENGTH
+                            + " characters..."
             );
         }
     }
@@ -335,8 +345,10 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
+        UUID authorId;
+
         try {
-            UUID.fromString(content);
+            authorId = UUID.fromString(content);
         } catch(IllegalArgumentException ignored) {
             errors.add(
                     "Malformed UUID found in "
@@ -345,7 +357,25 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             + this.path.getFileName()
                             + " at index "
                             + index
+            ) ;
+            return;
+        }
+
+        if(!authorId.toString().equals(content)) {
+            errors.add(
+                    "Non-canonical UUID found in "
+                            + path
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
             );
+        }
+
+       try {
+            UUID.fromString(content);
+        } catch(IllegalArgumentException ignored) {
+
         }
     }
     private void validateNoteTimestamp(String path, Object value, int index, List<String> errors) {
@@ -375,7 +405,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             + index
             );
         }
-        if(timestamp > System.currentTimeMillis() + Duration.ofHours(24).toMillis()) { // Allow a 24-hour buffer for clock skew
+        if(timestamp > System.currentTimeMillis() + Note.MAX_FUTURE_SKEW_MILLIS) { // Allow a 24-hour buffer for clock skew
             errors.add(
                     "Note entry timestamp is in the future for "
                             + path

@@ -21,6 +21,8 @@ import java.util.logging.Level;
 
 public class UltimateModeration extends JavaPlugin {
 
+
+
     private PlayerProfileLoader playerProfileLoader;
     private PlayerProfileManager playerProfileManager;
     private LangManager langManager;
@@ -66,21 +68,52 @@ public class UltimateModeration extends JavaPlugin {
         }
 
         playerProfileLoader = new PlayerProfileLoader(profileFolder.toPath(), getLogger());
-        playerProfileLoader.loadProfilesAsync().whenComplete((profiles, throwable) ->
-                getServer().getScheduler().runTask(this, () -> {
+        playerProfileLoader
+                .loadProfilesAsync()
+                .whenComplete((profiles, throwable) -> {
 
-                    playerProfileLoader.close();
-                    playerProfileLoader = null;
-
-                    if (throwable != null) {
-                        getLogger().log(Level.SEVERE, "Failed to load profiles! Disabling plugin.", throwable);
-                        getPluginLoader().disablePlugin(this);
+                    if (!isEnabled()) {
                         return;
                     }
 
-                    onPlayerProfileLoaderCompletion(profiles);
+                    getServer().getScheduler().runTask(
+                            this,
+                            () -> {
+                                if (playerProfileLoader != null) {
+                                    playerProfileLoader.close();
+                                    playerProfileLoader = null;
+                                }
 
-                }));
+                                if (throwable != null) {
+                                    getLogger().log(
+                                            Level.SEVERE,
+                                            "Failed to load profiles! "
+                                                    + "Disabling plugin.",
+                                            throwable
+                                    );
+
+                                    getPluginLoader()
+                                            .disablePlugin(this);
+                                    return;
+                                }
+
+                                try {
+                                    onPlayerProfileLoaderCompletion(
+                                            profiles
+                                    );
+                                } catch (RuntimeException e) {
+                                    getLogger().log(
+                                            Level.SEVERE,
+                                            "Failed to finish initialization. "
+                                                    + "Disabling plugin.",
+                                            e
+                                    );
+
+                                    getPluginLoader().disablePlugin(this);
+                                }
+                            }
+                    );
+                });
         //nothing should be written under this loadProfilesAsync()
         //as player profiles are a vital part of the plugin
     }
@@ -103,7 +136,7 @@ public class UltimateModeration extends JavaPlugin {
         );
         List<String> langErrors = langValidator.validate();
 
-        if(!langErrors.isEmpty()) {
+        if (!langErrors.isEmpty()) {
             langErrors.forEach(getLogger()::severe);
             getPluginLoader().disablePlugin(this);
             return;
@@ -112,16 +145,32 @@ public class UltimateModeration extends JavaPlugin {
         LangYml langYml = new LangYml(langConfiguration);
         langManager = new LangManager(langYml.loadMessages());
 
-        long autoSaveInterval = getConfig().getLong("profile-auto-save-interval", 20L * 60 * 5); // Default to 5 minutes if not set
+        long autoSaveSeconds =
+                getConfig().getLong(
+                        MainConfigValidation.PROFILE_AUTO_SAVE_INTERVAL_PATH
+                );
 
-        profileSaveTask = getServer().getScheduler().runTaskTimer(this, () -> playerProfileManager.saveAll(), autoSaveInterval, autoSaveInterval);
-        for(Player player : getServer().getOnlinePlayers()) {
+        long autoSaveTicks =
+                Math.multiplyExact(
+                        autoSaveSeconds,
+                        20L
+                ); // Default to 5 minutes if not set
+
+        profileSaveTask =
+                getServer().getScheduler().runTaskTimer(
+                        this,
+                        playerProfileManager::saveAll,
+                        autoSaveTicks,
+                        autoSaveTicks
+                );
+
+        for (Player player : getServer().getOnlinePlayers()) {
             PlayerProfile existing = playerProfileManager.getPlayerProfile(player.getUniqueId());
-            if(existing == null) {
+            if (existing == null) {
                 playerProfileManager.addPlayerProfile(
                         new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>())
                 );
-            } else if(!existing.playerName().equals(player.getName())) {
+            } else if (!existing.playerName().equals(player.getName())) {
                 existing.updatePlayerName(player.getName());
             }
         }
@@ -131,16 +180,16 @@ public class UltimateModeration extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        if(profileSaveTask != null) {
+        if (profileSaveTask != null) {
             profileSaveTask.cancel();
         }
 
-        if(playerProfileManager != null) {
+        if (playerProfileManager != null) {
             playerProfileManager.saveAll();
             playerProfileManager.close();
         }
 
-        if(playerProfileLoader != null) {
+        if (playerProfileLoader != null) {
             playerProfileLoader.close();
         }
 

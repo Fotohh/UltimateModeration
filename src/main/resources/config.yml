@@ -1,8 +1,6 @@
-# NEVER edit config-version, it is used to check if the file is up to date.
+# NEVER edit config-version; it is used to verify the file schema.
 config-version: 1
 
-auto-save-interval: 300
-
-messages:
-  prefix: '&7[&cUltimateModerationPlus&7] &r'
-  no-permission: '&cYou do not have permission to use this command.'
+# How often player profiles are autosaved, in seconds.
+# 300 seconds = 5 minutes.
+profile-auto-save-interval: 300

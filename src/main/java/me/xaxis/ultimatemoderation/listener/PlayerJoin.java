@@ -8,13 +8,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PlayerJoin implements Listener {
 
     private final PlayerProfileManager playerProfileManager;
 
-    public PlayerJoin(PlayerProfileManager playerProfileManager) {
-        this.playerProfileManager = playerProfileManager;
+    public PlayerJoin(
+            PlayerProfileManager playerProfileManager
+    ) {
+        this.playerProfileManager =
+                Objects.requireNonNull(
+                        playerProfileManager,
+                        "Player profile manager cannot be null"
+                );
     }
 
     @EventHandler
@@ -22,20 +29,30 @@ public class PlayerJoin implements Listener {
 
         Player player = event.getPlayer();
 
-        if(playerProfileManager.hasPlayerProfile(player.getUniqueId())) {
-            PlayerProfile profile = playerProfileManager.getPlayerProfile(player.getUniqueId());
-            if(!profile.playerName().equals(player.getName())){
-                profile.updatePlayerName(player.getName());
+        PlayerProfile profile =
+                playerProfileManager.getPlayerProfile(
+                        player.getUniqueId()
+                );
+
+        if(profile != null) {
+            if(!profile.playerName()
+                    .equals(player.getName())) {
+
+                profile.updatePlayerName(
+                        player.getName()
+                );
             }
-        } else {
-            playerProfileManager.addPlayerProfile(
-                    new PlayerProfile(
-                            player.getUniqueId(),
-                            player.getName(),
-                            new ArrayList<>()
-                    )
-            );
+
+            return;
         }
+
+        playerProfileManager.addPlayerProfile(
+                new PlayerProfile(
+                        player.getUniqueId(),
+                        player.getName(),
+                        new ArrayList<>()
+                )
+        );
     }
 
 }

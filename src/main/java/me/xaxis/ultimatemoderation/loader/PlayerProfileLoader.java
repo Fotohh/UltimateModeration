@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.loader;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
+import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
@@ -10,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -41,6 +43,7 @@ public class PlayerProfileLoader implements AutoCloseable{
                 logger,
                 "Logger cannot be null"
         );
+
     }
 
     private List<PlayerProfile> loadProfiles() {
@@ -48,6 +51,7 @@ public class PlayerProfileLoader implements AutoCloseable{
 
         File parentFolder = parentFolderPath.toFile();
         File[] files = parentFolder.listFiles();
+
         if(files == null) {
             throw new IllegalStateException(
                     "Unable to list player profile directory: "
@@ -61,21 +65,37 @@ public class PlayerProfileLoader implements AutoCloseable{
             String fileName = file.getName();
             String playerIdString = fileName.substring(0, fileName.length() - ".yml".length());
             UUID playerId;
+
             try {
                 playerId = UUID.fromString(playerIdString);
-            } catch (IllegalArgumentException e) {
-                logger.log(Level.SEVERE, "Found malformed uuid in the file name: " + fileName, e);
-                quarantineProfile(file);
-                continue;
-            }
-            if(!playerId.toString().equals(playerIdString)) {
-                logger.severe(
-                        "Non-canonical UUID filename: " + fileName
+            } catch(IllegalArgumentException e) {
+                logger.log(
+                        Level.SEVERE,
+                        "Found malformed UUID in profile filename: " + fileName,
+                        e
                 );
+
+                quarantineOrFail(file);
                 continue;
             }
 
-            PlayerProfile profile = loadProfile(file, playerId);
+            if(!playerId.toString().equals(playerIdString)) {
+                logger.severe(
+                        "Found non-canonical UUID profile filename: "
+                                + fileName
+                );
+
+                quarantineOrFail(file);
+                continue;
+            }
+
+            PlayerProfile profile;
+            try {
+                profile = loadProfile(file, playerId);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load profile: " + fileName + " | Skipping", e);
+                continue;
+            }
 
             if(profile == null) {
                 logger.log(Level.SEVERE, "Failed to load profile and/or create a backup: " + fileName + " | Skipping", new Exception());
@@ -87,6 +107,43 @@ public class PlayerProfileLoader implements AutoCloseable{
         }
 
         return profiles;
+    }
+
+    private void ensureSupportedProfileVersion(
+            File file,
+            YamlConfiguration configuration
+    ) {
+        if(!configuration.isInt(
+                ConfigConstants.CONFIG_VERSION_PATH
+        )) {
+            return;
+        }
+
+        int version =
+                configuration.getInt(
+                        ConfigConstants.CONFIG_VERSION_PATH
+                );
+
+        int currentVersion =
+                ConfigConstants.PLAYER_PROFILE.currentVersion();
+
+        if(version == currentVersion) {
+            return;
+        }
+
+        // TODO: Add explicit profile schema migrations before
+        // changing a released schema.
+        // Until then, leave version-mismatched data untouched
+        // and fail startup safely.
+        throw new IllegalStateException(
+                "Unsupported player profile schema version "
+                        + version
+                        + " in "
+                        + file.getName()
+                        + "; expected "
+                        + currentVersion
+                        + ". The file was left untouched."
+        );
     }
 
     public CompletableFuture<List<PlayerProfile>> loadProfilesAsync() {
@@ -101,30 +158,60 @@ public class PlayerProfileLoader implements AutoCloseable{
         YamlConfiguration configuration = new YamlConfiguration();
 
         configuration.set(ConfigConstants.CONFIG_VERSION_PATH, ConfigConstants.PLAYER_PROFILE.currentVersion());
-        configuration.set("player-id", uuid.toString());
-        configuration.set("player-name", UNKNOWN_PLAYER_NAME);
-        configuration.set("notes", List.of());
+        configuration.set(
+                ConfigConstants.CONFIG_VERSION_PATH,
+                ConfigConstants.PLAYER_PROFILE.currentVersion()
+        );
 
-        SafeFileWrite.save(file.toPath(), configuration.saveToString());
+        configuration.set(
+                PlayerProfileSchema.PLAYER_ID,
+                uuid.toString()
+        );
+
+        configuration.set(
+                PlayerProfileSchema.PLAYER_NAME,
+                UNKNOWN_PLAYER_NAME
+        );
+
+        configuration.set(
+                PlayerProfileSchema.NOTES,
+                List.of()
+        );
+
+        SafeFileWrite.save(
+                file.toPath(),
+                configuration.saveToString()
+        );
 
         return configuration;
     }
 
-    private void quarantineProfile(File file)  {
+    private Path quarantineProfile(File file) throws IOException {
         Path original = file.toPath();
         Path backup = getAvailableBackupPath(original);
 
+        Files.move(original, backup);
+
+        logger.info(
+                "Quarantined profile: "
+                        + file.getName()
+                        + " -> "
+                        + backup.getFileName()
+        );
+
+        return backup;
+    }
+
+    private void quarantineOrFail(File file) {
         try {
-            Files.move(original, backup);
-        } catch (IOException e) {
-            logger.log(
-                    Level.SEVERE,
-                    "Failed to quarantine profile: " + file.getName() + " -> " + backup.getFileName(),
+            quarantineProfile(file);
+        } catch(IOException e) {
+            throw new UncheckedIOException(
+                    "Failed to quarantine profile "
+                            + file.getName(),
                     e
             );
-            return;
         }
-        logger.info("Quarantined profile: " + file.getName() + " -> " + backup.getFileName());
     }
 
     private Path getAvailableBackupPath(Path file) {
@@ -138,33 +225,26 @@ public class PlayerProfileLoader implements AutoCloseable{
         return backup;
     }
 
-    private PlayerProfile loadProfile(File file, UUID uuid) {
+    private PlayerProfile loadProfile(File file, UUID uuid) throws IOException {
 
         YamlConfiguration configuration = new YamlConfiguration();
 
         try {
             configuration.load(file);
         } catch(InvalidConfigurationException | IOException e) {
-
             logger.log(
                     Level.WARNING,
-                    "Profile " + file.getName() + " could not be loaded. Attempting regeneration.",
+                    "Profile "
+                            + file.getName()
+                            + " could not be loaded. Attempting regeneration.",
                     e
             );
 
-            try {
-                quarantineProfile(file);
-                configuration = createFreshProfile(file, uuid);
-            } catch(IOException recoveryException) {
-                logger.log(
-                        Level.SEVERE,
-                        "Failed to regenerate profile " + file.getName(),
-                        recoveryException
-                );
-
-                return null;
-            }
+            quarantineProfile(file);
+            configuration = createFreshProfile(file, uuid);
         }
+
+        ensureSupportedProfileVersion(file, configuration);
 
         PlayerProfileYmlValidation validator =
                 new PlayerProfileYmlValidation(
@@ -201,22 +281,41 @@ public class PlayerProfileLoader implements AutoCloseable{
         );
     }
 
-    private List<Note> parseNotes(YamlConfiguration configuration) {
+    private List<Note> parseNotes(
+            YamlConfiguration configuration
+    ) {
         List<Note> notes = new ArrayList<>();
-        List<Map<?, ?>> noteMaps = configuration.getMapList(PlayerProfileLoader.NOTES_PATH);
-        for (Map<?, ?> noteMap : noteMaps) {
+
+        List<Map<?, ?>> noteMaps =
+                configuration.getMapList(
+                        PlayerProfileSchema.NOTES
+                );
+
+        for(Map<?, ?> noteMap : noteMaps) {
             notes.add(parseNoteFromMap(noteMap));
         }
+
         return notes;
     }
 
     private Note parseNoteFromMap(Map<?, ?> noteMap) {
-        Number timestampNumber = (Number) noteMap.get("timestamp");
+        Number timestampNumber =
+                (Number) noteMap.get(
+                        PlayerProfileSchema.NOTE_TIMESTAMP
+                );
 
         return new Note(
-                UUID.fromString((String) noteMap.get("author-id")),
-                (String) noteMap.get("author-name"),
-                (String) noteMap.get("content"),
+                UUID.fromString(
+                        (String) noteMap.get(
+                                PlayerProfileSchema.NOTE_AUTHOR_ID
+                        )
+                ),
+                (String) noteMap.get(
+                        PlayerProfileSchema.NOTE_AUTHOR_NAME
+                ),
+                (String) noteMap.get(
+                        PlayerProfileSchema.NOTE_CONTENT
+                ),
                 timestampNumber.longValue()
         );
     }

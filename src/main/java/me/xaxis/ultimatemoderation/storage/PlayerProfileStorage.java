@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.storage;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
+import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfileWrapper;
@@ -8,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,34 +36,69 @@ public class PlayerProfileStorage implements AutoCloseable {
     }
 
     private Map<String, Object> serializeNote(Note note) {
-        return Map.of(
-                "author-uuid", note.authorUUID().toString(),
-                "author-name", note.authorName(),
-                "content", note.content(),
-                "timestamp", note.timestamp()
+        Objects.requireNonNull(note, "Note cannot be null");
+
+        Map<String, Object> serialized = new LinkedHashMap<>();
+
+        serialized.put(
+                PlayerProfileSchema.NOTE_AUTHOR_ID,
+                note.authorUUID().toString()
         );
+
+        serialized.put(
+                PlayerProfileSchema.NOTE_AUTHOR_NAME,
+                note.authorName()
+        );
+
+        serialized.put(
+                PlayerProfileSchema.NOTE_CONTENT,
+                note.content()
+        );
+
+        serialized.put(
+                PlayerProfileSchema.NOTE_TIMESTAMP,
+                note.timestamp()
+        );
+
+        return serialized;
     }
 
     private void save(PlayerProfileWrapper profile) throws IOException {
-
-
         Path target = profilesDirectory.resolve(
-                profile.playerID().toString() + ".yml"
+                profile.playerID() + ".yml"
         );
 
         YamlConfiguration configuration = new YamlConfiguration();
 
-        configuration.set(ConfigConstants.CONFIG_VERSION_PATH, ConfigConstants.PLAYER_PROFILE.currentVersion());
-        configuration.set("player-id", profile.playerID().toString());
-        configuration.set("player-name", profile.playerName());
-        List<Map<String, Object>> notesList = profile.notes().stream()
-                .map(this::serializeNote).toList();
-        configuration.set("notes", notesList);
+        configuration.set(
+                ConfigConstants.CONFIG_VERSION_PATH,
+                ConfigConstants.PLAYER_PROFILE.currentVersion()
+        );
 
-        String data = configuration.saveToString();
+        configuration.set(
+                PlayerProfileSchema.PLAYER_ID,
+                profile.playerID().toString()
+        );
 
-        SafeFileWrite.save(target, data);
+        configuration.set(
+                PlayerProfileSchema.PLAYER_NAME,
+                profile.playerName()
+        );
 
+        List<Map<String, Object>> notesList =
+                profile.notes().stream()
+                        .map(this::serializeNote)
+                        .toList();
+
+        configuration.set(
+                PlayerProfileSchema.NOTES,
+                notesList
+        );
+
+        SafeFileWrite.save(
+                target,
+                configuration.saveToString()
+        );
     }
 
     public CompletableFuture<Void> saveAsync(PlayerProfileWrapper playerProfile) {

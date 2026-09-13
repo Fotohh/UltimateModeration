@@ -9,15 +9,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class YamlValidator {
+public abstract class YamlValidator {
 
     protected final Path path;
     protected final FileConfiguration configuration;
 
     private final int expectedVersion;
 
-    private final List<Consumer<List<String>>> validations =
-            new ArrayList<>();
+    public final List<String> validate() {
+        List<String> errors = new ArrayList<>();
+
+        validateConfigVersion(errors);
+        validateFile(errors);
+
+        return List.copyOf(errors);
+    }
+
+    protected abstract void validateFile(
+            List<String> errors
+    );
 
     public YamlValidator(
             Path path,
@@ -42,29 +52,6 @@ public class YamlValidator {
         }
 
         this.expectedVersion = expectedVersion;
-
-        addValidation(this::validateConfigVersion);
-    }
-
-    public List<String> validate() {
-        List<String> errors = new ArrayList<>();
-
-        validations.forEach(
-                validation -> validation.accept(errors)
-        );
-
-        return List.copyOf(errors);
-    }
-
-    protected void addValidation(
-            Consumer<List<String>> validation
-    ) {
-        validations.add(
-                Objects.requireNonNull(
-                        validation,
-                        "Validation cannot be null"
-                )
-        );
     }
 
     private void validateConfigVersion(List<String> errors) {

@@ -2,6 +2,7 @@ package me.xaxis.ultimatemoderation.player;
 
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,22 +12,25 @@ public record Note(
         String content,
         long timestamp
 ) {
+
+    public static final int MAX_CONTENT_LENGTH = 512;
+    public static final long MAX_FUTURE_SKEW_MILLIS = Duration.ofHours(24).toMillis();
+
     public Note {
-        Objects.requireNonNull(authorUUID, "Author UUID cannot be null");
-        Objects.requireNonNull(authorName, "Author name cannot be null");
-        Objects.requireNonNull(content, "Content cannot be null");
+        Objects.requireNonNull(
+                authorUUID,
+                "Author UUID cannot be null"
+        );
 
-        if(authorName.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Note author name cannot be blank"
-            );
-        }
+        Objects.requireNonNull(
+                authorName,
+                "Author name cannot be null"
+        );
 
-        if(authorName.length() > 16) {
-            throw new IllegalArgumentException(
-                    "Note author name cannot exceed 16 characters"
-            );
-        }
+        Objects.requireNonNull(
+                content,
+                "Content cannot be null"
+        );
 
         if(!PlayerNames.isValid(authorName)) {
             throw new IllegalArgumentException(
@@ -40,15 +44,25 @@ public record Note(
             );
         }
 
-        if(content.length() > 512) {
+        if(content.length() > MAX_CONTENT_LENGTH) {
             throw new IllegalArgumentException(
-                    "Note content cannot exceed 512 characters"
+                    "Note content cannot exceed "
+                            + MAX_CONTENT_LENGTH
+                            + " characters"
             );
         }
 
         if(timestamp < 0) {
             throw new IllegalArgumentException(
                     "Timestamp cannot be negative"
+            );
+        }
+
+        if(timestamp >
+                System.currentTimeMillis()
+                        + MAX_FUTURE_SKEW_MILLIS) {
+            throw new IllegalArgumentException(
+                    "Timestamp cannot be more than 24 hours in the future"
             );
         }
     }

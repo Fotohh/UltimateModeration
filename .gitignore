@@ -111,3 +111,10 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+gradlew
+gradlew.bat
+
+gradle/
+
+.gradle/

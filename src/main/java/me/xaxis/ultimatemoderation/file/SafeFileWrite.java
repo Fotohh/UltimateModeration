@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-public class SafeFileWrite {
+public final class SafeFileWrite {
+
+    private static final AtomicBoolean
+            FALLBACK_WARNING_LOGGED =
+            new AtomicBoolean(false);
 
     private SafeFileWrite() {
         throw new IllegalArgumentException("Do not instantiate Atomic Write, it is a utility class.");
@@ -17,7 +22,7 @@ public class SafeFileWrite {
         Path target = path.toAbsolutePath();
         Path parent = target.getParent();
 
-        if(parent == null) {
+        if (parent == null) {
             throw new IOException("Target path has no parent directory: " + target);
         }
 
@@ -25,7 +30,7 @@ public class SafeFileWrite {
 
         Path temp = Files.createTempFile(
                 parent,
-                target.getFileName().toString() + "." ,
+                target.getFileName().toString() + ".",
                 ".tmp"
         );
 
@@ -35,10 +40,11 @@ public class SafeFileWrite {
 
             writeDataToTemp(temp, data);
 
-            try(FileChannel channel = FileChannel.open(
-                    temp,
-                    StandardOpenOption.WRITE
-            )) {
+            try (FileChannel channel =
+                         FileChannel.open(
+                                 temp,
+                                 StandardOpenOption.WRITE
+                         )) {
                 channel.force(true);
             }
 
@@ -49,8 +55,17 @@ public class SafeFileWrite {
                         StandardCopyOption.ATOMIC_MOVE,
                         StandardCopyOption.REPLACE_EXISTING
                 );
-            } catch(AtomicMoveNotSupportedException e) {
-                Logger.getLogger("SafeFileWrite").warning("Atomic move not supported, falling back to regular move.");
+            } catch (AtomicMoveNotSupportedException e) {
+
+                if (FALLBACK_WARNING_LOGGED
+                        .compareAndSet(false, true)) {
+
+                    Logger.getLogger("SafeFileWrite").warning(
+                            "Atomic move is not supported by this filesystem; "
+                                    + "falling back to a non-atomic replacement."
+                    );
+                }
+
                 Files.move(
                         temp,
                         target,
@@ -61,7 +76,7 @@ public class SafeFileWrite {
             moved = true;
 
         } finally {
-            if(!moved) {
+            if (!moved) {
                 Files.deleteIfExists(temp);
             }
         }

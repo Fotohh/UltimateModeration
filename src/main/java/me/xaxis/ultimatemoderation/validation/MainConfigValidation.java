@@ -8,26 +8,64 @@ import java.util.List;
 
 public final class MainConfigValidation extends YamlValidator{
 
+    public static final String PROFILE_AUTO_SAVE_INTERVAL_PATH =
+            "profile-auto-save-interval";
+
+    private static final long MIN_AUTO_SAVE_INTERVAL_SECONDS =
+            60L;
+
     public MainConfigValidation(Path path, FileConfiguration configuration) {
         super(path, configuration, ConfigConstants.MAIN.currentVersion());
+    }
 
-        addValidation(this::validateAutoSaveInterval);
+    @Override
+    protected void validateFile(List<String> errors) {
+        validateAutoSaveInterval(errors);
     }
 
     private void validateAutoSaveInterval(List<String> errors) {
-        if(!configuration.isSet("profile-auto-save-interval")) {
-            errors.add("The 'profile-auto-save-interval' is not set in the configuration.");
+        Object rawValue =
+                configuration.get(
+                        PROFILE_AUTO_SAVE_INTERVAL_PATH
+                );
+
+        if(!(rawValue instanceof Integer)
+                && !(rawValue instanceof Long)) {
+
+            errors.add(
+                    "The '"
+                            + PROFILE_AUTO_SAVE_INTERVAL_PATH
+                            + "' must be a whole number of seconds."
+            );
+
             return;
         }
 
-        if(!configuration.isLong("profile-auto-save-interval")) {
-            errors.add("The 'profile-auto-save-interval' must be a number.");
+        long autoSaveIntervalSeconds =
+                ((Number) rawValue).longValue();
+
+        if(autoSaveIntervalSeconds
+                < MIN_AUTO_SAVE_INTERVAL_SECONDS) {
+
+            errors.add(
+                    "The '"
+                            + PROFILE_AUTO_SAVE_INTERVAL_PATH
+                            + "' must be at least "
+                            + MIN_AUTO_SAVE_INTERVAL_SECONDS
+                            + " seconds."
+            );
+
             return;
         }
 
-        long autoSaveInterval = configuration.getLong("profile-auto-save-interval");
-        if (autoSaveInterval < 20 * 60) { // 20 ticks * 60 seconds = 1 minute
-            errors.add("The 'profile-auto-save-interval' must be greater than 1 minute.");
+        if(autoSaveIntervalSeconds
+                > Long.MAX_VALUE / 20L) {
+
+            errors.add(
+                    "The '"
+                            + PROFILE_AUTO_SAVE_INTERVAL_PATH
+                            + "' is too large."
+            );
         }
     }
 }
