@@ -49,10 +49,10 @@ public class PlayerProfileLoader implements AutoCloseable{
         File parentFolder = parentFolderPath.toFile();
         File[] files = parentFolder.listFiles();
         if(files == null) {
-            logger.severe(
-                    "Failed to list player profile directory: " + parentFolderPath
+            throw new IllegalStateException(
+                    "Unable to list player profile directory: "
+                            + parentFolderPath
             );
-            return profiles;
         }
 
         for(File file : files) {
@@ -64,14 +64,20 @@ public class PlayerProfileLoader implements AutoCloseable{
             try {
                 playerId = UUID.fromString(playerIdString);
             } catch (IllegalArgumentException e) {
-                logger.severe("Found malformed uuid in the file name: " + fileName);
+                logger.log(Level.SEVERE, "Found malformed uuid in the file name: " + fileName, e);
+                continue;
+            }
+            if(!playerId.toString().equals(playerIdString)) {
+                logger.severe(
+                        "Non-canonical UUID filename: " + fileName
+                );
                 continue;
             }
 
             PlayerProfile profile = loadProfile(file, playerId);
 
             if(profile == null) {
-                logger.severe("Failed to load profile and/or create a backup: " + fileName + " | Skipping");
+                logger.log(Level.SEVERE, "Failed to load profile and/or create a backup: " + fileName + " | Skipping", new Exception());
                 continue;
             }
 

@@ -2,11 +2,14 @@ package me.xaxis.ultimatemoderation.storage;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.file.AtomicWrite;
+import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -30,10 +33,20 @@ public class PlayerProfileStorage implements AutoCloseable {
         );
     }
 
+    private Map<String, Object> serializeNote(Note note) {
+        return Map.of(
+                "author-uuid", note.authorUUID().toString(),
+                "author-name", note.authorName(),
+                "content", note.content(),
+                "timestamp", note.timestamp()
+        );
+    }
+
     private void save(PlayerProfileWrapper profile) throws IOException {
 
+
         Path target = profilesDirectory.resolve(
-                profile.playerID() + ".yml"
+                profile.playerID().toString() + ".yml"
         );
 
         YamlConfiguration configuration = new YamlConfiguration();
@@ -41,7 +54,9 @@ public class PlayerProfileStorage implements AutoCloseable {
         configuration.set(ConfigConstants.CONFIG_VERSION_PATH, ConfigConstants.PLAYER_PROFILE.currentVersion());
         configuration.set("player-id", profile.playerID().toString());
         configuration.set("player-name", profile.playerName());
-        configuration.set("notes", profile.notes());
+        List<Map<String, Object>> notesList = profile.notes().stream()
+                .map(this::serializeNote).toList();
+        configuration.set("notes", notesList);
 
         String data = configuration.saveToString();
 

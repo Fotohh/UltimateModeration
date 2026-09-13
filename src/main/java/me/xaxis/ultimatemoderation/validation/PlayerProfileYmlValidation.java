@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.validation;
 
+import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
@@ -8,9 +9,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public final class PlayerProfileYmlValidation extends YamlValidator {
-
-    private static final Pattern PLAYER_NAME_PATTERN =
-            Pattern.compile("^[A-Za-z0-9_]{3,16}$");
 
     public static final int CURRENT_CONFIG_VERSION = 1;
 
@@ -79,6 +77,18 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
+        String rawId = configuration.getString(PLAYER_ID_PATH);
+        UUID parsed = UUID.fromString(rawId);
+
+        if(!parsed.toString().equals(rawId)) {
+            errors.add(
+                    "Non-canonical UUID found in "
+                            + PLAYER_ID_PATH
+                            + " in "
+                            + path.getFileName()
+            );
+        }
+
         if(!expectedPlayerId.equals(playerId)) {
             errors.add(
                     PLAYER_ID_PATH
@@ -111,7 +121,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         String playerName =
                 configuration.getString(PLAYER_NAME_PATH);
 
-        if(!PLAYER_NAME_PATTERN.matcher(playerName).matches()) {
+        if(!PlayerNames.isValid(playerName)) {
             errors.add(
                     "Malformed player name found in "
                             + PLAYER_NAME_PATH
@@ -280,7 +290,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
             return;
         }
-        if(!PLAYER_NAME_PATTERN.matcher(content).matches()) {
+        if(!PlayerNames.isValid(content)) {
             errors.add(
                     "Invalid Minecraft username entry for "
                             + path

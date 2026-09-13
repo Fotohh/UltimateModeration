@@ -40,8 +40,6 @@ public class PlayerProfileManager implements AutoCloseable {
         playerProfiles.put(playerProfile.playerId(), playerProfile);
     }
 
-    //maybe add a removePlayerProfile method if needed
-
     public void saveAll() {
         for(PlayerProfile profile : playerProfiles.values()) {
             save(profile);

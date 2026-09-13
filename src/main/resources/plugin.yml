@@ -1,44 +1,4 @@
-name: UltimateModerationPlus
-main: me.xaxis.ultimatemoderation.UMP
+name: UltimateModeration
+main: me.xaxis.ultimatemoderation.UltimateModeration
 version: 1
-api-version: 1.21
-commands:
-  spy:
-    description: Spy on a player
-    usage: /spy <player_name>
-  staffchat:
-    description: Talk in staff chat
-    usage: /staffchat
-    aliases:
-      - sc
-  mute:
-    description: Mute a player
-    usage: /mute <player_name>
-  unmute:
-      description: Unmute a player
-      usage: /unmute <player_name>
-  kick:
-      description: Kick a player
-      usage: /kick <player_name> <reason>
-  warn:
-      description: Warn a player
-      usage: /warn <player_name> <reason>
-  settings:
-    description: adjust settings
-    usage: /settings
-  tempmute:
-    description: Temporarily mute a player
-    usage: /tempmute <player_name> <duration> <reason>
-  playerlist:
-    description: List all players
-    usage: /playerlist
-  vanish:
-    description: Vanish from all players
-    usage: /vanish
-  ban:
-    description: Permanently ban a player
-    usage: /ban <player_name> <reason>
-  tempban:
-    description: Temporarily ban a player
-    usage: /ban <player_name> <duration> <reason>
-
+api-version: '26.2'

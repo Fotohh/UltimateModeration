@@ -60,7 +60,8 @@ public class UltimateModeration extends JavaPlugin {
         File profileFolder = getDataFolder().toPath().resolve("player-data").toFile();
         if (!profileFolder.exists()) {
             if (!profileFolder.mkdirs()) {
-                getLogger().severe("Unable to make player_data");
+                getPluginLoader().disablePlugin(this);
+                getLogger().severe("Unable to make player_data, disabling plugin!");
             }
         }
 
@@ -69,7 +70,8 @@ public class UltimateModeration extends JavaPlugin {
                 getServer().getScheduler().runTask(this, () -> {
 
                     if (throwable != null) {
-                        getLogger().log(Level.SEVERE, "Failed to load profiles!", throwable);
+                        getLogger().log(Level.SEVERE, "Failed to load profiles! Disabling plugin.", throwable);
+                        getPluginLoader().disablePlugin(this);
                         return;
                     }
 

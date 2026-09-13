@@ -1,3 +1,6 @@
 # NEVER edit config-version, it is used to check if the file is up to date.
 config-version: 1
 
+messages:
+  prefix: '&7[&cUltimateModerationPlus&7] &r'
+  no-permission: '&cYou do not have permission to use this command.'

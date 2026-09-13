@@ -1,5 +1,7 @@
 package me.xaxis.ultimatemoderation.player;
 
+import me.xaxis.ultimatemoderation.constants.PlayerNames;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,8 @@ public class PlayerProfile {
 
     public void updatePlayerName(String newName) {
         if (newName.isBlank()) return;
+        if(newName.length() > 16) return;
+        if(!PlayerNames.isValid(newName)) return;
         this.playerName = newName;
     }
 
