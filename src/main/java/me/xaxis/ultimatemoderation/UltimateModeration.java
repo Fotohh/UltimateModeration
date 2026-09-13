@@ -3,6 +3,7 @@ package me.xaxis.ultimatemoderation;
 import me.xaxis.ultimatemoderation.lang.LangManager;
 import me.xaxis.ultimatemoderation.lang.LangValidator;
 import me.xaxis.ultimatemoderation.lang.LangYml;
+import me.xaxis.ultimatemoderation.listener.PlayerJoin;
 import me.xaxis.ultimatemoderation.loader.PlayerProfileLoader;
 import me.xaxis.ultimatemoderation.manager.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
@@ -10,6 +11,7 @@ import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.List;
@@ -20,6 +22,11 @@ public class UltimateModeration extends JavaPlugin {
     private PlayerProfileLoader playerProfileLoader;
     private PlayerProfileManager playerProfileManager;
     private LangManager langManager;
+    private BukkitTask profileSaveTask;
+
+    public LangManager getLangManager() {
+        return langManager;
+    }
 
     @Override
     public void onEnable() {
@@ -99,7 +106,8 @@ public class UltimateModeration extends JavaPlugin {
         LangYml langYml = new LangYml(langConfiguration);
         langManager = new LangManager(langYml);
 
-
+        getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
+        profileSaveTask = getServer().getScheduler().runTaskTimer(this, () -> playerProfileManager.saveAll(), 0L, 20L * 60 * 5);
     }
 
     @Override
@@ -112,6 +120,10 @@ public class UltimateModeration extends JavaPlugin {
         if (playerProfileManager != null) {
             playerProfileManager.saveAll();
             playerProfileManager.close();
+        }
+
+        if(profileSaveTask != null) {
+            profileSaveTask.cancel();
         }
 
     }
