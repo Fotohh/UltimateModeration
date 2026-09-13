@@ -6,9 +6,9 @@ import java.util.UUID;
 public class PlayerProfile {
     private final UUID playerId;
     private String playerName;
-    private final List<String> notes;
+    private final List<Note> notes;
 
-    public PlayerProfile(UUID playerId, String playerName, List<String> notes) {
+    public PlayerProfile(UUID playerId, String playerName, List<Note> notes) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.notes = notes;
@@ -22,7 +22,7 @@ public class PlayerProfile {
         return playerName;
     }
 
-    public List<String> notes() {
+    public List<Note> notes() {
         return notes;
     }
 
@@ -31,8 +31,8 @@ public class PlayerProfile {
         this.playerName = newName;
     }
 
-    public void addNote(String note) {
-        if (note.isBlank()) return;
+    public void addNote(Note note) {
+        if (note == null) return;
         notes.add(note);
     }
 

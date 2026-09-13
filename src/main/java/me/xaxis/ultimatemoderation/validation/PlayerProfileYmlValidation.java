@@ -3,13 +3,11 @@ package me.xaxis.ultimatemoderation.validation;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.Duration;
+import java.util.*;
 import java.util.regex.Pattern;
 
-public final class PlayerProfileYmlValidation
-        extends YamlValidator {
+public final class PlayerProfileYmlValidation extends YamlValidator {
 
     private static final Pattern PLAYER_NAME_PATTERN =
             Pattern.compile("^[A-Za-z0-9_]{3,16}$");
@@ -21,6 +19,7 @@ public final class PlayerProfileYmlValidation
     private static final String NOTES_PATH = "notes";
 
     private final UUID expectedPlayerId;
+
 
     public PlayerProfileYmlValidation(
             Path path,
@@ -122,6 +121,13 @@ public final class PlayerProfileYmlValidation
         }
     }
 
+    private static final Set<String> NOTE_FIELDS = Set.of(
+            "content",
+            "timestamp",
+            "author-id",
+            "author-name"
+    );
+
     private void validateNotes(List<String> errors) {
 
         if(!configuration.isSet(NOTES_PATH)) {
@@ -142,16 +148,228 @@ public final class PlayerProfileYmlValidation
             return;
         }
 
-        List<?> notes = configuration.getList(NOTES_PATH);
+        List<?> noteMaps = configuration.getList(NOTES_PATH);
 
-        for(int i = 0; i < notes.size(); i++) {
-            if(!(notes.get(i) instanceof String)) {
+        if(noteMaps == null) {
+            errors.add(
+                    "Null note list in "
+                            + path.getFileName()
+            );
+            return;
+        }
+
+        for(int i = 0; i < noteMaps.size(); i++) {
+            Object value = noteMaps.get(i);
+            if(!(value instanceof Map<?, ?> noteMap)) {
                 errors.add(
-                        NOTES_PATH
-                                + "[" + i + "] is not of type String in "
+                        "Invalid note entry type: "
+                                + value
+                                + " in "
                                 + path.getFileName()
+                                + " at index "
+                                + i
+                );
+                continue;
+            }
+
+            if(!NOTE_FIELDS.equals(noteMap.keySet())) {
+                errors.add(
+                        "Invalid note entry keys: "
+                                + noteMap.keySet()
+                                + " in "
+                                + path.getFileName()
+                                + " at index "
+                                + i
                 );
             }
+
+            for(Map.Entry<?, ?> entry : noteMap.entrySet()) {
+
+                if(!(entry.getKey() instanceof String field)) {
+                    errors.add(
+                            "Invalid note entry key type: "
+                                    + entry.getKey()
+                                    + " at index "
+                                    + i
+                                    + " in "
+                                    + path.getFileName()
+                    );
+                    continue;
+                }
+
+
+                validateNoteEntry(
+                        field,
+                        entry.getValue(),
+                        errors,
+                        i
+                );
+            }
+        }
+    }
+
+    private void validateNoteEntry(String field, Object value, List<String> errors, int index) {
+
+        switch (field) {
+            case "content" -> validateNoteContent(field, value, index, errors);
+            case "timestamp" -> validateNoteTimestamp(field, value, index, errors);
+            case "author-id" -> validateNoteAuthorId(field, value, index, errors);
+            case "author-name" -> validateNoteAuthorName(field, value, index, errors);
+            default -> errors.add(
+                    "Unknown note entry path: "
+                            + field
+                            + " in "
+                            + path.getFileName()
+                            + " at index "
+                            + index
+            );
+        }
+    }
+
+    private static final int MAX_NOTE_LENGTH = 512;
+
+    private void validateNoteContent(String path, Object value, int index, List<String> errors) {
+        if(!(value instanceof String content)) {
+            errors.add(
+                    "Invalid note entry value type for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+
+        if(content.isBlank()){ // Empty notes are not allowed
+            errors.add(
+                    "Empty note content for "
+                            + path
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+
+        if(content.length() > MAX_NOTE_LENGTH) { // Arbitrary limit to prevent abuse
+            errors.add(
+                    "Note content exceeds maximum length for "
+                            + path
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+        }
+    }
+    private void validateNoteAuthorName(String path, Object value, int index, List<String> errors) {
+        if(!(value instanceof String content)) {
+            errors.add(
+                    "Invalid note entry value type for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+        if(!PLAYER_NAME_PATTERN.matcher(content).matches()) {
+            errors.add(
+                    "Invalid Minecraft username entry for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+        }
+    }
+    private void validateNoteAuthorId(String path, Object value, int index, List<String> errors) {
+        if(!(value instanceof String content)) {
+            errors.add(
+                    "Invalid note entry value type for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+        if(content.isEmpty()) {
+            errors.add(
+                    "Empty note entry found in "
+                            + path
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+
+        try {
+            UUID.fromString(content);
+        } catch(IllegalArgumentException ignored) {
+            errors.add(
+                    "Malformed UUID found in "
+                            + path
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+        }
+    }
+    private void validateNoteTimestamp(String path, Object value, int index, List<String> errors) {
+        if(!(value instanceof Long timestamp)) {
+            errors.add(
+                    "Invalid note entry value type for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+
+        if(timestamp < 0) {
+            errors.add(
+                    "Invalid note entry timestamp for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
+        }
+        if(timestamp > System.currentTimeMillis() + Duration.ofHours(24).toMillis()) { // Allow a 24-hour buffer for clock skew
+            errors.add(
+                    "Note entry timestamp is in the future for "
+                            + path
+                            + ": "
+                            + value
+                            + " in "
+                            + this.path.getFileName()
+                            + " at index "
+                            + index
+            );
         }
     }
 }

@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.loader;
 
 import me.xaxis.ultimatemoderation.file.AtomicWrite;
+import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.validation.PlayerProfileYmlValidation;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -10,10 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -177,10 +175,31 @@ public class PlayerProfileLoader implements AutoCloseable{
             }
         }
 
+        List<Note> notes = parseNotes(configuration);
         return new PlayerProfile(
                 uuid,
                 configuration.getString(PLAYER_NAME_PATH),
-                configuration.getStringList(NOTES_PATH)
+                notes
+        );
+    }
+
+    private List<Note> parseNotes(YamlConfiguration configuration) {
+        List<Note> notes = new ArrayList<>();
+        List<Map<?, ?>> noteMaps = configuration.getMapList(PlayerProfileLoader.NOTES_PATH);
+        for (Map<?, ?> noteMap : noteMaps) {
+            notes.add(parseNoteFromMap(noteMap));
+        }
+        return notes;
+    }
+
+    private Note parseNoteFromMap(Map<?, ?> noteMap) {
+        Number timestampNumber = (Number) noteMap.get("timestamp");
+
+        return new Note(
+                UUID.fromString((String) noteMap.get("author-id")),
+                (String) noteMap.get("author-name"),
+                (String) noteMap.get("content"),
+                timestampNumber.longValue()
         );
     }
 

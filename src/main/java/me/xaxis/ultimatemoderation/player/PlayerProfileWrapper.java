@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public record PlayerProfileWrapper(UUID playerID, String playerName, List<String> notes) {
+public record PlayerProfileWrapper(UUID playerID, String playerName, List<Note> notes) {
     public PlayerProfileWrapper {
         Objects.requireNonNull(
                 playerID,
