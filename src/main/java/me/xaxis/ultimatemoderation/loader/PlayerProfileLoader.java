@@ -26,10 +26,8 @@ public class PlayerProfileLoader implements AutoCloseable{
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private static final String UNKNOWN_PLAYER_NAME = "unknown";
-
+    private static final String UNKNOWN_PLAYER_NAME = "Unknown";
     private static final String PLAYER_NAME_PATH = "player-name";
-    private static final String NOTES_PATH = "notes";
 
     private final Path parentFolderPath;
     private final Logger logger;

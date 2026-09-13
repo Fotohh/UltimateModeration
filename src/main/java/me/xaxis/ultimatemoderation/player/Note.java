@@ -13,7 +13,6 @@ public record Note(
         long timestamp
 ) {
 
-    public static final int MAX_CONTENT_LENGTH = 512;
     public static final long MAX_FUTURE_SKEW_MILLIS = Duration.ofHours(24).toMillis();
 
     public Note {
@@ -32,33 +31,25 @@ public record Note(
                 "Content cannot be null"
         );
 
-        if(!PlayerNames.isValid(authorName)) {
+        if (!PlayerNames.isValid(authorName)) {
             throw new IllegalArgumentException(
                     "Note author name is invalid"
             );
         }
 
-        if(content.isBlank()) {
+        if (content.isBlank()) {
             throw new IllegalArgumentException(
                     "Note content cannot be blank"
             );
         }
 
-        if(content.length() > MAX_CONTENT_LENGTH) {
-            throw new IllegalArgumentException(
-                    "Note content cannot exceed "
-                            + MAX_CONTENT_LENGTH
-                            + " characters"
-            );
-        }
-
-        if(timestamp < 0) {
+        if (timestamp < 0) {
             throw new IllegalArgumentException(
                     "Timestamp cannot be negative"
             );
         }
 
-        if(timestamp >
+        if (timestamp >
                 System.currentTimeMillis()
                         + MAX_FUTURE_SKEW_MILLIS) {
             throw new IllegalArgumentException(

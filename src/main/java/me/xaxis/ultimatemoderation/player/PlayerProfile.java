@@ -1,7 +1,5 @@
 package me.xaxis.ultimatemoderation.player;
 
-import me.xaxis.ultimatemoderation.constants.PlayerNames;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,20 +30,17 @@ public class PlayerProfile {
         return List.copyOf(notes);
     }
 
-    public void updatePlayerName(String newName) {
+    protected void updatePlayerName(String newName) {
         newName = Objects.requireNonNull(newName, "New name cannot be null");
-        if (newName.isBlank()) return;
-        if(newName.length() > 16) return;
-        if(!PlayerNames.isValid(newName)) return;
         this.playerName = newName;
     }
 
-    public void removeNote(Note note) {
+    protected void removeNote(Note note) {
         if (note == null) return;
         notes.remove(note);
     }
 
-    public void addNote(Note note) {
+    protected void addNote(Note note) {
         if (note == null) return;
         notes.add(note);
     }

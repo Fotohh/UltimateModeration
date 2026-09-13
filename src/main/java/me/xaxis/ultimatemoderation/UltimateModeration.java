@@ -1,13 +1,16 @@
 package me.xaxis.ultimatemoderation;
 
+import me.xaxis.ultimatemoderation.commands.NoteCommand;
+import me.xaxis.ultimatemoderation.config.ConfigSettingsLoader;
+import me.xaxis.ultimatemoderation.config.ConfigSettings;
 import me.xaxis.ultimatemoderation.lang.LangManager;
-import me.xaxis.ultimatemoderation.validation.LangValidator;
 import me.xaxis.ultimatemoderation.lang.LangYml;
 import me.xaxis.ultimatemoderation.listener.PlayerJoin;
 import me.xaxis.ultimatemoderation.loader.PlayerProfileLoader;
-import me.xaxis.ultimatemoderation.manager.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
+import me.xaxis.ultimatemoderation.player.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
+import me.xaxis.ultimatemoderation.validation.LangValidator;
 import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -22,9 +25,9 @@ import java.util.logging.Level;
 public class UltimateModeration extends JavaPlugin {
 
 
-
     private PlayerProfileLoader playerProfileLoader;
     private PlayerProfileManager playerProfileManager;
+    private ConfigSettings configSettings;
     private LangManager langManager;
     private BukkitTask profileSaveTask;
 
@@ -58,6 +61,9 @@ public class UltimateModeration extends JavaPlugin {
             getPluginLoader().disablePlugin(this);
             return;
         }
+
+        ConfigSettingsLoader loader = new ConfigSettingsLoader(getConfig());
+        configSettings = loader.load();
 
         File profileFolder = getDataFolder().toPath().resolve("player-data").toFile();
         if (!profileFolder.exists()) {
@@ -124,7 +130,7 @@ public class UltimateModeration extends JavaPlugin {
                 getDataFolder().toPath().resolve("player-data"),
                 getLogger()
         );
-        playerProfileManager = new PlayerProfileManager(profiles, playerProfileStorage, getLogger());
+        playerProfileManager = new PlayerProfileManager(profiles, playerProfileStorage, configSettings, getLogger());
 
         saveResource("lang.yml", false);
         YamlConfiguration langConfiguration = YamlConfiguration.loadConfiguration(
@@ -145,24 +151,14 @@ public class UltimateModeration extends JavaPlugin {
         LangYml langYml = new LangYml(langConfiguration);
         langManager = new LangManager(langYml.loadMessages());
 
-        long autoSaveSeconds =
-                getConfig().getLong(
-                        MainConfigValidation.PROFILE_AUTO_SAVE_INTERVAL_PATH
-                );
+        long autoSaveTicks = configSettings.profileAutoSaveInterval();
 
-        long autoSaveTicks =
-                Math.multiplyExact(
-                        autoSaveSeconds,
-                        20L
-                ); // Default to 5 minutes if not set
-
-        profileSaveTask =
-                getServer().getScheduler().runTaskTimer(
-                        this,
-                        playerProfileManager::saveAll,
-                        autoSaveTicks,
-                        autoSaveTicks
-                );
+        profileSaveTask = getServer().getScheduler().runTaskTimer(
+                this,
+                playerProfileManager::saveAll,
+                autoSaveTicks,
+                autoSaveTicks
+        );
 
         for (Player player : getServer().getOnlinePlayers()) {
             PlayerProfile existing = playerProfileManager.getPlayerProfile(player.getUniqueId());
@@ -171,10 +167,13 @@ public class UltimateModeration extends JavaPlugin {
                         new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>())
                 );
             } else if (!existing.playerName().equals(player.getName())) {
-                existing.updatePlayerName(player.getName());
+                playerProfileManager.changeName(existing, player.getName());
             }
         }
+
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
+        getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager));
+        //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
     }
 
     @Override

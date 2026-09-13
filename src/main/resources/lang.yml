@@ -10,3 +10,4 @@ config-version: 1
 messages:
   prefix: '&7[&cUltimateModeration&7] &r'
   no-permission: '&cYou do not have permission to perform this command.'
+  player-not-found: '&c{player} was not found or does not exist.'

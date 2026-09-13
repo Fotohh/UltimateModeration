@@ -1,6 +1,6 @@
 package me.xaxis.ultimatemoderation.listener;
 
-import me.xaxis.ultimatemoderation.manager.PlayerProfileManager;
+import me.xaxis.ultimatemoderation.player.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,9 +38,7 @@ public class PlayerJoin implements Listener {
             if(!profile.playerName()
                     .equals(player.getName())) {
 
-                profile.updatePlayerName(
-                        player.getName()
-                );
+                playerProfileManager.changeName(profile, player.getName());
             }
 
             return;
