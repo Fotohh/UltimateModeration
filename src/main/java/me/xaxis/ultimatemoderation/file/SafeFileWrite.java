@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.concurrent.*;
+import java.util.logging.Logger;
 
-public class AtomicWrite {
+public class SafeFileWrite {
 
-    private AtomicWrite() {
+    private SafeFileWrite() {
         throw new IllegalArgumentException("Do not instantiate Atomic Write, it is a utility class.");
     }
 
@@ -37,7 +37,7 @@ public class AtomicWrite {
 
             try(FileChannel channel = FileChannel.open(
                     temp,
-                    StandardOpenOption.SYNC
+                    StandardOpenOption.WRITE
             )) {
                 channel.force(true);
             }
@@ -50,6 +50,7 @@ public class AtomicWrite {
                         StandardCopyOption.REPLACE_EXISTING
                 );
             } catch(AtomicMoveNotSupportedException e) {
+                Logger.getLogger("SafeFileWrite").warning("Atomic move not supported, falling back to regular move.");
                 Files.move(
                         temp,
                         target,

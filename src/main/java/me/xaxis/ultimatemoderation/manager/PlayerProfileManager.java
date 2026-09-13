@@ -5,6 +5,7 @@ import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,11 +22,11 @@ public class PlayerProfileManager implements AutoCloseable {
             PlayerProfileStorage storage,
             Logger logger
     ) {
-        this.playerProfiles = playerProfiles.stream().collect(
+        this.playerProfiles = Objects.requireNonNull(playerProfiles, "Player profiles cannot be null").stream().collect(
                 Collectors.toMap(PlayerProfile::playerId, profile -> profile)
         );
-        this.storage = storage;
-        this.logger = logger;
+        this.storage = Objects.requireNonNull(storage, "Storage cannot be null");
+        this.logger = Objects.requireNonNull(logger, "Logger cannot be null");
     }
 
     public boolean hasPlayerProfile(UUID playerId) {
@@ -37,7 +38,18 @@ public class PlayerProfileManager implements AutoCloseable {
     }
 
     public void addPlayerProfile(PlayerProfile playerProfile) {
-        playerProfiles.put(playerProfile.playerId(), playerProfile);
+        PlayerProfile previous =
+                playerProfiles.putIfAbsent(
+                        playerProfile.playerId(),
+                        playerProfile
+                );
+
+        if(previous != null) {
+            throw new IllegalStateException(
+                    "Profile already exists for "
+                            + playerProfile.playerId()
+            );
+        }
     }
 
     public void saveAll() {

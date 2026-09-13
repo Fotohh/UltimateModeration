@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderation.loader;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
-import me.xaxis.ultimatemoderation.file.AtomicWrite;
+import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.validation.PlayerProfileYmlValidation;
@@ -65,6 +65,7 @@ public class PlayerProfileLoader implements AutoCloseable{
                 playerId = UUID.fromString(playerIdString);
             } catch (IllegalArgumentException e) {
                 logger.log(Level.SEVERE, "Found malformed uuid in the file name: " + fileName, e);
+                quarantineProfile(file);
                 continue;
             }
             if(!playerId.toString().equals(playerIdString)) {
@@ -104,16 +105,26 @@ public class PlayerProfileLoader implements AutoCloseable{
         configuration.set("player-name", UNKNOWN_PLAYER_NAME);
         configuration.set("notes", List.of());
 
-        AtomicWrite.save(file.toPath(), configuration.saveToString());
+        SafeFileWrite.save(file.toPath(), configuration.saveToString());
 
         return configuration;
     }
 
-    private void quarantineProfile(File file) throws IOException {
+    private void quarantineProfile(File file)  {
         Path original = file.toPath();
         Path backup = getAvailableBackupPath(original);
 
-        Files.move(original, backup);
+        try {
+            Files.move(original, backup);
+        } catch (IOException e) {
+            logger.log(
+                    Level.SEVERE,
+                    "Failed to quarantine profile: " + file.getName() + " -> " + backup.getFileName(),
+                    e
+            );
+            return;
+        }
+        logger.info("Quarantined profile: " + file.getName() + " -> " + backup.getFileName());
     }
 
     private Path getAvailableBackupPath(Path file) {

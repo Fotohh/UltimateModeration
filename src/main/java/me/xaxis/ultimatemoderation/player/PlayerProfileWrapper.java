@@ -14,9 +14,11 @@ public record PlayerProfileWrapper(UUID playerID, String playerName, List<Note> 
                 playerName,
                 "Player name cannot be null"
         );
-        notes = Objects.requireNonNull(
-                List.copyOf(notes),
-                "Notes cannot be null"
+        notes = List.copyOf(
+                Objects.requireNonNull(
+                        notes,
+                        "Notes cannot be null"
+                )
         );
     }
 }

@@ -69,6 +69,9 @@ public class UltimateModeration extends JavaPlugin {
         playerProfileLoader.loadProfilesAsync().whenComplete((profiles, throwable) ->
                 getServer().getScheduler().runTask(this, () -> {
 
+                    playerProfileLoader.close();
+                    playerProfileLoader = null;
+
                     if (throwable != null) {
                         getLogger().log(Level.SEVERE, "Failed to load profiles! Disabling plugin.", throwable);
                         getPluginLoader().disablePlugin(this);
@@ -107,14 +110,19 @@ public class UltimateModeration extends JavaPlugin {
         }
 
         LangYml langYml = new LangYml(langConfiguration);
-        langManager = new LangManager(langYml);
+        langManager = new LangManager(langYml.loadMessages());
 
-        profileSaveTask = getServer().getScheduler().runTaskTimer(this, () -> playerProfileManager.saveAll(), 0L, 20L * 60 * 5);
+        long autoSaveInterval = getConfig().getLong("profile-auto-save-interval", 20L * 60 * 5); // Default to 5 minutes if not set
+
+        profileSaveTask = getServer().getScheduler().runTaskTimer(this, () -> playerProfileManager.saveAll(), autoSaveInterval, autoSaveInterval);
         for(Player player : getServer().getOnlinePlayers()) {
-            if(!playerProfileManager.hasPlayerProfile(player.getUniqueId())) {
+            PlayerProfile existing = playerProfileManager.getPlayerProfile(player.getUniqueId());
+            if(existing == null) {
                 playerProfileManager.addPlayerProfile(
                         new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>())
                 );
+            } else if(!existing.playerName().equals(player.getName())) {
+                existing.updatePlayerName(player.getName());
             }
         }
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
@@ -123,17 +131,17 @@ public class UltimateModeration extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        if (playerProfileLoader != null) {
-            playerProfileLoader.close();
+        if(profileSaveTask != null) {
+            profileSaveTask.cancel();
         }
 
-        if (playerProfileManager != null) {
+        if(playerProfileManager != null) {
             playerProfileManager.saveAll();
             playerProfileManager.close();
         }
 
-        if(profileSaveTask != null) {
-            profileSaveTask.cancel();
+        if(playerProfileLoader != null) {
+            playerProfileLoader.close();
         }
 
     }

@@ -2,7 +2,9 @@ package me.xaxis.ultimatemoderation.player;
 
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerProfile {
@@ -11,9 +13,11 @@ public class PlayerProfile {
     private final List<Note> notes;
 
     public PlayerProfile(UUID playerId, String playerName, List<Note> notes) {
-        this.playerId = playerId;
-        this.playerName = playerName;
-        this.notes = notes;
+        this.playerId = Objects.requireNonNull(playerId, "Player ID cannot be null");
+        this.playerName = Objects.requireNonNull(playerName, "Player name cannot be null");
+        this.notes = new ArrayList<>(
+                Objects.requireNonNull(notes, "Notes cannot be null")
+        );
     }
 
     public UUID playerId() {
@@ -25,14 +29,20 @@ public class PlayerProfile {
     }
 
     public List<Note> notes() {
-        return notes;
+        return List.copyOf(notes);
     }
 
     public void updatePlayerName(String newName) {
+        newName = Objects.requireNonNull(newName, "New name cannot be null");
         if (newName.isBlank()) return;
         if(newName.length() > 16) return;
         if(!PlayerNames.isValid(newName)) return;
         this.playerName = newName;
+    }
+
+    public void removeNote(Note note) {
+        if (note == null) return;
+        notes.remove(note);
     }
 
     public void addNote(Note note) {

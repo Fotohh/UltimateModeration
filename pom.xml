@@ -39,7 +39,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
-                                    <shadedPattern>me.xaxis.UltimateModeration</shadedPattern>
+                                    <shadedPattern>me.xaxis.ultimatemoderation.lib.bstats</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

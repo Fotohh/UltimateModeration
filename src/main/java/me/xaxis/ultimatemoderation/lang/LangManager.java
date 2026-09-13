@@ -1,17 +1,19 @@
 package me.xaxis.ultimatemoderation.lang;
 
+import me.xaxis.ultimatemoderation.utils.Utils;
+
 import java.util.Map;
 
 public class LangManager {
 
     private final Map<LangKey, String> messages;
 
-    public LangManager(LangYml langYml) {
-        this.messages = langYml.loadMessages();
+    public LangManager(Map<LangKey, String> messages) {
+        this.messages = messages;
     }
 
     public String getMessage(LangKey key) {
-        return messages.get(key);
+        return Utils.chat(messages.get(key));
     }
 
     public String replacePlaceholders(String message, Map<String, String> placeholders) {

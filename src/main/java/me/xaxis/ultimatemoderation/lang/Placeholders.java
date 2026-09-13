@@ -2,7 +2,7 @@ package me.xaxis.ultimatemoderation.lang;
 
 public enum Placeholders {
 
-    PLAYER_NAME("player_name"),
+    PLAYER_NAME("player"),
     REASON("reason"),
     DURATION("duration"),
     STAFF_NAME("staff_name"),

@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderation.storage;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
-import me.xaxis.ultimatemoderation.file.AtomicWrite;
+import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -60,7 +60,7 @@ public class PlayerProfileStorage implements AutoCloseable {
 
         String data = configuration.saveToString();
 
-        AtomicWrite.save(target, data);
+        SafeFileWrite.save(target, data);
 
     }
 
@@ -87,11 +87,23 @@ public class PlayerProfileStorage implements AutoCloseable {
                                 "Forcing shutdown."
                 );
 
-                executor.shutdownNow();
+                List<Runnable> dropped = executor.shutdownNow();
+
+                logger.severe(
+                        "Forced profile-storage shutdown; "
+                                + dropped.size()
+                                + " queued save(s) were not started."
+                );
             }
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, "Failed to shutdown PlayerProfileStorage thread!", e);
-            executor.shutdownNow();
+            List<Runnable> dropped = executor.shutdownNow();
+
+            logger.severe(
+                    "Forced profile-storage shutdown; "
+                            + dropped.size()
+                            + " queued save(s) were not started."
+            );
             Thread.currentThread().interrupt();
         }
     }

@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderation.validation;
 
+import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -9,8 +10,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public final class PlayerProfileYmlValidation extends YamlValidator {
-
-    public static final int CURRENT_CONFIG_VERSION = 1;
 
     private static final String PLAYER_ID_PATH = "player-id";
     private static final String PLAYER_NAME_PATH = "player-name";
@@ -27,8 +26,15 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         super(
                 path,
                 configuration,
-                CURRENT_CONFIG_VERSION
+                ConfigConstants.PLAYER_PROFILE.currentVersion()
         );
+
+        if(configuration.getInt("config-version") > ConfigConstants.PLAYER_PROFILE.currentVersion()) {
+            throw new IllegalStateException(
+                    "Config version is too new for this plugin version in "
+                            + path.getFileName()
+            );
+        }
 
         this.expectedPlayerId = Objects.requireNonNull(
                 expectedPlayerId,
