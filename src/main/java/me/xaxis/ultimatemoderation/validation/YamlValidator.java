@@ -69,7 +69,7 @@ public class YamlValidator {
 
     private void validateConfigVersion(List<String> errors) {
 
-        if(!configuration.contains(ConfigConstants.CONFIG_VERSION_PATH)) {
+        if(!configuration.isSet(ConfigConstants.CONFIG_VERSION_PATH)) {
             errors.add(
                     "Missing " + ConfigConstants.CONFIG_VERSION_PATH + " in "
                             + path.getFileName()
