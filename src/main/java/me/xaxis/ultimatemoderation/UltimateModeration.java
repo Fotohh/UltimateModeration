@@ -12,6 +12,7 @@ import me.xaxis.ultimatemoderation.player.PlayerProfileManager;
 import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 import me.xaxis.ultimatemoderation.validation.LangValidator;
 import me.xaxis.ultimatemoderation.validation.MainConfigValidation;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -171,6 +172,9 @@ public class UltimateModeration extends JavaPlugin {
                 playerProfileManager.changeName(existing, player.getName());
             }
         }
+
+        int bstatsPluginId = 34047;
+        new Metrics(this, bstatsPluginId);
 
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
         getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager, configSettings));
