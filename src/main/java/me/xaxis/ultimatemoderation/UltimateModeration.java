@@ -172,7 +172,7 @@ public class UltimateModeration extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
-        getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager));
+        getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager, configSettings));
         //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
     }
 
