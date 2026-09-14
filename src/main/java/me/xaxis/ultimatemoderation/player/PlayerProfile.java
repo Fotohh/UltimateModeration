@@ -35,9 +35,11 @@ public class PlayerProfile {
         this.playerName = newName;
     }
 
-    protected void removeNote(Note note) {
-        if (note == null) return;
-        notes.remove(note);
+    protected void removeNote(int index) {
+        if (index < 0 || index >= notes.size()) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for notes list.");
+        }
+        notes.remove(index);
     }
 
     protected void addNote(Note note) {

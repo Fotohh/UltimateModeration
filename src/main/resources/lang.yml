@@ -1,13 +1,28 @@
 # NEVER edit config-version, it is used to check if the file is up to date.
 config-version: 1
 
-# Built-in placeholders that may be used by messages as features are added:
+# Please note that if you attempt to use placeholders in fields that do not support them, they will not work.
+# For example, you cannot use {note-index} in the no-permission message, as it is not relevant to that message.
+# If you use a placeholder in a message where it is not applicable, it will be displayed as-is.
+# If you use a placeholder in a message where it is applicable, it will be replaced with the actual value.
+# This applies to all placeholders in the messages section.
+# Built-in placeholders that are used by messages as features are added:
 # {player}   - The target player name.
-# {reason}   - A moderation reason.
-# {duration} - A formatted moderation duration.
-# {staff}    - The staff member name.
+# {note-index} - The index of a note.
+# {note-author} - The author of a note.
+# {note-content} - The content of a note.
+# {note-max-length} - The maximum length of a note, as defined in the configuration file.
 
 messages:
-  prefix: '&7[&cUltimateModeration&7] &r'
   no-permission: '&cYou do not have permission to perform this command.'
   player-not-found: '&c{player} was not found or does not exist.'
+  no-delete-message-index: '&cYou must specify a message index to delete.'
+  note-deleted: '&aDeleted note {note-index} for {player}.'
+  note-added: '&aAdded note for {player}.'
+  invalid-note-index: '&c{note-index} is not a valid note index for {player}.'
+  note-must-have-content: '&cYou must provide content for the note.'
+  unable-to-execute-command: '&cYou cannot execute this command.'
+  note-too-long: '&cThe note is too long. Please keep it under {note-max-length} characters.'
+  no-notes: '&c{player} has no notes.'
+  note-list-header: '&6Notes for {player}:'
+  note-list-entry: '&7[{note-index}] Author: {note-author}, &f{note-content}'

@@ -60,6 +60,37 @@ public class PlayerProfileManager implements AutoCloseable {
         });
     }
 
+    public PlayerProfile getPlayerProfile(String playerName) {
+        Objects.requireNonNull(
+                playerName,
+                "Player name cannot be null"
+        );
+
+        UUID playerId =
+                idsByName.get(
+                        normalizeName(playerName)
+                );
+
+        if(playerId == null) {
+            return null;
+        }
+
+        PlayerProfile profile =
+                playerProfiles.get(playerId);
+
+        if(profile == null) {
+            logger.severe(
+                    "Name index contains player "
+                            + playerName
+                            + " mapped to "
+                            + playerId
+                            + ", but no profile exists."
+            );
+        }
+
+        return profile;
+    }
+
     public void addNoteToProfile(PlayerProfile profile, Note note) {
         if (note.content().length() > configSettings.noteMaxContentLength()) {
             throw new IllegalArgumentException("Note content cannot exceed " + configSettings.noteMaxContentLength() + " characters");
@@ -68,17 +99,21 @@ public class PlayerProfileManager implements AutoCloseable {
         save(profile);
     }
 
-    public void removeNoteFromProfile(PlayerProfile profile, Note note) {
-        profile.removeNote(note);
+    public void removeNoteFromProfile(PlayerProfile profile, int index) {
+        profile.removeNote(index);
         save(profile);
+    }
+
+    public List<Note> getNotesFromProfile(PlayerProfile profile) {
+        if (profile == null) {
+            throw new IllegalArgumentException("Profile cannot be null");
+        }
+        return profile.notes();
     }
 
     public List<Note> getNotesFromProfile(UUID playerId) {
         PlayerProfile profile = playerProfiles.get(playerId);
-        if (profile == null) {
-            throw new IllegalArgumentException("No profile found for player ID: " + playerId);
-        }
-        return profile.notes();
+        return getNotesFromProfile(profile);
     }
 
     private void addNameMapping(PlayerProfile profile) {
@@ -176,7 +211,7 @@ public class PlayerProfileManager implements AutoCloseable {
         storage.close();
     }
 
-    public UUID getUUIDFromName(String playerArgument) {
+    private UUID getUUIDFromName(String playerArgument) {
         Objects.requireNonNull(
                 playerArgument,
                 "Player name cannot be null"

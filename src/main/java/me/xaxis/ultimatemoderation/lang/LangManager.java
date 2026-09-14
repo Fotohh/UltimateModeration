@@ -38,10 +38,10 @@ public class LangManager {
         return Utils.chat(message);
     }
 
-    public String replacePlaceholders(String message, Map<String, String> placeholders) {
+    public String replacePlaceholders(String message, Map<Placeholders, String> placeholders) {
         String result = message;
-        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            result = result.replace("{" + entry.getKey() + "}", entry.getValue());
+        for (Map.Entry<Placeholders, String> entry : placeholders.entrySet()) {
+            result = result.replace("{" + entry.getKey().getPlaceholder() + "}", entry.getValue());
         }
         return result;
     }

@@ -3,9 +3,10 @@ package me.xaxis.ultimatemoderation.lang;
 public enum Placeholders {
 
     PLAYER("player"),
-    REASON("reason"),
-    DURATION("duration"),
-    STAFF("staff"),
+    NOTE_CONTENT("note-content"),
+    NOTE_INDEX("note-index"),
+    NOTE_AUTHOR("note-author"),
+    NOTE_MAX_LENGTH("note-max-length")
     ;
 
     private final String placeholder;
