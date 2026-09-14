@@ -69,7 +69,12 @@ public class NoteCommand implements CommandExecutor {
         PlayerProfile targetProfile = playerProfileManager.getPlayerProfile(targetName);
 
         if (targetProfile == null) {
-            sender.sendMessage(langManager.getMessage(LangKey.PLAYER_NOT_FOUND));
+            sender.sendMessage(langManager.replacePlaceholders(
+                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    Map.of(
+                            Placeholders.PLAYER, targetName
+                    )
+            ));
             return true;
         }
 
@@ -180,6 +185,7 @@ public class NoteCommand implements CommandExecutor {
                             )
                     )
             );
+            return;
         }
         sender.sendMessage(
                 langManager.replacePlaceholders(
@@ -227,10 +233,19 @@ public class NoteCommand implements CommandExecutor {
         //todo maybe log note deletions to a file for auditing purposes
 
         try {
-            int noteIndex = Integer.parseInt(args[2]) - 1; // Convert to 0-based index
+            int displayIndex =
+                    Integer.parseInt(args[2]);
+
+            int noteIndex =
+                    displayIndex - 1;
             List<Note> notes = playerProfileManager.getNotesFromProfile(target);
             if (noteIndex < 0 || noteIndex >= notes.size()) {
-                sender.sendMessage(langManager.getMessage(LangKey.NO_DELETE_MESSAGE_INDEX));
+                sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(LangKey.INVALID_NOTE_INDEX),
+                        Map.of(
+                                Placeholders.PLAYER, target.playerName(),
+                                Placeholders.NOTE_INDEX, String.valueOf(displayIndex)
+                        )
+                ));
                 return;
             }
 
@@ -238,7 +253,7 @@ public class NoteCommand implements CommandExecutor {
             sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(LangKey.NOTE_DELETED),
                     Map.of(
                             Placeholders.PLAYER, target.playerName(),
-                            Placeholders.NOTE_INDEX, String.valueOf(noteIndex)
+                            Placeholders.NOTE_INDEX, String.valueOf(displayIndex)
                     )
             ));
         } catch (NumberFormatException e) {

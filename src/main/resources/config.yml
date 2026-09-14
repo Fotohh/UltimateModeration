@@ -3,7 +3,7 @@ config-version: 1
 
 # How often player profiles are autosaved, in ticks.
 # 6000 ticks = 5 minutes.
-# is clamped to a minimum of 120 ticks = 1 minute.
+# is clamped to a minimum of 1200 ticks = 1 minute.
 profile-auto-save-interval: 6000
 
 # The maximum length of a note that can be added to a player profile.

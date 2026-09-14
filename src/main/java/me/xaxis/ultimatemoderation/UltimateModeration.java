@@ -68,12 +68,13 @@ public class UltimateModeration extends JavaPlugin {
         File profileFolder = getDataFolder().toPath().resolve("player-data").toFile();
         if (!profileFolder.exists()) {
             if (!profileFolder.mkdirs()) {
+                getLogger().severe("Unable to make player-data folder, disabling plugin!");
                 getPluginLoader().disablePlugin(this);
-                getLogger().severe("Unable to make player_data, disabling plugin!");
+                return;
             }
         }
 
-        playerProfileLoader = new PlayerProfileLoader(profileFolder.toPath(), getLogger());
+        playerProfileLoader = new PlayerProfileLoader(profileFolder.toPath(), getLogger(), configSettings);
         playerProfileLoader
                 .loadProfilesAsync()
                 .whenComplete((profiles, throwable) -> {

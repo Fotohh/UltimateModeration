@@ -1,13 +1,14 @@
 package me.xaxis.ultimatemoderation.validation;
 
+import me.xaxis.ultimatemoderation.config.ConfigSettings;
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
+import me.xaxis.ultimatemoderation.constants.ModerationConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.player.Note;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.*;
 
 
@@ -16,13 +17,21 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     private static final String PLAYER_ID_PATH = "player-id";
     private static final String PLAYER_NAME_PATH = "player-name";
     private static final String NOTES_PATH = "notes";
-
+    private static final Set<String> NOTE_FIELDS = Set.of(
+            "content",
+            "timestamp",
+            "author-id",
+            "author-name"
+    );
+    private static final int MAX_NOTE_LENGTH = 512;
     private final UUID expectedPlayerId;
+    private final ConfigSettings configSettings;
 
     public PlayerProfileYmlValidation(
             Path path,
             FileConfiguration configuration,
-            UUID expectedPlayerId
+            UUID expectedPlayerId,
+            ConfigSettings configSettings
     ) {
         super(
                 path,
@@ -33,6 +42,10 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         this.expectedPlayerId = Objects.requireNonNull(
                 expectedPlayerId,
                 "Expected player ID cannot be null"
+        );
+        this.configSettings = Objects.requireNonNull(
+                configSettings,
+                "Config settings cannot be null"
         );
     }
 
@@ -45,7 +58,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
     private void validatePlayerId(List<String> errors) {
 
-        if(!configuration.isSet(PLAYER_ID_PATH)) {
+        if (!configuration.isSet(PLAYER_ID_PATH)) {
             errors.add(
                     PLAYER_ID_PATH
                             + " is not set in "
@@ -54,7 +67,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(!configuration.isString(PLAYER_ID_PATH)) {
+        if (!configuration.isString(PLAYER_ID_PATH)) {
             errors.add(
                     "Expected type String from "
                             + PLAYER_ID_PATH
@@ -70,7 +83,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             playerId = UUID.fromString(
                     configuration.getString(PLAYER_ID_PATH)
             );
-        } catch(IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
             errors.add(
                     "Malformed UUID found in "
                             + PLAYER_ID_PATH
@@ -83,7 +96,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         String rawId = configuration.getString(PLAYER_ID_PATH);
         UUID parsed = UUID.fromString(rawId);
 
-        if(!parsed.toString().equals(rawId)) {
+        if (!parsed.toString().equals(rawId)) {
             errors.add(
                     "Non-canonical UUID found in "
                             + PLAYER_ID_PATH
@@ -92,7 +105,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
         }
 
-        if(!expectedPlayerId.equals(playerId)) {
+        if (!expectedPlayerId.equals(playerId)) {
             errors.add(
                     PLAYER_ID_PATH
                             + " does not match profile filename in "
@@ -103,7 +116,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
     private void validatePlayerName(List<String> errors) {
 
-        if(!configuration.isSet(PLAYER_NAME_PATH)) {
+        if (!configuration.isSet(PLAYER_NAME_PATH)) {
             errors.add(
                     PLAYER_NAME_PATH
                             + " is not set in "
@@ -112,7 +125,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(!configuration.isString(PLAYER_NAME_PATH)) {
+        if (!configuration.isString(PLAYER_NAME_PATH)) {
             errors.add(
                     PLAYER_NAME_PATH
                             + " is not of type String in "
@@ -124,7 +137,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         String playerName =
                 configuration.getString(PLAYER_NAME_PATH);
 
-        if(!PlayerNames.isValid(playerName)) {
+        if (!playerName.equals(
+                ModerationConstants.UNKNOWN_PLAYER_NAME
+        ) && !PlayerNames.isValid(playerName)) {
             errors.add(
                     "Malformed player name found in "
                             + PLAYER_NAME_PATH
@@ -134,16 +149,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         }
     }
 
-    private static final Set<String> NOTE_FIELDS = Set.of(
-            "content",
-            "timestamp",
-            "author-id",
-            "author-name"
-    );
-
     private void validateNotes(List<String> errors) {
 
-        if(!configuration.isSet(NOTES_PATH)) {
+        if (!configuration.isSet(NOTES_PATH)) {
             errors.add(
                     NOTES_PATH
                             + " is not set in "
@@ -152,7 +160,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(!configuration.isList(NOTES_PATH)) {
+        if (!configuration.isList(NOTES_PATH)) {
             errors.add(
                     NOTES_PATH
                             + " is not of type List in "
@@ -163,7 +171,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
         List<?> noteMaps = configuration.getList(NOTES_PATH);
 
-        if(noteMaps == null) {
+        if (noteMaps == null) {
             errors.add(
                     "Null note list in "
                             + path.getFileName()
@@ -171,9 +179,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        for(int i = 0; i < noteMaps.size(); i++) {
+        for (int i = 0; i < noteMaps.size(); i++) {
             Object value = noteMaps.get(i);
-            if(!(value instanceof Map<?, ?> noteMap)) {
+            if (!(value instanceof Map<?, ?> noteMap)) {
                 errors.add(
                         "Invalid note entry type: "
                                 + value
@@ -185,7 +193,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                 continue;
             }
 
-            if(!NOTE_FIELDS.equals(noteMap.keySet())) {
+            if (!NOTE_FIELDS.equals(noteMap.keySet())) {
                 errors.add(
                         "Invalid note entry keys: "
                                 + noteMap.keySet()
@@ -196,9 +204,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                 );
             }
 
-            for(Map.Entry<?, ?> entry : noteMap.entrySet()) {
+            for (Map.Entry<?, ?> entry : noteMap.entrySet()) {
 
-                if(!(entry.getKey() instanceof String field)) {
+                if (!(entry.getKey() instanceof String field)) {
                     errors.add(
                             "Invalid note entry key type: "
                                     + entry.getKey()
@@ -223,26 +231,22 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
     private void validateNoteEntry(String field, Object value, List<String> errors, int index) {
 
-        switch(field) {
-            case PlayerProfileSchema.NOTE_CONTENT ->
-                    validateNoteContent(
-                            field, value, index, errors
-                    );
+        switch (field) {
+            case PlayerProfileSchema.NOTE_CONTENT -> validateNoteContent(
+                    field, value, index, errors
+            );
 
-            case PlayerProfileSchema.NOTE_TIMESTAMP ->
-                    validateNoteTimestamp(
-                            field, value, index, errors
-                    );
+            case PlayerProfileSchema.NOTE_TIMESTAMP -> validateNoteTimestamp(
+                    field, value, index, errors
+            );
 
-            case PlayerProfileSchema.NOTE_AUTHOR_ID ->
-                    validateNoteAuthorId(
-                            field, value, index, errors
-                    );
+            case PlayerProfileSchema.NOTE_AUTHOR_ID -> validateNoteAuthorId(
+                    field, value, index, errors
+            );
 
-            case PlayerProfileSchema.NOTE_AUTHOR_NAME ->
-                    validateNoteAuthorName(
-                            field, value, index, errors
-                    );
+            case PlayerProfileSchema.NOTE_AUTHOR_NAME -> validateNoteAuthorName(
+                    field, value, index, errors
+            );
 
             default -> errors.add(
                     "Unknown note entry path: "
@@ -255,10 +259,8 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         }
     }
 
-    private static final int MAX_NOTE_LENGTH = 512;
-
     private void validateNoteContent(String path, Object value, int index, List<String> errors) {
-        if(!(value instanceof String content)) {
+        if (!(value instanceof String content)) {
             errors.add(
                     "Invalid note entry value type for "
                             + path
@@ -272,7 +274,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(content.isBlank()){ // Empty notes are not allowed
+        if (content.isBlank()) { // Empty notes are not allowed
             errors.add(
                     "Empty note content for "
                             + path
@@ -284,16 +286,17 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(content.length() > Note.MAX_CONTENT_LENGTH) {
+        if (content.length() > configSettings.noteMaxContentLength()) {
             errors.add(
                     "Note content exceeds maximum length of "
-                            + Note.MAX_CONTENT_LENGTH
+                            + configSettings.noteMaxContentLength()
                             + " characters..."
             );
         }
     }
+
     private void validateNoteAuthorName(String path, Object value, int index, List<String> errors) {
-        if(!(value instanceof String content)) {
+        if (!(value instanceof String content)) {
             errors.add(
                     "Invalid note entry value type for "
                             + path
@@ -306,7 +309,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
             return;
         }
-        if(!PlayerNames.isValid(content)) {
+        if (!PlayerNames.isValid(content)) {
             errors.add(
                     "Invalid Minecraft username entry for "
                             + path
@@ -319,8 +322,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
         }
     }
+
     private void validateNoteAuthorId(String path, Object value, int index, List<String> errors) {
-        if(!(value instanceof String content)) {
+        if (!(value instanceof String content)) {
             errors.add(
                     "Invalid note entry value type for "
                             + path
@@ -333,7 +337,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
             return;
         }
-        if(content.isEmpty()) {
+        if (content.isEmpty()) {
             errors.add(
                     "Empty note entry found in "
                             + path
@@ -349,7 +353,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
 
         try {
             authorId = UUID.fromString(content);
-        } catch(IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
             errors.add(
                     "Malformed UUID found in "
                             + path
@@ -357,11 +361,11 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             + this.path.getFileName()
                             + " at index "
                             + index
-            ) ;
+            );
             return;
         }
 
-        if(!authorId.toString().equals(content)) {
+        if (!authorId.toString().equals(content)) {
             errors.add(
                     "Non-canonical UUID found in "
                             + path
@@ -372,14 +376,15 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             );
         }
 
-       try {
+        try {
             UUID.fromString(content);
-        } catch(IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
 
         }
     }
+
     private void validateNoteTimestamp(String path, Object value, int index, List<String> errors) {
-        if(!(value instanceof Long timestamp)) {
+        if (!(value instanceof Long timestamp)) {
             errors.add(
                     "Invalid note entry value type for "
                             + path
@@ -393,7 +398,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
             return;
         }
 
-        if(timestamp < 0) {
+        if (timestamp < 0) {
             errors.add(
                     "Invalid note entry timestamp for "
                             + path
@@ -405,7 +410,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             + index
             );
         }
-        if(timestamp > System.currentTimeMillis() + Note.MAX_FUTURE_SKEW_MILLIS) { // Allow a 24-hour buffer for clock skew
+        if (timestamp > System.currentTimeMillis() + Note.MAX_FUTURE_SKEW_MILLIS) { // Allow a 24-hour buffer for clock skew
             errors.add(
                     "Note entry timestamp is in the future for "
                             + path

@@ -14,7 +14,7 @@ public final class MainConfigValidation extends YamlValidator {
     private static final String NOTE_MAX_CONTENT_LENGTH_PATH =
             "note-max-content-length";
 
-    private static final long MIN_AUTO_SAVE_INTERVAL_SECONDS = 20L * 60L;
+    private static final long MIN_AUTO_SAVE_INTERVAL_TICKS = 20L * 60L;
 
     public MainConfigValidation(Path path, FileConfiguration configuration) {
         super(path, configuration, ConfigConstants.MAIN.currentVersion());
@@ -63,7 +63,7 @@ public final class MainConfigValidation extends YamlValidator {
             errors.add(
                     "The '" + PROFILE_AUTO_SAVE_INTERVAL_PATH + "' is missing."
                             + " in the configuration file. Please add it with a value of at least "
-                            + MIN_AUTO_SAVE_INTERVAL_SECONDS + " seconds."
+                            + MIN_AUTO_SAVE_INTERVAL_TICKS + " seconds."
             );
             return;
         }
@@ -81,11 +81,11 @@ public final class MainConfigValidation extends YamlValidator {
 
         long autoSaveIntervalSeconds = ((Number) rawValue).longValue();
 
-        if (autoSaveIntervalSeconds < MIN_AUTO_SAVE_INTERVAL_SECONDS) {
+        if (autoSaveIntervalSeconds < MIN_AUTO_SAVE_INTERVAL_TICKS) {
 
             errors.add(
                     "The '" + PROFILE_AUTO_SAVE_INTERVAL_PATH + "' must be at least "
-                            + MIN_AUTO_SAVE_INTERVAL_SECONDS + " seconds."
+                            + MIN_AUTO_SAVE_INTERVAL_TICKS + " seconds."
             );
 
             return;

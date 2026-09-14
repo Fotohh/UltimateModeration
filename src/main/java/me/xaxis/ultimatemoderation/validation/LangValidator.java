@@ -11,8 +11,6 @@ public class LangValidator extends YamlValidator {
 
     public LangValidator(Path path, YamlConfiguration configuration) {
         super(path, configuration, ConfigConstants.LANG.currentVersion());
-
-        addValidation(this::validateMessages);
     }
 
     private void validateMessages(List<String> errors){
@@ -39,5 +37,11 @@ public class LangValidator extends YamlValidator {
         }
 
 
+    }
+
+    @Override
+    protected void validateFile(List<String> errors) {
+
+        validateMessages(errors);
     }
 }

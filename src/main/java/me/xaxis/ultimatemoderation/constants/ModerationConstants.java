@@ -12,4 +12,6 @@ public final class ModerationConstants {
             UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public static final String CONSOLE_NAME = "CONSOLE";
+
+    public static final String UNKNOWN_PLAYER_NAME = "<unknown>";
 }

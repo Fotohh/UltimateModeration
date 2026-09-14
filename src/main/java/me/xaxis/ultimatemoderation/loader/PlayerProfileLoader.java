@@ -1,6 +1,8 @@
 package me.xaxis.ultimatemoderation.loader;
 
+import me.xaxis.ultimatemoderation.config.ConfigSettings;
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
+import me.xaxis.ultimatemoderation.constants.ModerationConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
@@ -25,14 +27,13 @@ import java.util.logging.Logger;
 public class PlayerProfileLoader implements AutoCloseable{
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
-    private static final String UNKNOWN_PLAYER_NAME = "Unknown";
     private static final String PLAYER_NAME_PATH = "player-name";
 
     private final Path parentFolderPath;
     private final Logger logger;
+    private final ConfigSettings configSettings;
 
-    public PlayerProfileLoader(Path parentFolder, Logger logger) {
+    public PlayerProfileLoader(Path parentFolder, Logger logger, ConfigSettings configSettings) {
         this.parentFolderPath = Objects.requireNonNull(
                 parentFolder,
                 "Parent Folder cannot be null"
@@ -40,6 +41,10 @@ public class PlayerProfileLoader implements AutoCloseable{
         this.logger = Objects.requireNonNull(
                 logger,
                 "Logger cannot be null"
+        );
+        this.configSettings = Objects.requireNonNull(
+                configSettings,
+                "ConfigSettings cannot be null"
         );
 
     }
@@ -168,7 +173,7 @@ public class PlayerProfileLoader implements AutoCloseable{
 
         configuration.set(
                 PlayerProfileSchema.PLAYER_NAME,
-                UNKNOWN_PLAYER_NAME
+                ModerationConstants.UNKNOWN_PLAYER_NAME
         );
 
         configuration.set(
@@ -248,7 +253,8 @@ public class PlayerProfileLoader implements AutoCloseable{
                 new PlayerProfileYmlValidation(
                         file.toPath(),
                         configuration,
-                        uuid
+                        uuid,
+                        configSettings
                 );
 
         List<String> errors = validator.validate();

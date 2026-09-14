@@ -2,3 +2,8 @@ name: UltimateModeration
 main: me.xaxis.ultimatemoderation.UltimateModeration
 version: 1
 api-version: '26.2'
+commands:
+  note:
+    description: Manage player notes.
+    usage: /<command> <add|delete|list> [player] [note]
+    permission: ultimatemoderation.admin.note-command

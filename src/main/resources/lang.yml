@@ -26,3 +26,6 @@ messages:
   no-notes: '&c{player} has no notes.'
   note-list-header: '&6Notes for {player}:'
   note-list-entry: '&7[{note-index}] Author: {note-author}, &f{note-content}'
+  note-command-usage: '&cUsage: /note <add|list|delete> <player>'
+  note-add-command-usage: '&cUsage: /note add <player> <content>'
+  note-delete-command-usage: '&cUsage: /note delete <player> <index>'
