@@ -12,6 +12,7 @@ config-version: 1
 # {note-author} - The author of a note.
 # {note-content} - The content of a note.
 # {note-max-length} - The maximum length of a note, as defined in the configuration file.
+# {value} usually represents numerical inputs that aren't numbers. Ex: hi is not a valid number.
 
 messages:
   no-permission: '&cYou do not have permission to perform this command.'
@@ -22,7 +23,7 @@ messages:
   invalid-note-index: '&c{note-index} is not a valid note index for {player}.'
   note-must-have-content: '&cYou must provide content for the note.'
   unable-to-execute-command: '&cYou cannot execute this command.'
-  note-too-long: '&cThe note is too long. Please keep it under {note-max-length} characters.'
+  content-too-long: '&cThe content is too long. Please keep it under {note-max-length} characters.'
   no-notes: '&c{player} has no notes.'
   note-list-header: '&6Notes for {player}:'
   note-list-entry: '&7[{note-index}] Author: {note-author}, &f{note-content}'
@@ -34,3 +35,10 @@ messages:
   warn-add-command-usage: '&cUsage: /warn add <player> <reason>'
   warn-delete-command-usage: '&cUsage: /warn delete <player> <index>'
   warn-must-have-reason: '&cYou must specify a reason for warning {player}.'
+  invalid-number: '&c{value} is not a valid number.'
+  invalid-warn-index: '&c{value} is not a valid warn index for {player}.'
+  warn-deleted: '&aDeleted warn {value} for {player}.' #value represents the index of the player warn
+  warn-list-command-usage: '&cUsage: /warn list <player>'
+  no-warns: '&c{player} has no warns.'
+  warn-list-header: '&6Warns for {player}:'
+  warn-list-entry: '&7[{value}] Author: {warn-author}, &f{warn-content}'

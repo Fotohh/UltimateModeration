@@ -13,7 +13,7 @@ public enum LangKey {
     INVALID_NOTE_INDEX("messages.invalid-note-index"),
     NOTE_MUST_HAVE_CONTENT("messages.note-must-have-content"),
     UNABLE_TO_EXECUTE_COMMAND("messages.unable-to-execute-command"),
-    NOTE_TOO_LONG("messages.note-too-long"),
+    CONTENT_TOO_LONG("messages.note-too-long"),
     NO_NOTES("messages.no-notes"),
     NOTE_LIST_HEADER("messages.note-list-header"),
     NOTE_LIST_ENTRY("messages.note-list-entry"),
@@ -22,8 +22,13 @@ public enum LangKey {
     WARN_ADD_COMMAND_USAGE("messages.warn-add-command-usage"),
     WARN_DELETE_COMMAND_USAGE("mesages.warn-delete-command-usage"),
     WARN_MUST_HAVE_REASON("messages.warn-must-have-reason"),
-
-    ;
+    INVALID_NUMBER("messages.invalid-number"),
+    INVALID_WARN_INDEX("messages.invalid-warn-index"),
+    WARN_DELETED("messages.warn-deleted"),
+    WARN_LIST_COMMAND_USAGE("messages.warn-list-command-usage"),
+    NO_WARNS("messages.no-warns"),
+    WARN_LIST_HEADER("messages.warn-list-header"),
+    WARN_LIST_ENTRY("messages.warn-list-entry"),;
     private final String path;
 
     LangKey(String path) {
