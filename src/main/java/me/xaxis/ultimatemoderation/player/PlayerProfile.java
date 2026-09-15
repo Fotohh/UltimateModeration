@@ -22,6 +22,15 @@ public class PlayerProfile {
         );
     }
 
+    public static PlayerProfile create(UUID playerId, String playerName) {
+        return new PlayerProfile(
+                playerId,
+                playerName,
+                List.of(),
+                List.of()
+        );
+    }
+
     public UUID playerId() {
         return playerId;
     }

@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderation.player;
 
 import me.xaxis.ultimatemoderation.config.ConfigSettings;
+import me.xaxis.ultimatemoderation.constants.ModerationConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import me.xaxis.ultimatemoderation.storage.PlayerProfileStorage;
 
@@ -66,6 +67,15 @@ public class PlayerProfileManager implements AutoCloseable {
     }
 
     public void addWarningToProfile(PlayerProfile profile, Warning warning) {
+        Objects.requireNonNull(profile, "Profile cannot be null");
+        Objects.requireNonNull(warning, "Warning cannot be null");
+
+        if (!profile.playerId().equals(warning.playerUUID())) {
+            throw new IllegalArgumentException(
+                    "Warning target UUID does not match profile UUID"
+            );
+        }
+
         profile.addWarning(warning);
         save(profile);
     }
@@ -138,8 +148,7 @@ public class PlayerProfileManager implements AutoCloseable {
             throw new IllegalArgumentException("Profile cannot be null");
         }
 
-        if (profile.playerName().equalsIgnoreCase("unknown")) {
-            logger.warning("Player name 'unknown' is reserved and should not be used. Player ID: " + profile.playerId());
+        if (profile.playerName().equals(ModerationConstants.UNKNOWN_PLAYER_NAME)) {
             return;
         }
 

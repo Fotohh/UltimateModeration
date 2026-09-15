@@ -19,7 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -75,7 +74,7 @@ public class UltimateModeration extends JavaPlugin {
             }
         }
 
-        playerProfileLoader = new PlayerProfileLoader(profileFolder.toPath(), getLogger(), configSettings);
+        playerProfileLoader = new PlayerProfileLoader(profileFolder.toPath(), getLogger());
         playerProfileLoader
                 .loadProfilesAsync()
                 .whenComplete((profiles, throwable) -> {
@@ -166,7 +165,7 @@ public class UltimateModeration extends JavaPlugin {
             PlayerProfile existing = playerProfileManager.getPlayerProfile(player.getUniqueId());
             if (existing == null) {
                 playerProfileManager.addPlayerProfile(
-                        new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>(), new ArrayList<>())
+                        PlayerProfile.create(player.getUniqueId(), player.getName())
                 );
             } else if (!existing.playerName().equals(player.getName())) {
                 playerProfileManager.changeName(existing, player.getName());

@@ -1,25 +1,26 @@
 package me.xaxis.ultimatemoderation.storage;
 
-import me.xaxis.ultimatemoderation.constants.ConfigConstants;
-import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
+import me.xaxis.ultimatemoderation.codec.PlayerProfileCodec;
 import me.xaxis.ultimatemoderation.file.SafeFileWrite;
-import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerProfileStorage implements AutoCloseable {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final PlayerProfileCodec profileCodec = new PlayerProfileCodec();
 
     private final Path profilesDirectory;
     private final Logger logger;
@@ -35,65 +36,12 @@ public class PlayerProfileStorage implements AutoCloseable {
         );
     }
 
-    private Map<String, Object> serializeNote(Note note) {
-        Objects.requireNonNull(note, "Note cannot be null");
-
-        Map<String, Object> serialized = new LinkedHashMap<>();
-
-        serialized.put(
-                PlayerProfileSchema.NOTE_AUTHOR_ID,
-                note.authorUUID().toString()
-        );
-
-        serialized.put(
-                PlayerProfileSchema.NOTE_AUTHOR_NAME,
-                note.authorName()
-        );
-
-        serialized.put(
-                PlayerProfileSchema.NOTE_CONTENT,
-                note.content()
-        );
-
-        serialized.put(
-                PlayerProfileSchema.NOTE_TIMESTAMP,
-                note.timestamp()
-        );
-
-        return serialized;
-    }
-
     private void save(PlayerProfileWrapper profile) throws IOException {
         Path target = profilesDirectory.resolve(
                 profile.playerID() + ".yml"
         );
 
-        YamlConfiguration configuration = new YamlConfiguration();
-
-        configuration.set(
-                ConfigConstants.CONFIG_VERSION_PATH,
-                ConfigConstants.PLAYER_PROFILE.currentVersion()
-        );
-
-        configuration.set(
-                PlayerProfileSchema.PLAYER_ID,
-                profile.playerID().toString()
-        );
-
-        configuration.set(
-                PlayerProfileSchema.PLAYER_NAME,
-                profile.playerName()
-        );
-
-        List<Map<String, Object>> notesList =
-                profile.notes().stream()
-                        .map(this::serializeNote)
-                        .toList();
-
-        configuration.set(
-                PlayerProfileSchema.NOTES,
-                notesList
-        );
+        YamlConfiguration configuration = profileCodec.encode(profile);
 
         SafeFileWrite.save(
                 target,

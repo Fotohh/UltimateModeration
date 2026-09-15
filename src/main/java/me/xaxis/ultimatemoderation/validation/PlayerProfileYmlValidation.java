@@ -1,37 +1,27 @@
 package me.xaxis.ultimatemoderation.validation;
 
-import me.xaxis.ultimatemoderation.config.ConfigSettings;
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
 import me.xaxis.ultimatemoderation.constants.ModerationConstants;
 import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.player.Note;
+import me.xaxis.ultimatemoderation.player.Warning;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
-import java.util.*;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public final class PlayerProfileYmlValidation extends YamlValidator {
 
-    private static final String PLAYER_ID_PATH = "player-id";
-    private static final String PLAYER_NAME_PATH = "player-name";
-    private static final String NOTES_PATH = "notes";
-    private static final Set<String> NOTE_FIELDS = Set.of(
-            "content",
-            "timestamp",
-            "author-id",
-            "author-name"
-    );
-    private static final int MAX_NOTE_LENGTH = 512;
     private final UUID expectedPlayerId;
-    private final ConfigSettings configSettings;
 
     public PlayerProfileYmlValidation(
             Path path,
             FileConfiguration configuration,
-            UUID expectedPlayerId,
-            ConfigSettings configSettings
+            UUID expectedPlayerId
     ) {
         super(
                 path,
@@ -42,10 +32,6 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         this.expectedPlayerId = Objects.requireNonNull(
                 expectedPlayerId,
                 "Expected player ID cannot be null"
-        );
-        this.configSettings = Objects.requireNonNull(
-                configSettings,
-                "Config settings cannot be null"
         );
     }
 
@@ -58,57 +44,29 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     }
 
     private void validatePlayerId(List<String> errors) {
+        String field = PlayerProfileSchema.PLAYER_ID;
 
-        if (!configuration.isSet(PLAYER_ID_PATH)) {
-            errors.add(
-                    PLAYER_ID_PATH
-                            + " is not set in "
-                            + path.getFileName()
-            );
+        if (!configuration.isSet(field)) {
+            errors.add(field + " is not set in " + path.getFileName());
             return;
         }
 
-        if (!configuration.isString(PLAYER_ID_PATH)) {
+        if (!configuration.isString(field)) {
             errors.add(
                     "Expected type String from "
-                            + PLAYER_ID_PATH
+                            + field
                             + ", got an invalid data type in "
                             + path.getFileName()
             );
             return;
         }
 
-        UUID playerId;
+        String rawId = configuration.getString(field);
+        UUID playerId = parseCanonicalUuid(rawId, field, -1, "profile", errors);
 
-        try {
-            playerId = UUID.fromString(
-                    configuration.getString(PLAYER_ID_PATH)
-            );
-        } catch (IllegalArgumentException ignored) {
+        if (playerId != null && !expectedPlayerId.equals(playerId)) {
             errors.add(
-                    "Malformed UUID found in "
-                            + PLAYER_ID_PATH
-                            + " in "
-                            + path.getFileName()
-            );
-            return;
-        }
-
-        String rawId = configuration.getString(PLAYER_ID_PATH);
-        UUID parsed = UUID.fromString(rawId);
-
-        if (!parsed.toString().equals(rawId)) {
-            errors.add(
-                    "Non-canonical UUID found in "
-                            + PLAYER_ID_PATH
-                            + " in "
-                            + path.getFileName()
-            );
-        }
-
-        if (!expectedPlayerId.equals(playerId)) {
-            errors.add(
-                    PLAYER_ID_PATH
+                    field
                             + " does not match profile filename in "
                             + path.getFileName()
             );
@@ -116,34 +74,25 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     }
 
     private void validatePlayerName(List<String> errors) {
+        String field = PlayerProfileSchema.PLAYER_NAME;
 
-        if (!configuration.isSet(PLAYER_NAME_PATH)) {
-            errors.add(
-                    PLAYER_NAME_PATH
-                            + " is not set in "
-                            + path.getFileName()
-            );
+        if (!configuration.isSet(field)) {
+            errors.add(field + " is not set in " + path.getFileName());
             return;
         }
 
-        if (!configuration.isString(PLAYER_NAME_PATH)) {
-            errors.add(
-                    PLAYER_NAME_PATH
-                            + " is not of type String in "
-                            + path.getFileName()
-            );
+        if (!configuration.isString(field)) {
+            errors.add(field + " is not of type String in " + path.getFileName());
             return;
         }
 
-        String playerName =
-                configuration.getString(PLAYER_NAME_PATH);
+        String playerName = configuration.getString(field);
 
-        if (!playerName.equals(
-                ModerationConstants.UNKNOWN_PLAYER_NAME
-        ) && !PlayerNames.isValid(playerName)) {
+        if (!ModerationConstants.UNKNOWN_PLAYER_NAME.equals(playerName)
+                && !PlayerNames.isValid(playerName)) {
             errors.add(
                     "Malformed player name found in "
-                            + PLAYER_NAME_PATH
+                            + field
                             + " in "
                             + path.getFileName()
             );
@@ -151,108 +100,211 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     }
 
     private void validateNotes(List<String> errors) {
+        String listPath = PlayerProfileSchema.NOTES;
 
-        if (!configuration.isSet(NOTES_PATH)) {
-            errors.add(
-                    NOTES_PATH
-                            + " is not set in "
-                            + path.getFileName()
-            );
+        if (!configuration.isSet(listPath)) {
+            errors.add(listPath + " is not set in " + path.getFileName());
             return;
         }
 
-        if (!configuration.isList(NOTES_PATH)) {
-            errors.add(
-                    NOTES_PATH
-                            + " is not of type List in "
-                            + path.getFileName()
-            );
+        if (!configuration.isList(listPath)) {
+            errors.add(listPath + " is not of type List in " + path.getFileName());
             return;
         }
 
-        List<?> noteMaps = configuration.getList(NOTES_PATH);
-
-        if (noteMaps == null) {
-            errors.add(
-                    "Null note list in "
-                            + path.getFileName()
-            );
+        List<?> entries = configuration.getList(listPath);
+        if (entries == null) {
+            errors.add("Null note list in " + path.getFileName());
             return;
         }
 
-        for (int i = 0; i < noteMaps.size(); i++) {
-            Object value = noteMaps.get(i);
-            if (!(value instanceof Map<?, ?> noteMap)) {
+        for (int index = 0; index < entries.size(); index++) {
+            Object entry = entries.get(index);
+
+            if (!(entry instanceof Map<?, ?> noteMap)) {
                 errors.add(
                         "Invalid note entry type: "
-                                + value
+                                + entry
                                 + " in "
                                 + path.getFileName()
                                 + " at index "
-                                + i
+                                + index
                 );
                 continue;
             }
 
-            if (!NOTE_FIELDS.equals(noteMap.keySet())) {
+            if (!PlayerProfileSchema.NOTE_FIELDS.equals(noteMap.keySet())) {
                 errors.add(
                         "Invalid note entry keys: "
                                 + noteMap.keySet()
                                 + " in "
                                 + path.getFileName()
                                 + " at index "
-                                + i
+                                + index
                 );
             }
 
-            for (Map.Entry<?, ?> entry : noteMap.entrySet()) {
-
-                if (!(entry.getKey() instanceof String field)) {
-                    errors.add(
-                            "Invalid note entry key type: "
-                                    + entry.getKey()
-                                    + " at index "
-                                    + i
-                                    + " in "
-                                    + path.getFileName()
-                    );
-                    continue;
-                }
-
-
-                validateNoteEntry(
-                        field,
-                        entry.getValue(),
-                        errors,
-                        i
-                );
-            }
+            validateNoteField(
+                    PlayerProfileSchema.NOTE_AUTHOR_ID,
+                    noteMap.get(PlayerProfileSchema.NOTE_AUTHOR_ID),
+                    index,
+                    errors
+            );
+            validateNoteField(
+                    PlayerProfileSchema.NOTE_AUTHOR_NAME,
+                    noteMap.get(PlayerProfileSchema.NOTE_AUTHOR_NAME),
+                    index,
+                    errors
+            );
+            validateNoteField(
+                    PlayerProfileSchema.NOTE_CONTENT,
+                    noteMap.get(PlayerProfileSchema.NOTE_CONTENT),
+                    index,
+                    errors
+            );
+            validateNoteField(
+                    PlayerProfileSchema.NOTE_TIMESTAMP,
+                    noteMap.get(PlayerProfileSchema.NOTE_TIMESTAMP),
+                    index,
+                    errors
+            );
         }
     }
 
-    private void validateNoteEntry(String field, Object value, List<String> errors, int index) {
-
+    private void validateNoteField(
+            String field,
+            Object value,
+            int index,
+            List<String> errors
+    ) {
         switch (field) {
-            case PlayerProfileSchema.NOTE_CONTENT -> validateNoteContent(
-                    field, value, index, errors
-            );
+            case PlayerProfileSchema.NOTE_AUTHOR_ID ->
+                    validateUuidValue(value, field, index, "note", errors);
+            case PlayerProfileSchema.NOTE_AUTHOR_NAME ->
+                    validateMinecraftName(value, field, index, "note", errors);
+            case PlayerProfileSchema.NOTE_CONTENT ->
+                    validateNonBlankString(value, field, index, "note", errors);
+            case PlayerProfileSchema.NOTE_TIMESTAMP ->
+                    validateTimestamp(
+                            value,
+                            field,
+                            index,
+                            "note",
+                            Note.MAX_FUTURE_SKEW_MILLIS,
+                            errors
+                    );
+            default -> throw new IllegalStateException("Unknown note field: " + field);
+        }
+    }
 
-            case PlayerProfileSchema.NOTE_TIMESTAMP -> validateNoteTimestamp(
-                    field, value, index, errors
-            );
+    private void validateWarnings(List<String> errors) {
+        String listPath = PlayerProfileSchema.WARNINGS;
 
-            case PlayerProfileSchema.NOTE_AUTHOR_ID -> validateNoteAuthorId(
-                    field, value, index, errors
-            );
+        if (!configuration.isSet(listPath)) {
+            errors.add(listPath + " is not set in " + path.getFileName());
+            return;
+        }
 
-            case PlayerProfileSchema.NOTE_AUTHOR_NAME -> validateNoteAuthorName(
-                    field, value, index, errors
-            );
+        if (!configuration.isList(listPath)) {
+            errors.add(listPath + " is not of type List in " + path.getFileName());
+            return;
+        }
 
-            default -> errors.add(
-                    "Unknown note entry path: "
-                            + field
+        List<?> entries = configuration.getList(listPath);
+        if (entries == null) {
+            errors.add("Null warning list in " + path.getFileName());
+            return;
+        }
+
+        for (int index = 0; index < entries.size(); index++) {
+            Object entry = entries.get(index);
+
+            if (!(entry instanceof Map<?, ?> warningMap)) {
+                errors.add(
+                        "Invalid warning entry type: "
+                                + entry
+                                + " in "
+                                + path.getFileName()
+                                + " at index "
+                                + index
+                );
+                continue;
+            }
+
+            if (!PlayerProfileSchema.WARNING_FIELDS.equals(warningMap.keySet())) {
+                errors.add(
+                        "Invalid warning entry keys: "
+                                + warningMap.keySet()
+                                + " in "
+                                + path.getFileName()
+                                + " at index "
+                                + index
+                );
+            }
+
+            validateWarningTargetId(
+                    warningMap.get(PlayerProfileSchema.WARNING_TARGET_ID),
+                    index,
+                    errors
+            );
+            validateUuidValue(
+                    warningMap.get(PlayerProfileSchema.WARNING_STAFF_ID),
+                    PlayerProfileSchema.WARNING_STAFF_ID,
+                    index,
+                    "warning",
+                    errors
+            );
+            validateMinecraftName(
+                    warningMap.get(PlayerProfileSchema.WARNING_STAFF_NAME),
+                    PlayerProfileSchema.WARNING_STAFF_NAME,
+                    index,
+                    "warning",
+                    errors
+            );
+            validateNonBlankString(
+                    warningMap.get(PlayerProfileSchema.WARNING_CONTENT),
+                    PlayerProfileSchema.WARNING_CONTENT,
+                    index,
+                    "warning",
+                    errors
+            );
+            validateTimestamp(
+                    warningMap.get(PlayerProfileSchema.WARNING_TIMESTAMP),
+                    PlayerProfileSchema.WARNING_TIMESTAMP,
+                    index,
+                    "warning",
+                    Warning.MAX_FUTURE_SKEW_MILLIS,
+                    errors
+            );
+        }
+    }
+
+    private void validateWarningTargetId(Object value, int index, List<String> errors) {
+        if (!(value instanceof String rawId)) {
+            errors.add(
+                    "Invalid warning entry value type for "
+                            + PlayerProfileSchema.WARNING_TARGET_ID
+                            + ": "
+                            + value
                             + " in "
+                            + path.getFileName()
+                            + " at index "
+                            + index
+            );
+            return;
+        }
+
+        UUID targetId = parseCanonicalUuid(
+                rawId,
+                PlayerProfileSchema.WARNING_TARGET_ID,
+                index,
+                "warning",
+                errors
+        );
+
+        if (targetId != null && !expectedPlayerId.equals(targetId)) {
+            errors.add(
+                    "Warning target UUID does not match profile UUID in "
                             + path.getFileName()
                             + " at index "
                             + index
@@ -260,172 +312,185 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         }
     }
 
-    private void validateNoteContent(String path, Object value, int index, List<String> errors) {
-        if (!(value instanceof String content)) {
+    private void validateUuidValue(
+            Object value,
+            String field,
+            int index,
+            String entryType,
+            List<String> errors
+    ) {
+        if (!(value instanceof String rawId)) {
             errors.add(
-                    "Invalid note entry value type for "
-                            + path
+                    "Invalid "
+                            + entryType
+                            + " entry value type for "
+                            + field
                             + ": "
                             + value
                             + " in "
-                            + this.path.getFileName()
+                            + path.getFileName()
                             + " at index "
                             + index
             );
             return;
         }
 
-        if (content.isBlank()) { // Empty notes are not allowed
-            errors.add(
-                    "Empty note content for "
-                            + path
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
-            );
-            return;
-        }
-
-        if (content.length() > configSettings.noteMaxContentLength()) {
-            errors.add(
-                    "Note content exceeds maximum length of "
-                            + configSettings.noteMaxContentLength()
-                            + " characters..."
-            );
-        }
+        parseCanonicalUuid(rawId, field, index, entryType, errors);
     }
 
-    private void validateNoteAuthorName(String path, Object value, int index, List<String> errors) {
-        if (!(value instanceof String content)) {
+    private UUID parseCanonicalUuid(
+            String rawId,
+            String field,
+            int index,
+            String entryType,
+            List<String> errors
+    ) {
+        if (rawId == null || rawId.isBlank()) {
             errors.add(
-                    "Invalid note entry value type for "
-                            + path
-                            + ": "
-                            + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                    "Empty "
+                            + entryType
+                            + " UUID for "
+                            + field
+                            + locationSuffix(index)
             );
-            return;
-        }
-        if (!PlayerNames.isValid(content)) {
-            errors.add(
-                    "Invalid Minecraft username entry for "
-                            + path
-                            + ": "
-                            + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
-            );
-        }
-    }
-
-    private void validateNoteAuthorId(String path, Object value, int index, List<String> errors) {
-        if (!(value instanceof String content)) {
-            errors.add(
-                    "Invalid note entry value type for "
-                            + path
-                            + ": "
-                            + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
-            );
-            return;
-        }
-        if (content.isEmpty()) {
-            errors.add(
-                    "Empty note entry found in "
-                            + path
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
-            );
-            return;
+            return null;
         }
 
-        UUID authorId;
-
+        UUID parsed;
         try {
-            authorId = UUID.fromString(content);
+            parsed = UUID.fromString(rawId);
         } catch (IllegalArgumentException ignored) {
             errors.add(
                     "Malformed UUID found in "
-                            + path
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                            + field
+                            + locationSuffix(index)
+            );
+            return null;
+        }
+
+        if (!parsed.toString().equals(rawId)) {
+            errors.add(
+                    "Non-canonical UUID found in "
+                            + field
+                            + locationSuffix(index)
+            );
+        }
+
+        return parsed;
+    }
+
+    private void validateMinecraftName(
+            Object value,
+            String field,
+            int index,
+            String entryType,
+            List<String> errors
+    ) {
+        if (!(value instanceof String name)) {
+            errors.add(
+                    "Invalid "
+                            + entryType
+                            + " entry value type for "
+                            + field
+                            + ": "
+                            + value
+                            + locationSuffix(index)
             );
             return;
         }
 
-        if (!authorId.toString().equals(content)) {
+        if (!PlayerNames.isValid(name)) {
             errors.add(
-                    "Non-canonical UUID found in "
-                            + path
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                    "Invalid Minecraft username entry for "
+                            + field
+                            + ": "
+                            + name
+                            + locationSuffix(index)
             );
-        }
-
-        try {
-            UUID.fromString(content);
-        } catch (IllegalArgumentException ignored) {
-
         }
     }
 
-    private void validateNoteTimestamp(String path, Object value, int index, List<String> errors) {
-        if (!(value instanceof Long timestamp)) {
+    private void validateNonBlankString(
+            Object value,
+            String field,
+            int index,
+            String entryType,
+            List<String> errors
+    ) {
+        if (!(value instanceof String content)) {
             errors.add(
-                    "Invalid note entry value type for "
-                            + path
+                    "Invalid "
+                            + entryType
+                            + " entry value type for "
+                            + field
                             + ": "
                             + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                            + locationSuffix(index)
+            );
+            return;
+        }
+
+        if (content.isBlank()) {
+            errors.add(
+                    "Blank "
+                            + entryType
+                            + " content for "
+                            + field
+                            + locationSuffix(index)
+            );
+        }
+    }
+
+    private void validateTimestamp(
+            Object value,
+            String field,
+            int index,
+            String entryType,
+            long maxFutureSkewMillis,
+            List<String> errors
+    ) {
+        if (!(value instanceof Long timestamp)) {
+            errors.add(
+                    "Invalid "
+                            + entryType
+                            + " entry value type for "
+                            + field
+                            + ": "
+                            + value
+                            + locationSuffix(index)
             );
             return;
         }
 
         if (timestamp < 0) {
             errors.add(
-                    "Invalid note entry timestamp for "
-                            + path
+                    "Invalid "
+                            + entryType
+                            + " timestamp for "
+                            + field
                             + ": "
-                            + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                            + timestamp
+                            + locationSuffix(index)
             );
         }
-        if (timestamp > System.currentTimeMillis() + Note.MAX_FUTURE_SKEW_MILLIS) { // Allow a 24-hour buffer for clock skew
+
+        if (timestamp > System.currentTimeMillis() + maxFutureSkewMillis) {
             errors.add(
-                    "Note entry timestamp is in the future for "
-                            + path
+                    entryType
+                            + " timestamp is too far in the future for "
+                            + field
                             + ": "
-                            + value
-                            + " in "
-                            + this.path.getFileName()
-                            + " at index "
-                            + index
+                            + timestamp
+                            + locationSuffix(index)
             );
         }
     }
 
-    private void validateWarnings(List<String> errors) {
+    private String locationSuffix(int index) {
+        if (index < 0) {
+            return " in " + path.getFileName();
+        }
 
+        return " in " + path.getFileName() + " at index " + index;
     }
 }

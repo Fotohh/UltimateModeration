@@ -27,5 +27,13 @@ public final class PlayerProfileSchema {
             NOTE_TIMESTAMP
     );
 
+    public static final Set<String> WARNING_FIELDS = Set.of(
+            WARNING_STAFF_ID,
+            WARNING_STAFF_NAME,
+            WARNING_CONTENT,
+            WARNING_TIMESTAMP,
+            WARNING_TARGET_ID
+    );
+
     private PlayerProfileSchema() {}
 }
