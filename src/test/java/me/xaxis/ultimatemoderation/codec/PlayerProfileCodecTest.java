@@ -52,8 +52,7 @@ class PlayerProfileCodecTest {
 
         List<String> validationErrors = new PlayerProfileYmlValidation(
                 Path.of(playerId + ".yml"),
-                encoded,
-                playerId
+                encoded
         ).validate();
 
         assertTrue(
@@ -105,8 +104,7 @@ class PlayerProfileCodecTest {
 
         List<String> errors = new PlayerProfileYmlValidation(
                 Path.of(playerId + ".yml"),
-                encoded,
-                playerId
+                encoded
         ).validate();
 
         assertTrue(

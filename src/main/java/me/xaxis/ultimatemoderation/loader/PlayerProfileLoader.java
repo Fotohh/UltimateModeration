@@ -2,8 +2,6 @@ package me.xaxis.ultimatemoderation.loader;
 
 import me.xaxis.ultimatemoderation.codec.PlayerProfileCodec;
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
-import me.xaxis.ultimatemoderation.constants.ModerationConstants;
-import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
 import me.xaxis.ultimatemoderation.validation.PlayerProfileYmlValidation;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -12,7 +10,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +73,6 @@ public class PlayerProfileLoader implements AutoCloseable {
                         "Found malformed UUID in profile filename: " + fileName,
                         e
                 );
-                quarantineOrFail(file);
                 continue;
             }
 
@@ -85,12 +81,14 @@ public class PlayerProfileLoader implements AutoCloseable {
                         "Found non-canonical UUID profile filename: "
                                 + fileName
                 );
-                quarantineOrFail(file);
                 continue;
             }
 
             try {
-                profiles.add(loadProfile(file, playerId));
+                PlayerProfile profile = loadProfile(file, playerId);
+                if (profile != null) {
+                    profiles.add(profile);
+                }
             } catch (IOException e) {
                 throw new UncheckedIOException(
                         "Failed to load player profile: " + fileName,
@@ -119,8 +117,6 @@ public class PlayerProfileLoader implements AutoCloseable {
             return;
         }
 
-        // TODO: Add explicit profile schema migrations before changing a released schema.
-        // Until then, leave version-mismatched data untouched and fail startup safely.
         throw new IllegalStateException(
                 "Unsupported player profile schema version "
                         + version
@@ -139,63 +135,6 @@ public class PlayerProfileLoader implements AutoCloseable {
         );
     }
 
-    private YamlConfiguration createFreshProfile(File file, UUID uuid) throws IOException {
-        PlayerProfile freshProfile = PlayerProfile.create(
-                uuid,
-                ModerationConstants.UNKNOWN_PLAYER_NAME
-        );
-
-        YamlConfiguration configuration = profileCodec.encode(
-                freshProfile.toWrapper()
-        );
-
-        SafeFileWrite.save(
-                file.toPath(),
-                configuration.saveToString()
-        );
-
-        return configuration;
-    }
-
-    private void quarantineProfile(File file) throws IOException {
-        Path original = file.toPath();
-        Path backup = getAvailableBackupPath(original);
-
-        Files.move(original, backup);
-
-        logger.info(
-                "Quarantined profile: "
-                        + file.getName()
-                        + " -> "
-                        + backup.getFileName()
-        );
-    }
-
-    private void quarantineOrFail(File file) {
-        try {
-            quarantineProfile(file);
-        } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to quarantine profile "
-                            + file.getName(),
-                    e
-            );
-        }
-    }
-
-    private Path getAvailableBackupPath(Path file) {
-        Path parent = file.getParent();
-        String baseName = file.getFileName() + ".bak";
-        Path backup = parent.resolve(baseName);
-        int count = 1;
-
-        while (Files.exists(backup)) {
-            backup = parent.resolve(baseName + "." + count++);
-        }
-
-        return backup;
-    }
-
     private PlayerProfile loadProfile(File file, UUID uuid) throws IOException {
         YamlConfiguration configuration = new YamlConfiguration();
 
@@ -206,12 +145,10 @@ public class PlayerProfileLoader implements AutoCloseable {
                     Level.WARNING,
                     "Profile "
                             + file.getName()
-                            + " could not be loaded. Attempting regeneration.",
+                            + " could not be loaded.",
                     e
             );
-
-            quarantineProfile(file);
-            configuration = createFreshProfile(file, uuid);
+            return null;
         }
 
         ensureSupportedProfileVersion(file, configuration);
@@ -219,8 +156,7 @@ public class PlayerProfileLoader implements AutoCloseable {
         PlayerProfileYmlValidation validator =
                 new PlayerProfileYmlValidation(
                         file.toPath(),
-                        configuration,
-                        uuid
+                        configuration
                 );
 
         List<String> errors = validator.validate();
@@ -228,8 +164,7 @@ public class PlayerProfileLoader implements AutoCloseable {
         if (!errors.isEmpty()) {
             errors.forEach(logger::severe);
 
-            quarantineProfile(file);
-            configuration = createFreshProfile(file, uuid);
+            return null;
         }
 
         return profileCodec.decode(configuration, uuid);

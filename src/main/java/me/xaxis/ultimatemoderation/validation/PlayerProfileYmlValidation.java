@@ -1,8 +1,6 @@
 package me.xaxis.ultimatemoderation.validation;
 
 import me.xaxis.ultimatemoderation.constants.ConfigConstants;
-import me.xaxis.ultimatemoderation.constants.ModerationConstants;
-import me.xaxis.ultimatemoderation.constants.PlayerNames;
 import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.Warning;
@@ -11,27 +9,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 public final class PlayerProfileYmlValidation extends YamlValidator {
 
-    private final UUID expectedPlayerId;
-
     public PlayerProfileYmlValidation(
             Path path,
-            FileConfiguration configuration,
-            UUID expectedPlayerId
+            FileConfiguration configuration
     ) {
         super(
                 path,
                 configuration,
                 ConfigConstants.PLAYER_PROFILE.currentVersion()
-        );
-
-        this.expectedPlayerId = Objects.requireNonNull(
-                expectedPlayerId,
-                "Expected player ID cannot be null"
         );
     }
 
@@ -44,59 +32,25 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     }
 
     private void validatePlayerId(List<String> errors) {
-        String field = PlayerProfileSchema.PLAYER_ID;
-
-        if (!configuration.isSet(field)) {
-            errors.add(field + " is not set in " + path.getFileName());
-            return;
-        }
-
-        if (!configuration.isString(field)) {
-            errors.add(
-                    "Expected type String from "
-                            + field
-                            + ", got an invalid data type in "
-                            + path.getFileName()
-            );
-            return;
-        }
-
-        String rawId = configuration.getString(field);
-        UUID playerId = parseCanonicalUuid(rawId, field, -1, "profile", errors);
-
-        if (playerId != null && !expectedPlayerId.equals(playerId)) {
-            errors.add(
-                    field
-                            + " does not match profile filename in "
-                            + path.getFileName()
-            );
-        }
+        ValidatorHelper.validateUuidValue(
+                configuration.get(PlayerProfileSchema.PLAYER_ID),
+                PlayerProfileSchema.PLAYER_ID,
+                -1,
+                "player profile",
+                errors,
+                path.getFileName().toString()
+        );
     }
 
     private void validatePlayerName(List<String> errors) {
-        String field = PlayerProfileSchema.PLAYER_NAME;
-
-        if (!configuration.isSet(field)) {
-            errors.add(field + " is not set in " + path.getFileName());
-            return;
-        }
-
-        if (!configuration.isString(field)) {
-            errors.add(field + " is not of type String in " + path.getFileName());
-            return;
-        }
-
-        String playerName = configuration.getString(field);
-
-        if (!ModerationConstants.UNKNOWN_PLAYER_NAME.equals(playerName)
-                && !PlayerNames.isValid(playerName)) {
-            errors.add(
-                    "Malformed player name found in "
-                            + field
-                            + " in "
-                            + path.getFileName()
-            );
-        }
+        ValidatorHelper.validateMinecraftName(
+                configuration.get(PlayerProfileSchema.PLAYER_NAME),
+                PlayerProfileSchema.PLAYER_NAME,
+                -1,
+                "player profile",
+                errors,
+                path.getFileName().toString()
+        );
     }
 
     private void validateNotes(List<String> errors) {
@@ -179,19 +133,20 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
     ) {
         switch (field) {
             case PlayerProfileSchema.NOTE_AUTHOR_ID ->
-                    validateUuidValue(value, field, index, "note", errors);
+                    ValidatorHelper.validateUuidValue(value, field, index, "note", errors, path.getFileName().toString());
             case PlayerProfileSchema.NOTE_AUTHOR_NAME ->
-                    validateMinecraftName(value, field, index, "note", errors);
+                    ValidatorHelper.validateMinecraftName(value, field, index, "note", errors, path.getFileName().toString());
             case PlayerProfileSchema.NOTE_CONTENT ->
-                    validateNonBlankString(value, field, index, "note", errors);
+                    ValidatorHelper.validateNonBlankString(value, field, index, "note", errors, path.getFileName().toString());
             case PlayerProfileSchema.NOTE_TIMESTAMP ->
-                    validateTimestamp(
+                    ValidatorHelper.validateTimestamp(
                             value,
                             field,
                             index,
                             "note",
                             Note.MAX_FUTURE_SKEW_MILLIS,
-                            errors
+                            errors,
+                            path.getFileName().toString()
                     );
             default -> throw new IllegalStateException("Unknown note field: " + field);
         }
@@ -242,255 +197,49 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                 );
             }
 
-            validateWarningTargetId(
+            ValidatorHelper.validateUuidValue(
                     warningMap.get(PlayerProfileSchema.WARNING_TARGET_ID),
+                    PlayerProfileSchema.WARNING_TARGET_ID,
                     index,
-                    errors
+                    "warning",
+                    errors,
+                    path.getFileName().toString()
             );
-            validateUuidValue(
+            ValidatorHelper.validateUuidValue(
                     warningMap.get(PlayerProfileSchema.WARNING_STAFF_ID),
                     PlayerProfileSchema.WARNING_STAFF_ID,
                     index,
                     "warning",
-                    errors
+                    errors,
+                    path.getFileName().toString()
             );
-            validateMinecraftName(
+            ValidatorHelper.validateMinecraftName(
                     warningMap.get(PlayerProfileSchema.WARNING_STAFF_NAME),
                     PlayerProfileSchema.WARNING_STAFF_NAME,
                     index,
                     "warning",
-                    errors
+                    errors,
+                    path.getFileName().toString()
             );
-            validateNonBlankString(
+            ValidatorHelper.validateNonBlankString(
                     warningMap.get(PlayerProfileSchema.WARNING_CONTENT),
                     PlayerProfileSchema.WARNING_CONTENT,
                     index,
                     "warning",
-                    errors
+                    errors,
+                    path.getFileName().toString()
             );
-            validateTimestamp(
+            ValidatorHelper.validateTimestamp(
                     warningMap.get(PlayerProfileSchema.WARNING_TIMESTAMP),
                     PlayerProfileSchema.WARNING_TIMESTAMP,
                     index,
                     "warning",
                     Warning.MAX_FUTURE_SKEW_MILLIS,
-                    errors
+                    errors,
+                    path.getFileName().toString()
             );
         }
     }
 
-    private void validateWarningTargetId(Object value, int index, List<String> errors) {
-        if (!(value instanceof String rawId)) {
-            errors.add(
-                    "Invalid warning entry value type for "
-                            + PlayerProfileSchema.WARNING_TARGET_ID
-                            + ": "
-                            + value
-                            + " in "
-                            + path.getFileName()
-                            + " at index "
-                            + index
-            );
-            return;
-        }
 
-        UUID targetId = parseCanonicalUuid(
-                rawId,
-                PlayerProfileSchema.WARNING_TARGET_ID,
-                index,
-                "warning",
-                errors
-        );
-
-        if (targetId != null && !expectedPlayerId.equals(targetId)) {
-            errors.add(
-                    "Warning target UUID does not match profile UUID in "
-                            + path.getFileName()
-                            + " at index "
-                            + index
-            );
-        }
-    }
-
-    private void validateUuidValue(
-            Object value,
-            String field,
-            int index,
-            String entryType,
-            List<String> errors
-    ) {
-        if (!(value instanceof String rawId)) {
-            errors.add(
-                    "Invalid "
-                            + entryType
-                            + " entry value type for "
-                            + field
-                            + ": "
-                            + value
-                            + " in "
-                            + path.getFileName()
-                            + " at index "
-                            + index
-            );
-            return;
-        }
-
-        parseCanonicalUuid(rawId, field, index, entryType, errors);
-    }
-
-    private UUID parseCanonicalUuid(
-            String rawId,
-            String field,
-            int index,
-            String entryType,
-            List<String> errors
-    ) {
-        if (rawId == null || rawId.isBlank()) {
-            errors.add(
-                    "Empty "
-                            + entryType
-                            + " UUID for "
-                            + field
-                            + locationSuffix(index)
-            );
-            return null;
-        }
-
-        UUID parsed;
-        try {
-            parsed = UUID.fromString(rawId);
-        } catch (IllegalArgumentException ignored) {
-            errors.add(
-                    "Malformed UUID found in "
-                            + field
-                            + locationSuffix(index)
-            );
-            return null;
-        }
-
-        if (!parsed.toString().equals(rawId)) {
-            errors.add(
-                    "Non-canonical UUID found in "
-                            + field
-                            + locationSuffix(index)
-            );
-        }
-
-        return parsed;
-    }
-
-    private void validateMinecraftName(
-            Object value,
-            String field,
-            int index,
-            String entryType,
-            List<String> errors
-    ) {
-        if (!(value instanceof String name)) {
-            errors.add(
-                    "Invalid "
-                            + entryType
-                            + " entry value type for "
-                            + field
-                            + ": "
-                            + value
-                            + locationSuffix(index)
-            );
-            return;
-        }
-
-        if (!PlayerNames.isValid(name)) {
-            errors.add(
-                    "Invalid Minecraft username entry for "
-                            + field
-                            + ": "
-                            + name
-                            + locationSuffix(index)
-            );
-        }
-    }
-
-    private void validateNonBlankString(
-            Object value,
-            String field,
-            int index,
-            String entryType,
-            List<String> errors
-    ) {
-        if (!(value instanceof String content)) {
-            errors.add(
-                    "Invalid "
-                            + entryType
-                            + " entry value type for "
-                            + field
-                            + ": "
-                            + value
-                            + locationSuffix(index)
-            );
-            return;
-        }
-
-        if (content.isBlank()) {
-            errors.add(
-                    "Blank "
-                            + entryType
-                            + " content for "
-                            + field
-                            + locationSuffix(index)
-            );
-        }
-    }
-
-    private void validateTimestamp(
-            Object value,
-            String field,
-            int index,
-            String entryType,
-            long maxFutureSkewMillis,
-            List<String> errors
-    ) {
-        if (!(value instanceof Long timestamp)) {
-            errors.add(
-                    "Invalid "
-                            + entryType
-                            + " entry value type for "
-                            + field
-                            + ": "
-                            + value
-                            + locationSuffix(index)
-            );
-            return;
-        }
-
-        if (timestamp < 0) {
-            errors.add(
-                    "Invalid "
-                            + entryType
-                            + " timestamp for "
-                            + field
-                            + ": "
-                            + timestamp
-                            + locationSuffix(index)
-            );
-        }
-
-        if (timestamp > System.currentTimeMillis() + maxFutureSkewMillis) {
-            errors.add(
-                    entryType
-                            + " timestamp is too far in the future for "
-                            + field
-                            + ": "
-                            + timestamp
-                            + locationSuffix(index)
-            );
-        }
-    }
-
-    private String locationSuffix(int index) {
-        if (index < 0) {
-            return " in " + path.getFileName();
-        }
-
-        return " in " + path.getFileName() + " at index " + index;
-    }
 }
