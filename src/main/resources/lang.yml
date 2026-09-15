@@ -29,3 +29,8 @@ messages:
   note-command-usage: '&cUsage: /note <add|list|delete> <player>'
   note-add-command-usage: '&cUsage: /note add <player> <content>'
   note-delete-command-usage: '&cUsage: /note delete <player> <index>'
+  sender-not-player: '&cOnly players can execute this command!'
+  warn-command-usage: '&cUsage: /warn <add|list|delete> <player>'
+  warn-add-command-usage: '&cUsage: /warn add <player> <reason>'
+  warn-delete-command-usage: '&cUsage: /warn delete <player> <index>'
+  warn-must-have-reason: '&cYou must specify a reason for warning {player}.'

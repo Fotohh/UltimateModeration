@@ -1,5 +1,5 @@
-name: UltimateModeration
-main: me.xaxis.ultimatemoderation.UltimateModeration
+name: UltimateModerationPlus
+main: me.xaxis.ultimatemoderationplus.UltimateModerationPlus
 version: 1
 api-version: '26.2'
 commands:
