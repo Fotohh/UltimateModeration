@@ -119,8 +119,8 @@ public class PlayerProfileManager implements AutoCloseable {
     }
 
     public void addNoteToProfile(PlayerProfile profile, Note note) {
-        if (note.content().length() > configSettings.noteMaxContentLength()) {
-            throw new IllegalArgumentException("Note content cannot exceed " + configSettings.noteMaxContentLength() + " characters");
+        if (note.content().length() > configSettings.maxContentLength()) {
+            throw new IllegalArgumentException("Note content cannot exceed " + configSettings.maxContentLength() + " characters");
         }
         profile.addNote(note);
         save(profile);

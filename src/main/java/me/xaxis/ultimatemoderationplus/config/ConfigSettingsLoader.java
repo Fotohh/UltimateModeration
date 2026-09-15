@@ -17,7 +17,7 @@ public class ConfigSettingsLoader {
     }
 
     private long getNoteMaxContentLength() {
-        return configuration.getLong("note-max-content-length");
+        return configuration.getLong("max-content-length");
     }
 
     public ConfigSettings load() {

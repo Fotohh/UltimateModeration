@@ -39,10 +39,18 @@ public class PlayerProfile {
         return playerName;
     }
 
+    /**
+     * Do not access from here. Use {@link PlayerProfileManager#getWarningsFromProfile(PlayerProfile)}
+     * @return immutable list of warnings
+     */
     public List<Warning> warnings() {
         return List.copyOf(warnings);
     }
 
+    /**
+     * Do not access from here. Use {@link PlayerProfileManager#getNotesFromProfile(PlayerProfile)}
+     * @return immutable list of notes
+     */
     public List<Note> notes() {
         return List.copyOf(notes);
     }

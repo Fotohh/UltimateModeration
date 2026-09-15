@@ -12,7 +12,7 @@ public final class MainConfigValidation extends YamlValidator {
             "profile-auto-save-interval";
 
     private static final String NOTE_MAX_CONTENT_LENGTH_PATH =
-            "note-max-content-length";
+            "max-content-length";
 
     private static final long MIN_AUTO_SAVE_INTERVAL_TICKS = 20L * 60L;
 

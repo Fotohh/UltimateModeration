@@ -144,12 +144,12 @@ public class NoteCommand implements CommandExecutor {
             sender.sendMessage(langManager.getMessage(LangKey.NOTE_MUST_HAVE_CONTENT));
             return;
         }
-        if (noteContent.length() > configSettings.noteMaxContentLength()) {
+        if (noteContent.length() > configSettings.maxContentLength()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.NOTE_TOO_LONG),
+                    langManager.getMessage(LangKey.CONTENT_TOO_LONG),
                     Map.of(
                             Placeholders.NOTE_MAX_LENGTH,
-                            String.valueOf(configSettings.noteMaxContentLength())
+                            String.valueOf(configSettings.maxContentLength())
                     )
             ));
             return;

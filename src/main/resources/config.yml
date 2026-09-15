@@ -6,5 +6,5 @@ config-version: 1
 # is clamped to a minimum of 1200 ticks = 1 minute.
 profile-auto-save-interval: 6000
 
-# The maximum length of a note that can be added to a player profile.
-note-max-content-length: 512
+# The maximum length of a note or warn that can be added to a player profile.
+max-content-length: 512
