@@ -42,3 +42,4 @@ messages:
   no-warns: '&c{player} has no warns.'
   warn-list-header: '&6Warns for {player}:'
   warn-list-entry: '&7[{value}] Author: {warn-author}, &f{warn-content}'
+  warn-added: '&aSuccessfully warned {player}.'

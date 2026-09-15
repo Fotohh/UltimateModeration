@@ -28,7 +28,8 @@ public enum LangKey {
     WARN_LIST_COMMAND_USAGE("messages.warn-list-command-usage"),
     NO_WARNS("messages.no-warns"),
     WARN_LIST_HEADER("messages.warn-list-header"),
-    WARN_LIST_ENTRY("messages.warn-list-entry"),;
+    WARN_LIST_ENTRY("messages.warn-list-entry"),
+    WARN_ADDED("messages.warn-added"),;
     private final String path;
 
     LangKey(String path) {

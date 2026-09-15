@@ -58,9 +58,8 @@ public class WarnCommand implements CommandExecutor {
                     sender.sendMessage(langManager.getMessage(LangKey.WARN_ADD_COMMAND_USAGE));
                     return true;
                 }
-                var addValues = handleAdd(sender, identity, args[1], String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
-                if (addValues == null) return true;
-                playerProfileManager.addWarningToProfile(addValues.first(), addValues.second());
+                
+                handleAdd(sender, identity, args[1], String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
             }
 
             case "delete" -> {
@@ -73,7 +72,7 @@ public class WarnCommand implements CommandExecutor {
             }
 
             case "list" -> {
-                if(args.length < 2) {
+                if (args.length < 2) {
                     sender.sendMessage(langManager.getMessage(LangKey.WARN_LIST_COMMAND_USAGE));
                     return true;
                 }
@@ -87,8 +86,7 @@ public class WarnCommand implements CommandExecutor {
         return true;
     }
 
-    private Tuple<PlayerProfile, Warning> handleAdd(CommandSender sender, Tuple<UUID, String> identity, String targetName, String reason) {
-        Tuple<PlayerProfile, Warning> val;
+    private void handleAdd(CommandSender sender, Tuple<UUID, String> identity, String targetName, String reason) {
 
         if (reason.isBlank()) {
             sender.sendMessage(langManager.replacePlaceholders(
@@ -97,7 +95,7 @@ public class WarnCommand implements CommandExecutor {
                             Placeholders.PLAYER, targetName
                     )
             ));
-            return null;
+            return;
         }
 
         if (reason.length() > configSettings.maxContentLength()) {
@@ -107,7 +105,7 @@ public class WarnCommand implements CommandExecutor {
                             Placeholders.NOTE_MAX_LENGTH, String.valueOf(configSettings.maxContentLength())
                     )
             ));
-            return null;
+            return;
         }
 
         PlayerProfile playerProfile = playerProfileManager.getPlayerProfile(targetName);
@@ -119,10 +117,11 @@ public class WarnCommand implements CommandExecutor {
                             Placeholders.PLAYER, targetName
                     )
             ));
-            return null;
+            return;
         }
 
-        return new Tuple<>(
+
+        playerProfileManager.addWarningToProfile(
                 playerProfile,
                 new Warning(
                         playerProfile.playerId(),
@@ -132,6 +131,12 @@ public class WarnCommand implements CommandExecutor {
                         identity.second()
                 )
         );
+        sender.sendMessage(langManager.replacePlaceholders(
+                langManager.getMessage(LangKey.WARN_ADDED),
+                Map.of(
+                        Placeholders.PLAYER, targetName
+                )
+        ));
 
     }
 
@@ -176,7 +181,7 @@ public class WarnCommand implements CommandExecutor {
 
         int size = playerProfileManager.getWarningsFromProfile(profile).size();
 
-        if(actualIndex >= size) {
+        if (actualIndex >= size) {
             sender.sendMessage(langManager.replacePlaceholders(
                     langManager.getMessage(LangKey.INVALID_WARN_INDEX),
                     Map.of(
@@ -200,11 +205,11 @@ public class WarnCommand implements CommandExecutor {
     private void handleList(CommandSender sender, String targetName) {
         PlayerProfile profile = playerProfileManager.getPlayerProfile(targetName);
 
-        if(profile == null) {
+        if (profile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
                     langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
                     Map.of(
-                        Placeholders.PLAYER, targetName
+                            Placeholders.PLAYER, targetName
                     )
             ));
             return;
@@ -212,13 +217,14 @@ public class WarnCommand implements CommandExecutor {
 
         List<Warning> warnings = playerProfileManager.getWarningsFromProfile(profile);
 
-        if(warnings.isEmpty()) {
+        if (warnings.isEmpty()) {
             sender.sendMessage(langManager.replacePlaceholders(
                     langManager.getMessage(LangKey.NO_NOTES),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
             ));
+            return;
         }
 
         sender.sendMessage(langManager.replacePlaceholders(
@@ -228,7 +234,7 @@ public class WarnCommand implements CommandExecutor {
                 )
         ));
 
-        for(int i = 0; i < warnings.size(); i++) {
+        for (int i = 0; i < warnings.size(); i++) {
             int displayIndex = i + 1;
             String warnContent = warnings.get(i).reason();
             String authorName = warnings.get(i).moderatorName();
