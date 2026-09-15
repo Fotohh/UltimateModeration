@@ -60,6 +60,23 @@ public class PlayerProfileManager implements AutoCloseable {
         });
     }
 
+    public void removeWarningFromProfile(PlayerProfile profile, int index) {
+        profile.removeWarning(index);
+        save(profile);
+    }
+
+    public void addWarningToProfile(PlayerProfile profile, Warning warning) {
+        profile.addWarning(warning);
+        save(profile);
+    }
+
+    public List<Warning> getWarningsFromProfile(PlayerProfile profile) {
+        if (profile == null) {
+            throw new IllegalArgumentException("Profile cannot be null");
+        }
+        return profile.warnings();
+    }
+
     public PlayerProfile getPlayerProfile(String playerName) {
         Objects.requireNonNull(
                 playerName,

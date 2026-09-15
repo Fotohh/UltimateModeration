@@ -54,6 +54,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         validatePlayerId(errors);
         validatePlayerName(errors);
         validateNotes(errors);
+        validateWarnings(errors);
     }
 
     private void validatePlayerId(List<String> errors) {
@@ -422,5 +423,9 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             + index
             );
         }
+    }
+
+    private void validateWarnings(List<String> errors) {
+
     }
 }

@@ -166,7 +166,7 @@ public class UltimateModeration extends JavaPlugin {
             PlayerProfile existing = playerProfileManager.getPlayerProfile(player.getUniqueId());
             if (existing == null) {
                 playerProfileManager.addPlayerProfile(
-                        new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>())
+                        new PlayerProfile(player.getUniqueId(), player.getName(), new ArrayList<>(), new ArrayList<>())
                 );
             } else if (!existing.playerName().equals(player.getName())) {
                 playerProfileManager.changeName(existing, player.getName());

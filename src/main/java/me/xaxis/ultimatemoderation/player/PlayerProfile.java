@@ -9,12 +9,16 @@ public class PlayerProfile {
     private final UUID playerId;
     private String playerName;
     private final List<Note> notes;
+    private final List<Warning> warnings;
 
-    public PlayerProfile(UUID playerId, String playerName, List<Note> notes) {
+    public PlayerProfile(UUID playerId, String playerName, List<Note> notes, List<Warning> warnings) {
         this.playerId = Objects.requireNonNull(playerId, "Player ID cannot be null");
         this.playerName = Objects.requireNonNull(playerName, "Player name cannot be null");
         this.notes = new ArrayList<>(
                 Objects.requireNonNull(notes, "Notes cannot be null")
+        );
+        this.warnings = new ArrayList<>(
+                Objects.requireNonNull(warnings, "Warnings cannot be null")
         );
     }
 
@@ -24,6 +28,10 @@ public class PlayerProfile {
 
     public String playerName() {
         return playerName;
+    }
+
+    public List<Warning> warnings() {
+        return List.copyOf(warnings);
     }
 
     public List<Note> notes() {
@@ -47,8 +55,20 @@ public class PlayerProfile {
         notes.add(note);
     }
 
+    protected void addWarning(Warning warning) {
+        if (warning == null) return;
+        warnings.add(warning);
+    }
+
+    protected void removeWarning(int index) {
+        if (index < 0 || index >= warnings.size()) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for warnings list.");
+        }
+        warnings.remove(index);
+    }
+
     public PlayerProfileWrapper toWrapper() {
-        return new PlayerProfileWrapper(playerId, playerName, notes);
+        return new PlayerProfileWrapper(playerId, playerName, notes, warnings);
     }
 
 

@@ -7,6 +7,7 @@ import me.xaxis.ultimatemoderation.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderation.file.SafeFileWrite;
 import me.xaxis.ultimatemoderation.player.Note;
 import me.xaxis.ultimatemoderation.player.PlayerProfile;
+import me.xaxis.ultimatemoderation.player.Warning;
 import me.xaxis.ultimatemoderation.validation.PlayerProfileYmlValidation;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -47,6 +48,48 @@ public class PlayerProfileLoader implements AutoCloseable{
                 "ConfigSettings cannot be null"
         );
 
+    }
+
+    private List<Warning> parseWarnings(YamlConfiguration configuration) {
+        List<Warning> warnings = new ArrayList<>();
+
+        List<Map<?, ?>> warningMaps =
+                configuration.getMapList(
+                        PlayerProfileSchema.WARNINGS
+                );
+
+        for(Map<?, ?> warningMap : warningMaps) {
+            warnings.add(parseWarningFromMap(warningMap));
+        }
+
+        return warnings;
+    }
+
+    private Warning parseWarningFromMap(Map<?, ?> warningMap) {
+        Number timestampNumber =
+                (Number) warningMap.get(
+                        PlayerProfileSchema.WARNING_TIMESTAMP
+                );
+
+        return new Warning(
+                UUID.fromString(
+                        (String) warningMap.get(
+                                PlayerProfileSchema.WARNING_TARGET_ID
+                        )
+                ),
+                UUID.fromString(
+                        (String) warningMap.get(
+                                PlayerProfileSchema.WARNING_STAFF_ID
+                        )
+                ),
+                (String) warningMap.get(
+                        PlayerProfileSchema.WARNING_CONTENT
+                ),
+                timestampNumber.longValue(),
+                (String) warningMap.get(
+                        PlayerProfileSchema.WARNING_STAFF_NAME
+                )
+        );
     }
 
     private List<PlayerProfile> loadProfiles() {
@@ -181,6 +224,11 @@ public class PlayerProfileLoader implements AutoCloseable{
                 List.of()
         );
 
+        configuration.set(
+                PlayerProfileSchema.WARNINGS,
+                List.of()
+        );
+
         SafeFileWrite.save(
                 file.toPath(),
                 configuration.saveToString()
@@ -189,7 +237,7 @@ public class PlayerProfileLoader implements AutoCloseable{
         return configuration;
     }
 
-    private Path quarantineProfile(File file) throws IOException {
+    private void quarantineProfile(File file) throws IOException {
         Path original = file.toPath();
         Path backup = getAvailableBackupPath(original);
 
@@ -202,7 +250,6 @@ public class PlayerProfileLoader implements AutoCloseable{
                         + backup.getFileName()
         );
 
-        return backup;
     }
 
     private void quarantineOrFail(File file) {
@@ -278,10 +325,12 @@ public class PlayerProfileLoader implements AutoCloseable{
         }
 
         List<Note> notes = parseNotes(configuration);
+        List<Warning> warnings = parseWarnings(configuration);
         return new PlayerProfile(
                 uuid,
                 configuration.getString(PLAYER_NAME_PATH),
-                notes
+                notes,
+                warnings
         );
     }
 
@@ -323,7 +372,6 @@ public class PlayerProfileLoader implements AutoCloseable{
                 timestampNumber.longValue()
         );
     }
-
 
     @Override
     public void close() {
