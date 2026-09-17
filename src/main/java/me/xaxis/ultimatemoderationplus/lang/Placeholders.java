@@ -10,7 +10,7 @@ public enum Placeholders {
     VALUE("value"),
     WARN_CONTENT("warn-content"),
     WARN_AUTHOR("warn-author"),
-    ;
+    REASON("reason");
 
     private final String placeholder;
 

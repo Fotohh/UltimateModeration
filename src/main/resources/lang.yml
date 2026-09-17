@@ -43,3 +43,7 @@ messages:
   warn-list-header: '&6Warns for {player}:'
   warn-list-entry: '&7[{value}] Author: {warn-author}, &f{warn-content}'
   warn-added: '&aSuccessfully warned {player}.'
+  kick-command-usage: '&cUsage: /kick <player> <reason>'
+  kick-must-have-reason: '&cYou must include a reason.'
+  player-not-online: '&cThat player is not online.'
+  kicked-player: '&aYou have kicked {player} for {reason}.'

@@ -10,8 +10,9 @@ public class PlayerProfile {
     private String playerName;
     private final List<Note> notes;
     private final List<Warning> warnings;
+    private Mute playerMute;
 
-    public PlayerProfile(UUID playerId, String playerName, List<Note> notes, List<Warning> warnings) {
+    public PlayerProfile(UUID playerId, String playerName, List<Note> notes, Mute playerMute, List<Warning> warnings) {
         this.playerId = Objects.requireNonNull(playerId, "Player ID cannot be null");
         this.playerName = Objects.requireNonNull(playerName, "Player name cannot be null");
         this.notes = new ArrayList<>(
@@ -27,8 +28,21 @@ public class PlayerProfile {
                 playerId,
                 playerName,
                 List.of(),
+                null,
                 List.of()
         );
+    }
+
+    protected Mute getPlayerMute() {
+        return playerMute;
+    }
+
+    protected void mutePlayer(Mute mute) {
+        playerMute = mute;
+    }
+
+    protected void removeMute() {
+        playerMute = null;
     }
 
     public UUID playerId() {
@@ -85,7 +99,7 @@ public class PlayerProfile {
     }
 
     public PlayerProfileWrapper toWrapper() {
-        return new PlayerProfileWrapper(playerId, playerName, notes, warnings);
+        return new PlayerProfileWrapper(playerId, playerName, notes, playerMute, warnings);
     }
 
 

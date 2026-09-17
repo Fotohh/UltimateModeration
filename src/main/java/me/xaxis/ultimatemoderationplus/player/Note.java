@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.player;
 
+import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;
 
 import java.time.Duration;
@@ -12,8 +13,6 @@ public record Note(
         String content,
         long timestamp
 ) {
-
-    public static final long MAX_FUTURE_SKEW_MILLIS = Duration.ofHours(24).toMillis();
 
     public Note {
         Objects.requireNonNull(
@@ -51,7 +50,7 @@ public record Note(
 
         if (timestamp >
                 System.currentTimeMillis()
-                        + MAX_FUTURE_SKEW_MILLIS) {
+                        + ConfigConstants.MAX_FUTURE_SKEW_MILLIS) {
             throw new IllegalArgumentException(
                     "Timestamp cannot be more than 24 hours in the future"
             );

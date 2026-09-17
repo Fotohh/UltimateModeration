@@ -8,6 +8,7 @@ public final class PlayerProfileSchema {
     public static final String PLAYER_NAME = "player-name";
     public static final String NOTES = "notes";
     public static final String WARNINGS = "warnings";
+    public static final String MUTE = "mute";
 
     public static final String NOTE_AUTHOR_ID = "author-id";
     public static final String NOTE_AUTHOR_NAME = "author-name";
@@ -19,6 +20,12 @@ public final class PlayerProfileSchema {
     public static final String WARNING_CONTENT = "content";
     public static final String WARNING_TIMESTAMP = "timestamp";
     public static final String WARNING_TARGET_ID = "player-id";
+
+    public static final String MUTE_STAFF_ID = "staff-id";
+    public static final String MUTE_STAFF_NAME = "staff-name";
+    public static final String MUTE_REASON = "reason";
+    public static final String MUTE_TIMESTAMP = "timestamp";
+    public static final String MUTE_TARGET_ID = "player-id";
 
     public static final Set<String> NOTE_FIELDS = Set.of(
             NOTE_AUTHOR_ID,

@@ -4,6 +4,7 @@ import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
 import me.xaxis.ultimatemoderationplus.player.Note;
 import me.xaxis.ultimatemoderationplus.player.Warning;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.nio.file.Path;
@@ -29,6 +30,103 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         validatePlayerName(errors);
         validateNotes(errors);
         validateWarnings(errors);
+        validateMute(errors);
+    }
+
+    private void validateMute(List<String> errors) {
+        if (!configuration.isSet(PlayerProfileSchema.MUTE)) {
+            return;
+        }
+
+        ConfigurationSection muteSection =
+                configuration.getConfigurationSection(
+                        PlayerProfileSchema.MUTE
+                );
+
+        if (muteSection == null) {
+            errors.add(
+                    PlayerProfileSchema.MUTE
+                            + " is not a configuration section in "
+                            + path.getFileName()
+            );
+            return;
+        }
+
+        ValidatorHelper.validateUuidValue(
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_STAFF_ID
+                ),
+                PlayerProfileSchema.MUTE_STAFF_ID,
+                -1,
+                "mute",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateMinecraftName(
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_STAFF_NAME
+                ),
+                PlayerProfileSchema.MUTE_STAFF_NAME,
+                -1,
+                "mute",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateTimestamp(
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_TIMESTAMP
+                ),
+                PlayerProfileSchema.MUTE_TIMESTAMP,
+                -1,
+                "mute",
+                ConfigConstants.MAX_FUTURE_SKEW_MILLIS,
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateNonBlankString(
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_REASON
+                ),
+                PlayerProfileSchema.MUTE_REASON,
+                -1,
+                "mute",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateUuidValue(
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_TARGET_ID
+                ),
+                PlayerProfileSchema.MUTE_TARGET_ID,
+                -1,
+                "mute",
+                errors,
+                path.getFileName().toString()
+        );
+
+        Object profileId =
+                configuration.get(
+                        PlayerProfileSchema.PLAYER_ID
+                );
+
+        Object muteTargetId =
+                muteSection.get(
+                        PlayerProfileSchema.MUTE_TARGET_ID
+                );
+
+        if (profileId instanceof String profileIdString
+                && muteTargetId instanceof String targetIdString
+                && !profileIdString.equals(targetIdString)) {
+
+            errors.add(
+                    "Mute target ID does not match profile player ID in "
+                            + path.getFileName()
+            );
+        }
     }
 
     private void validatePlayerId(List<String> errors) {
@@ -144,7 +242,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                             field,
                             index,
                             "note",
-                            Note.MAX_FUTURE_SKEW_MILLIS,
+                            ConfigConstants.MAX_FUTURE_SKEW_MILLIS,
                             errors,
                             path.getFileName().toString()
                     );
@@ -234,7 +332,7 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
                     PlayerProfileSchema.WARNING_TIMESTAMP,
                     index,
                     "warning",
-                    Warning.MAX_FUTURE_SKEW_MILLIS,
+                    ConfigConstants.MAX_FUTURE_SKEW_MILLIS,
                     errors,
                     path.getFileName().toString()
             );

@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.player;
 
+import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;
 
 import java.time.Duration;
@@ -13,8 +14,6 @@ public record Warning(
         long timestamp,
         String moderatorName
 ) {
-
-    public static final long MAX_FUTURE_SKEW_MILLIS = Duration.ofHours(24).toMillis();
 
     public Warning {
         Objects.requireNonNull(playerUUID, "Player UUID cannot be null");
@@ -34,7 +33,7 @@ public record Warning(
             throw new IllegalArgumentException("Warning timestamp cannot be negative");
         }
 
-        if (timestamp > System.currentTimeMillis() + MAX_FUTURE_SKEW_MILLIS) {
+        if (timestamp > System.currentTimeMillis() + ConfigConstants.MAX_FUTURE_SKEW_MILLIS) {
             throw new IllegalArgumentException(
                     "Warning timestamp cannot be more than 24 hours in the future"
             );

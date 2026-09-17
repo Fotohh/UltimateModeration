@@ -66,6 +66,43 @@ public class PlayerProfileManager implements AutoCloseable {
         save(profile);
     }
 
+    public void muteProfile(PlayerProfile playerProfile, Mute mute) {
+        Objects.requireNonNull(
+                playerProfile,
+                "Profile cannot be null"
+        );
+
+        Objects.requireNonNull(
+                mute,
+                "Mute cannot be null"
+        );
+
+        if (!playerProfile.playerId().equals(mute.targetId())) {
+            throw new IllegalArgumentException(
+                    "Mute target UUID does not match profile UUID"
+            );
+        }
+        playerProfile.mutePlayer(mute);
+        save(playerProfile);
+    }
+
+    public void unmuteProfile(PlayerProfile playerProfile) {
+        Objects.requireNonNull(
+                playerProfile,
+                "Profile cannot be null"
+        );
+        playerProfile.removeMute();
+        save(playerProfile);
+    }
+
+    public boolean isMuted(PlayerProfile playerProfile) {
+        return playerProfile.getPlayerMute() != null;
+    }
+
+    public Mute getMute(PlayerProfile playerProfile) {
+        return playerProfile.getPlayerMute();
+    }
+
     public void addWarningToProfile(PlayerProfile profile, Warning warning) {
         Objects.requireNonNull(profile, "Profile cannot be null");
         Objects.requireNonNull(warning, "Warning cannot be null");

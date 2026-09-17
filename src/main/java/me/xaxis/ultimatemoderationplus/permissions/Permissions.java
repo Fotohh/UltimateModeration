@@ -8,6 +8,7 @@ public enum Permissions {
     WARN_COMMAND_DELETE("ultimatemoderationplus.admin.warn-command.delete"),
     WARN_COMMAND_EDIT("ultimatemoderationplus.admin.warn-command.edit"),
     WARN_COMMAND_VIEW("ultimatemoderationplus.admin.warn-command.view"),
+    KICK_COMMAND("ultimatemoderationplus.admin.kick"),
 
     ;
 

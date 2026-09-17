@@ -29,7 +29,12 @@ public enum LangKey {
     NO_WARNS("messages.no-warns"),
     WARN_LIST_HEADER("messages.warn-list-header"),
     WARN_LIST_ENTRY("messages.warn-list-entry"),
-    WARN_ADDED("messages.warn-added"),;
+    WARN_ADDED("messages.warn-added"),
+    KICK_COMMAND_USAGE("messages.kick-command-usage"),
+    KICK_MUST_HAVE_REASON("messages.kick-must-have-reason"),
+    PLAYER_NOT_ONLINE("messages.player-not-online"),
+    KICKED_PLAYER("messages.kicked-player"),
+    ;
     private final String path;
 
     LangKey(String path) {

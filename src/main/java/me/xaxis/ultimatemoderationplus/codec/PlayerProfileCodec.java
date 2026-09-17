@@ -2,10 +2,12 @@ package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
+import me.xaxis.ultimatemoderationplus.player.Mute;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ public final class PlayerProfileCodec {
 
     private final NoteCodec noteCodec = new NoteCodec();
     private final WarningCodec warningCodec = new WarningCodec();
+    private final MuteCodec muteCodec = new MuteCodec();
 
     public YamlConfiguration encode(PlayerProfileWrapper profile) {
         Objects.requireNonNull(profile, "Player profile cannot be null");
@@ -38,6 +41,12 @@ public final class PlayerProfileCodec {
                 PlayerProfileSchema.WARNINGS,
                 warningCodec.encodeAll(profile.warnings())
         );
+        configuration.set(
+                PlayerProfileSchema.MUTE,
+                profile.playerMute() == null
+                        ? null
+                        : muteCodec.encode(profile.playerMute())
+        );
 
         return configuration;
     }
@@ -51,10 +60,16 @@ public final class PlayerProfileCodec {
                 "Validated profile is missing player-name"
         );
 
+        Map<String, Object> map = configuration.isConfigurationSection(PlayerProfileSchema.MUTE)
+                ? configuration.getConfigurationSection(PlayerProfileSchema.MUTE).getValues(false)
+                : null;
+        Mute mute = map == null ? null : muteCodec.decode(map);
+
         return new PlayerProfile(
                 expectedPlayerId,
                 playerName,
                 noteCodec.decodeAll(configuration.getMapList(PlayerProfileSchema.NOTES)),
+                mute,
                 warningCodec.decodeAll(configuration.getMapList(PlayerProfileSchema.WARNINGS))
         );
     }

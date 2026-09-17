@@ -4,7 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public record PlayerProfileWrapper(UUID playerID, String playerName, List<Note> notes, List<Warning> warnings) {
+public record PlayerProfileWrapper(
+        UUID playerID,
+        String playerName,
+        List<Note> notes,
+        Mute playerMute,
+        List<Warning> warnings
+) {
     public PlayerProfileWrapper {
         Objects.requireNonNull(
                 playerID,
@@ -19,6 +25,10 @@ public record PlayerProfileWrapper(UUID playerID, String playerName, List<Note> 
                         notes,
                         "Notes cannot be null"
                 )
+        );
+        Objects.requireNonNull(
+                playerMute,
+                "Player Mute cannot be null"
         );
         warnings = List.copyOf(
                 Objects.requireNonNull(
