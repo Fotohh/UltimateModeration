@@ -9,7 +9,6 @@ import me.xaxis.ultimatemoderationplus.permissions.Permissions;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
 import me.xaxis.ultimatemoderationplus.utils.Tuple;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,16 +62,9 @@ public class MuteCommand implements CommandExecutor {
             return true;
         }
 
-        Player targetPlayer = Bukkit.getPlayer(playerProfile.playerId());
-
-        if (targetPlayer == null || !targetPlayer.isOnline()) {
-            sender.sendMessage(langManager.getMessage(LangKey.PLAYER_NOT_ONLINE));
-            return true;
-        }
-
         String reason = String.join(
                 args[1],
-                Arrays.copyOfRange(args, 2, args.length)
+                Arrays.copyOfRange(args, 1, args.length)
         );
 
         if(reason.isBlank()) {
