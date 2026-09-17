@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
-import me.xaxis.ultimatemoderationplus.player.Mute;
+import me.xaxis.ultimatemoderationplus.infractions.Mute;
 
 import java.util.HashMap;
 import java.util.Map;

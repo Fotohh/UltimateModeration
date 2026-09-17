@@ -2,8 +2,6 @@ package me.xaxis.ultimatemoderationplus.validation;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
-import me.xaxis.ultimatemoderationplus.player.Note;
-import me.xaxis.ultimatemoderationplus.player.Warning;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 

@@ -6,7 +6,7 @@ import me.xaxis.ultimatemoderationplus.lang.LangKey;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
-import me.xaxis.ultimatemoderationplus.player.Note;
+import me.xaxis.ultimatemoderationplus.infractions.Note;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
 import org.bukkit.command.Command;

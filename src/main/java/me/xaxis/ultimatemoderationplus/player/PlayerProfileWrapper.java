@@ -1,5 +1,9 @@
 package me.xaxis.ultimatemoderationplus.player;
 
+import me.xaxis.ultimatemoderationplus.infractions.Mute;
+import me.xaxis.ultimatemoderationplus.infractions.Note;
+import me.xaxis.ultimatemoderationplus.infractions.Warning;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

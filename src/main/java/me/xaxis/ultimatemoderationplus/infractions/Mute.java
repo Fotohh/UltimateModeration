@@ -1,4 +1,4 @@
-package me.xaxis.ultimatemoderationplus.player;
+package me.xaxis.ultimatemoderationplus.infractions;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;

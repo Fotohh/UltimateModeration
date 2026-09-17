@@ -8,7 +8,7 @@ import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
-import me.xaxis.ultimatemoderationplus.player.Warning;
+import me.xaxis.ultimatemoderationplus.infractions.Warning;
 import me.xaxis.ultimatemoderationplus.utils.Tuple;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

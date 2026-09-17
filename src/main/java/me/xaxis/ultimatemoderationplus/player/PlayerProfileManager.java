@@ -3,6 +3,9 @@ package me.xaxis.ultimatemoderationplus.player;
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;
+import me.xaxis.ultimatemoderationplus.infractions.Mute;
+import me.xaxis.ultimatemoderationplus.infractions.Note;
+import me.xaxis.ultimatemoderationplus.infractions.Warning;
 import me.xaxis.ultimatemoderationplus.storage.PlayerProfileStorage;
 
 import java.util.*;

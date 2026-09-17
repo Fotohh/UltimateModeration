@@ -2,7 +2,7 @@ package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
-import me.xaxis.ultimatemoderationplus.player.Mute;
+import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileWrapper;
 import org.bukkit.configuration.file.YamlConfiguration;

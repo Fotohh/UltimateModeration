@@ -2,9 +2,9 @@ package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
-import me.xaxis.ultimatemoderationplus.player.Note;
+import me.xaxis.ultimatemoderationplus.infractions.Note;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
-import me.xaxis.ultimatemoderationplus.player.Warning;
+import me.xaxis.ultimatemoderationplus.infractions.Warning;
 import me.xaxis.ultimatemoderationplus.validation.PlayerProfileYmlValidation;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.Test;

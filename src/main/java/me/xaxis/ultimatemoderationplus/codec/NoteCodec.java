@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
-import me.xaxis.ultimatemoderationplus.player.Note;
+import me.xaxis.ultimatemoderationplus.infractions.Note;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

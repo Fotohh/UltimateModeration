@@ -1,9 +1,8 @@
-package me.xaxis.ultimatemoderationplus.player;
+package me.xaxis.ultimatemoderationplus.infractions;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
