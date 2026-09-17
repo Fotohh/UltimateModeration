@@ -34,11 +34,6 @@ public class WarnCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String @NonNull [] args) {
 
-        if (!sender.hasPermission(Permissions.WARN_COMMAND_VIEW.getPermission())) {
-            sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
-            return true;
-        }
-
         var identity = handleSender(sender);
         if (identity == null) {
             sender.sendMessage(langManager.getMessage(LangKey.UNABLE_TO_EXECUTE_COMMAND));
@@ -54,15 +49,23 @@ public class WarnCommand implements CommandExecutor {
 
         switch (type) {
             case "add" -> {
+                if (!sender.hasPermission(Permissions.WARN_COMMAND_EDIT.getPermission())) {
+                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    return true;
+                }
                 if (args.length < 3) {
                     sender.sendMessage(langManager.getMessage(LangKey.WARN_ADD_COMMAND_USAGE));
                     return true;
                 }
-                
+
                 handleAdd(sender, identity, args[1], String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
             }
 
             case "delete" -> {
+                if (!sender.hasPermission(Permissions.WARN_COMMAND_DELETE.getPermission())) {
+                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    return true;
+                }
                 if (args.length < 3) {
                     sender.sendMessage(langManager.getMessage(LangKey.WARN_DELETE_COMMAND_USAGE));
                     return true;
@@ -72,6 +75,10 @@ public class WarnCommand implements CommandExecutor {
             }
 
             case "list" -> {
+                if (!sender.hasPermission(Permissions.WARN_COMMAND_VIEW.getPermission())) {
+                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage(langManager.getMessage(LangKey.WARN_LIST_COMMAND_USAGE));
                     return true;
@@ -102,7 +109,8 @@ public class WarnCommand implements CommandExecutor {
             sender.sendMessage(langManager.replacePlaceholders(
                     langManager.getMessage(LangKey.CONTENT_TOO_LONG),
                     Map.of(
-                            Placeholders.NOTE_MAX_LENGTH, String.valueOf(configSettings.maxContentLength())
+                            Placeholders.CONTENT_MAX_LENGTH,
+                            String.valueOf(configSettings.maxContentLength())
                     )
             ));
             return;
@@ -219,7 +227,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (warnings.isEmpty()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.NO_NOTES),
+                    langManager.getMessage(LangKey.NO_WARNS),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )

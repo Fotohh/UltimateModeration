@@ -6,7 +6,7 @@ public enum Placeholders {
     NOTE_CONTENT("note-content"),
     NOTE_INDEX("note-index"),
     NOTE_AUTHOR("note-author"),
-    NOTE_MAX_LENGTH("note-max-length"),
+    CONTENT_MAX_LENGTH("content-too-long"),
     VALUE("value"),
     WARN_CONTENT("warn-content"),
     WARN_AUTHOR("warn-author"),
