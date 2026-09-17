@@ -6,14 +6,6 @@ config-version: 1
 # If you use a placeholder in a message where it is not applicable, it will be displayed as-is.
 # If you use a placeholder in a message where it is applicable, it will be replaced with the actual value.
 # This applies to all placeholders in the messages section.
-# Built-in placeholders that are used by messages as features are added:
-# {player}   - The target player name.
-# {note-index} - The index of a note.
-# {note-author} - The author of a note.
-# {note-content} - The content of a note.
-# {note-max-length} - The maximum length of a note, as defined in the configuration file.
-# {value} - Usually represents numerical inputs that aren't numbers. Ex: hi is not a valid number.
-# {reason} - The reason for a kick/ban/warn ect.
 
 messages:
   no-permission: '&cYou do not have permission to perform this command.'
@@ -52,3 +44,7 @@ messages:
   mute-must-have-reason: '&cYou must include a reason.'
   muted-player: '&aMuted {player} for {reason}.'
   player-muted: '&cYou are currently muted for {reason}.'
+  unmute-usage: '&cUsage: /unmute <player>'
+  player-not-muted: '&cThat player is not muted.'
+  player-already-muted: '&cThat player is already muted.'
+  player-unmuted: '&a{player} has been unmuted.'

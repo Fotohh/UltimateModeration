@@ -37,7 +37,12 @@ public enum LangKey {
     MUTE_USAGE("messages.mute-usage"),
     MUTE_MUST_HAVE_REASON("messages.mute-must-have-reason"),
     MUTED_PLAYER("messages.muted-player"),
-    PLAYER_MUTED("messages.player-muted");
+    PLAYER_MUTED("messages.player-muted"),
+    UNMUTE_USAGE("messages.unmute-usage"),
+    PLAYER_NOT_MUTED("messages.player-not-muted"),
+    PLAYER_ALREADY_MUTED("messages.player-already-muted"),
+    PLAYER_UNMUTED("messages.player-unmuted"),
+    ;
     private final String path;
 
     LangKey(String path) {
