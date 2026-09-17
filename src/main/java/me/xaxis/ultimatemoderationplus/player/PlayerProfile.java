@@ -14,7 +14,7 @@ public class PlayerProfile {
     private String playerName;
     private final List<Note> notes;
     private final List<Warning> warnings;
-    private Mute playerMute;
+    private volatile Mute playerMute;
 
     public PlayerProfile(UUID playerId, String playerName, List<Note> notes, Mute playerMute, List<Warning> warnings) {
         this.playerId = Objects.requireNonNull(playerId, "Player ID cannot be null");

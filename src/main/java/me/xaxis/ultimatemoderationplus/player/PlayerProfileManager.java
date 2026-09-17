@@ -9,13 +9,14 @@ import me.xaxis.ultimatemoderationplus.infractions.Warning;
 import me.xaxis.ultimatemoderationplus.storage.PlayerProfileStorage;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerProfileManager implements AutoCloseable {
 
-    private final Map<UUID, PlayerProfile> playerProfiles = new HashMap<>();
-    private final Map<String, UUID> idsByName = new HashMap<>();
+    private final Map<UUID, PlayerProfile> playerProfiles = new ConcurrentHashMap<>();
+    private final Map<String, UUID> idsByName = new ConcurrentHashMap<>();
     private final PlayerProfileStorage storage;
     private final Logger logger;
     private final ConfigSettings configSettings;
@@ -64,6 +65,14 @@ public class PlayerProfileManager implements AutoCloseable {
         });
     }
 
+    public boolean isMuted(UUID playerId) {
+        PlayerProfile profile =
+                playerProfiles.get(playerId);
+
+        return profile != null
+                && profile.getPlayerMute() != null;
+    }
+
     public void removeWarningFromProfile(PlayerProfile profile, int index) {
         profile.removeWarning(index);
         save(profile);
@@ -96,10 +105,6 @@ public class PlayerProfileManager implements AutoCloseable {
         );
         playerProfile.removeMute();
         save(playerProfile);
-    }
-
-    public boolean isMuted(PlayerProfile playerProfile) {
-        return playerProfile.getPlayerMute() != null;
     }
 
     public Mute getMute(PlayerProfile playerProfile) {

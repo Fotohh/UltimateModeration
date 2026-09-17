@@ -51,3 +51,4 @@ messages:
   mute-usage: '&cUsage: /mute <player> <reason>'
   mute-must-have-reason: '&cYou must include a reason.'
   muted-player: '&aMuted {player} for {reason}.'
+  player-muted: '&cYou are currently muted for {reason}.'
