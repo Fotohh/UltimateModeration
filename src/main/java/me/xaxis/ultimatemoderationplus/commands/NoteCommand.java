@@ -86,7 +86,7 @@ public class NoteCommand implements CommandExecutor {
         } else if (sender instanceof ConsoleCommandSender) {
             handleConsoleNoteCommand(sender, targetProfile, args);
         } else {
-            sender.sendMessage(langManager.getMessage(LangKey.UNABLE_TO_EXECUTE_COMMAND));
+            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
         }
 
         return true;

@@ -12,7 +12,8 @@ config-version: 1
 # {note-author} - The author of a note.
 # {note-content} - The content of a note.
 # {note-max-length} - The maximum length of a note, as defined in the configuration file.
-# {value} usually represents numerical inputs that aren't numbers. Ex: hi is not a valid number.
+# {value} - Usually represents numerical inputs that aren't numbers. Ex: hi is not a valid number.
+# {reason} - The reason for a kick/ban/warn ect.
 
 messages:
   no-permission: '&cYou do not have permission to perform this command.'
@@ -22,7 +23,7 @@ messages:
   note-added: '&aAdded note for {player}.'
   invalid-note-index: '&c{note-index} is not a valid note index for {player}.'
   note-must-have-content: '&cYou must provide content for the note.'
-  unable-to-execute-command: '&cYou cannot execute this command.'
+  sender-not-valid: '&cYou cannot execute this command.'
   content-too-long: '&cThe content is too long. Please keep it under {note-max-length} characters.'
   no-notes: '&c{player} has no notes.'
   note-list-header: '&6Notes for {player}:'
@@ -47,3 +48,6 @@ messages:
   kick-must-have-reason: '&cYou must include a reason.'
   player-not-online: '&cThat player is not online.'
   kicked-player: '&aYou have kicked {player} for {reason}.'
+  mute-usage: '&cUsage: /mute <player> <reason>'
+  mute-must-have-reason: '&cYou must include a reason.'
+  muted-player: '&aMuted {player} for {reason}.'

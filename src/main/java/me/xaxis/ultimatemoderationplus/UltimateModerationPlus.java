@@ -1,6 +1,7 @@
 package me.xaxis.ultimatemoderationplus;
 
 import me.xaxis.ultimatemoderationplus.commands.KickCommand;
+import me.xaxis.ultimatemoderationplus.commands.MuteCommand;
 import me.xaxis.ultimatemoderationplus.commands.NoteCommand;
 import me.xaxis.ultimatemoderationplus.commands.WarnCommand;
 import me.xaxis.ultimatemoderationplus.config.ConfigSettingsLoader;
@@ -181,6 +182,7 @@ public class UltimateModerationPlus extends JavaPlugin {
         getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager, configSettings));
         getCommand("warn").setExecutor(new WarnCommand(configSettings, playerProfileManager, langManager));
         getCommand("kick").setExecutor(new KickCommand(langManager, playerProfileManager));
+        getCommand("mute").setExecutor(new MuteCommand(langManager, playerProfileManager));
         //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
     }
 

@@ -36,7 +36,7 @@ public class WarnCommand implements CommandExecutor {
 
         var identity = handleSender(sender);
         if (identity == null) {
-            sender.sendMessage(langManager.getMessage(LangKey.UNABLE_TO_EXECUTE_COMMAND));
+            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
             return true;
         }
 

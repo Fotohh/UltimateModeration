@@ -12,7 +12,7 @@ public enum LangKey {
     NOTE_ADDED("messages.note-added"),
     INVALID_NOTE_INDEX("messages.invalid-note-index"),
     NOTE_MUST_HAVE_CONTENT("messages.note-must-have-content"),
-    UNABLE_TO_EXECUTE_COMMAND("messages.unable-to-execute-command"),
+    SENDER_NOT_VALID("messages.sender-not-valid"),
     CONTENT_TOO_LONG("messages.note-too-long"),
     NO_NOTES("messages.no-notes"),
     NOTE_LIST_HEADER("messages.note-list-header"),
@@ -34,7 +34,9 @@ public enum LangKey {
     KICK_MUST_HAVE_REASON("messages.kick-must-have-reason"),
     PLAYER_NOT_ONLINE("messages.player-not-online"),
     KICKED_PLAYER("messages.kicked-player"),
-    ;
+    MUTE_USAGE("messages.mute-usage"),
+    MUTE_MUST_HAVE_REASON("messages.mute-must-have-reason"),
+    MUTED_PLAYER("messages.muted-player"),;
     private final String path;
 
     LangKey(String path) {

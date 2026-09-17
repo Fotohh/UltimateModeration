@@ -9,6 +9,8 @@ public enum Permissions {
     WARN_COMMAND_EDIT("ultimatemoderationplus.admin.warn-command.edit"),
     WARN_COMMAND_VIEW("ultimatemoderationplus.admin.warn-command.view"),
     KICK_COMMAND("ultimatemoderationplus.admin.kick"),
+    MUTE_COMMAND("ultimatemoderationplus.admin.mute"),
+    UNMUTE_COMMAND("ultimatemoderationplus.admin.unmute"),
 
     ;
 
