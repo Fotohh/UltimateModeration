@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.player;
 
+import me.xaxis.ultimatemoderationplus.infractions.Ban;
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.infractions.Note;
 import me.xaxis.ultimatemoderationplus.infractions.Warning;
@@ -13,32 +14,6 @@ public record PlayerProfileWrapper(
         String playerName,
         List<Note> notes,
         Mute playerMute,
-        List<Warning> warnings
-) {
-    public PlayerProfileWrapper {
-        Objects.requireNonNull(
-                playerID,
-                "Player ID cannot be null"
-        );
-        Objects.requireNonNull(
-                playerName,
-                "Player name cannot be null"
-        );
-        notes = List.copyOf(
-                Objects.requireNonNull(
-                        notes,
-                        "Notes cannot be null"
-                )
-        );
-        Objects.requireNonNull(
-                playerMute,
-                "Player Mute cannot be null"
-        );
-        warnings = List.copyOf(
-                Objects.requireNonNull(
-                        warnings,
-                        "Warnings cannot be null"
-                )
-        );
-    }
-}
+        List<Warning> warnings,
+        Ban playerBan
+) { }

@@ -29,6 +29,102 @@ public final class PlayerProfileYmlValidation extends YamlValidator {
         validateNotes(errors);
         validateWarnings(errors);
         validateMute(errors);
+        validateBan(errors);
+    }
+
+    private void validateBan(List<String> errors) {
+        if(!configuration.isSet(PlayerProfileSchema.BAN)) {
+            return;
+        }
+
+        ConfigurationSection banSection = configuration.getConfigurationSection(
+                PlayerProfileSchema.BAN
+        );
+
+        if (banSection == null) {
+            errors.add(
+                    PlayerProfileSchema.BAN
+                            + " is not a configuration section in "
+                            + path.getFileName()
+            );
+            return;
+        }
+
+        ValidatorHelper.validateUuidValue(
+                banSection.get(
+                        PlayerProfileSchema.STAFF_ID
+                ),
+                PlayerProfileSchema.STAFF_ID,
+                -1,
+                "ban",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateMinecraftName(
+                banSection.get(
+                        PlayerProfileSchema.STAFF_NAME
+                ),
+                PlayerProfileSchema.STAFF_NAME,
+                -1,
+                "ban",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateTimestamp(
+                banSection.get(
+                        PlayerProfileSchema.TIMESTAMP
+                ),
+                PlayerProfileSchema.TIMESTAMP,
+                -1,
+                "ban",
+                ConfigConstants.MAX_FUTURE_SKEW_MILLIS,
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateNonBlankString(
+                banSection.get(
+                        PlayerProfileSchema.REASON
+                ),
+                PlayerProfileSchema.REASON,
+                -1,
+                "ban",
+                errors,
+                path.getFileName().toString()
+        );
+
+        ValidatorHelper.validateUuidValue(
+                banSection.get(
+                        PlayerProfileSchema.TARGET_ID
+                ),
+                PlayerProfileSchema.TARGET_ID,
+                -1,
+                "ban",
+                errors,
+                path.getFileName().toString()
+        );
+
+        Object profileId =
+                configuration.get(
+                        PlayerProfileSchema.PLAYER_ID
+                );
+
+        Object banTargetId =
+                banSection.get(
+                        PlayerProfileSchema.TARGET_ID
+                );
+
+        if (profileId instanceof String profileIdString
+                && banTargetId instanceof String targetIdString
+                && !profileIdString.equals(targetIdString)) {
+
+            errors.add(
+                    "Ban target ID does not match profile player ID in "
+                            + path.getFileName()
+            );
+        }
     }
 
     private void validateMute(List<String> errors) {

@@ -2,6 +2,7 @@ package me.xaxis.ultimatemoderationplus.codec;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerProfileSchema;
+import me.xaxis.ultimatemoderationplus.infractions.Ban;
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileWrapper;
@@ -16,6 +17,7 @@ public final class PlayerProfileCodec {
     private final NoteCodec noteCodec = new NoteCodec();
     private final WarningCodec warningCodec = new WarningCodec();
     private final MuteCodec muteCodec = new MuteCodec();
+    private final BanCodec banCodec = new BanCodec();
 
     public YamlConfiguration encode(PlayerProfileWrapper profile) {
         Objects.requireNonNull(profile, "Player profile cannot be null");
@@ -43,9 +45,12 @@ public final class PlayerProfileCodec {
         );
         configuration.set(
                 PlayerProfileSchema.MUTE,
-                profile.playerMute() == null
-                        ? null
-                        : muteCodec.encode(profile.playerMute())
+                profile.playerMute() == null ?
+                        null : muteCodec.encode(profile.playerMute())
+        );
+        configuration.set(PlayerProfileSchema.BAN,
+                profile.playerBan() == null ?
+                null : banCodec.encode(profile.playerBan())
         );
 
         return configuration;
@@ -65,12 +70,18 @@ public final class PlayerProfileCodec {
                 : null;
         Mute mute = map == null ? null : muteCodec.decode(map);
 
+        Map<String, Object> banEntry = configuration.isConfigurationSection(PlayerProfileSchema.BAN)
+                ? configuration.getConfigurationSection(PlayerProfileSchema.BAN).getValues(false)
+                : null;
+        Ban ban = banEntry == null ? null : banCodec.decode(banEntry);
+
         return new PlayerProfile(
                 expectedPlayerId,
                 playerName,
                 noteCodec.decodeAll(configuration.getMapList(PlayerProfileSchema.NOTES)),
                 mute,
-                warningCodec.decodeAll(configuration.getMapList(PlayerProfileSchema.WARNINGS))
+                warningCodec.decodeAll(configuration.getMapList(PlayerProfileSchema.WARNINGS)),
+                ban
         );
     }
 }

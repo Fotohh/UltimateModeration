@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.commands;
 
+import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.lang.LangKey;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
@@ -20,10 +21,12 @@ public class KickCommand implements CommandExecutor {
 
     private final LangManager langManager;
     private final PlayerProfileManager playerProfileManager;
+    private final ConfigSettings configSettings;
 
-    public KickCommand(LangManager langManager, PlayerProfileManager playerProfileManager) {
+    public KickCommand(LangManager langManager, PlayerProfileManager playerProfileManager, ConfigSettings configSettings) {
         this.langManager = langManager;
         this.playerProfileManager = playerProfileManager;
+        this.configSettings = configSettings;
     }
 
     @Override
@@ -56,6 +59,16 @@ public class KickCommand implements CommandExecutor {
         );
         if (reason.isBlank()) {
             sender.sendMessage(langManager.getMessage(LangKey.KICK_MUST_HAVE_REASON));
+            return true;
+        }
+
+        if(reason.length() > configSettings.maxContentLength()) {
+            sender.sendMessage(langManager.replacePlaceholders(
+                    langManager.getMessage(LangKey.CONTENT_TOO_LONG),
+                    Map.of(
+                            Placeholders.CONTENT_MAX_LENGTH, String.valueOf(configSettings.maxContentLength())
+                    )
+            ));
             return true;
         }
 

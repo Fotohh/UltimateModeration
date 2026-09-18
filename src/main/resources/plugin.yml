@@ -6,4 +6,20 @@ commands:
   note:
     description: Manage player notes.
     usage: /<command> <add|delete|list> [player] [note]
-    permission: ultimatemoderation.admin.note-command
+    permission: ultimatemoderationplus.admin.note-command
+  warn:
+    description: Warn a player.
+    usage: /<command> <add|delete|list> [player] [reason]
+    permission: ultimatemoderationplus.admin.warn-command
+  mute:
+    description: Mute a player.
+    usage: /<command> <player> <reason>
+    permission: ultimatemoderationplus.admin.mute-command
+  unmute:
+    description: Unmute a player.
+    usage: /<command> <player>
+    permission: ultimatemoderationplus.admin.unmute-command
+  kick:
+    description: Kick a player.
+    usage: /<command> <player> <reason>
+    permission: ultimatemoderationplus.admin.kick-command

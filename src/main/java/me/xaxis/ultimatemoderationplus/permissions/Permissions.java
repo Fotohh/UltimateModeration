@@ -8,9 +8,11 @@ public enum Permissions {
     WARN_COMMAND_DELETE("ultimatemoderationplus.admin.warn-command.delete"),
     WARN_COMMAND_EDIT("ultimatemoderationplus.admin.warn-command.edit"),
     WARN_COMMAND_VIEW("ultimatemoderationplus.admin.warn-command.view"),
-    KICK_COMMAND("ultimatemoderationplus.admin.kick"),
-    MUTE_COMMAND("ultimatemoderationplus.admin.mute"),
-    UNMUTE_COMMAND("ultimatemoderationplus.admin.unmute"),
+    KICK_COMMAND("ultimatemoderationplus.admin.kick-command"),
+    MUTE_COMMAND("ultimatemoderationplus.admin.mute-command"),
+    UNMUTE_COMMAND("ultimatemoderationplus.admin.unmute-command"),
+    BAN_COMMAND("ultimatemoderationplus.admin.ban-command"),
+    UNBAN_COMMAND("ultimatemoderationplus.admin.unban-command"),
 
     ;
 

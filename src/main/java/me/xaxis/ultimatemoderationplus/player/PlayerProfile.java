@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.player;
 
+import me.xaxis.ultimatemoderationplus.infractions.Ban;
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.infractions.Note;
 import me.xaxis.ultimatemoderationplus.infractions.Warning;
@@ -15,16 +16,15 @@ public class PlayerProfile {
     private final List<Note> notes;
     private final List<Warning> warnings;
     private volatile Mute playerMute;
+    private volatile Ban playerBan;
 
-    public PlayerProfile(UUID playerId, String playerName, List<Note> notes, Mute playerMute, List<Warning> warnings) {
-        this.playerId = Objects.requireNonNull(playerId, "Player ID cannot be null");
-        this.playerName = Objects.requireNonNull(playerName, "Player name cannot be null");
-        this.notes = new ArrayList<>(
-                Objects.requireNonNull(notes, "Notes cannot be null")
-        );
-        this.warnings = new ArrayList<>(
-                Objects.requireNonNull(warnings, "Warnings cannot be null")
-        );
+    public PlayerProfile(UUID playerId, String playerName, List<Note> notes, Mute playerMute, List<Warning> warnings, Ban playerBan) {
+        this.notes = notes;
+        this.warnings = warnings;
+        this.playerId = playerId;
+        this.playerBan = playerBan;
+        this.playerName = playerName;
+        this.playerMute = playerMute;
     }
 
     public static PlayerProfile create(UUID playerId, String playerName) {
@@ -33,8 +33,19 @@ public class PlayerProfile {
                 playerName,
                 List.of(),
                 null,
-                List.of()
+                List.of(),
+                null
         );
+    }
+
+    protected void unbanPlayer() {
+        playerBan = null;
+    }
+
+    protected Ban getPlayerBan() { return playerBan; }
+
+    protected void banPlayer(Ban ban) {
+        this.playerBan = ban;
     }
 
     protected Mute getPlayerMute() {
@@ -103,7 +114,7 @@ public class PlayerProfile {
     }
 
     public PlayerProfileWrapper toWrapper() {
-        return new PlayerProfileWrapper(playerId, playerName, notes, playerMute, warnings);
+        return new PlayerProfileWrapper(playerId, playerName, notes, playerMute, warnings, playerBan);
     }
 
 

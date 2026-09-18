@@ -42,7 +42,10 @@ public enum LangKey {
     PLAYER_NOT_MUTED("messages.player-not-muted"),
     PLAYER_ALREADY_MUTED("messages.player-already-muted"),
     PLAYER_UNMUTED("messages.player-unmuted"),
-    ;
+    BAN_USAGE("messages.ban-usage"),
+    BAN_MUST_HAVE_REASON("messages.ban-must-have-reason"),
+    BANNED_PLAYER("messages.banned-player"),
+    PLAYER_ALREADY_BANNED("messages.player-already-banned");
     private final String path;
 
     LangKey(String path) {

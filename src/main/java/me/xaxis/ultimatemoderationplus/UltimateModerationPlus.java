@@ -1,9 +1,6 @@
 package me.xaxis.ultimatemoderationplus;
 
-import me.xaxis.ultimatemoderationplus.commands.KickCommand;
-import me.xaxis.ultimatemoderationplus.commands.MuteCommand;
-import me.xaxis.ultimatemoderationplus.commands.NoteCommand;
-import me.xaxis.ultimatemoderationplus.commands.WarnCommand;
+import me.xaxis.ultimatemoderationplus.commands.*;
 import me.xaxis.ultimatemoderationplus.config.ConfigSettingsLoader;
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
@@ -181,8 +178,10 @@ public class UltimateModerationPlus extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
         getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager, configSettings));
         getCommand("warn").setExecutor(new WarnCommand(configSettings, playerProfileManager, langManager));
-        getCommand("kick").setExecutor(new KickCommand(langManager, playerProfileManager));
-        getCommand("mute").setExecutor(new MuteCommand(langManager, playerProfileManager));
+        getCommand("kick").setExecutor(new KickCommand(langManager, playerProfileManager, configSettings));
+        getCommand("mute").setExecutor(new MuteCommand(langManager, playerProfileManager, configSettings));
+        getCommand("unmute").setExecutor(new UnmuteCommand(langManager, playerProfileManager));
+        getCommand("ban").setExecutor(new BanCommand(langManager, playerProfileManager, configSettings));
         //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
     }
 

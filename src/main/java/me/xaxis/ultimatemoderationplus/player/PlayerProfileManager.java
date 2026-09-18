@@ -3,6 +3,7 @@ package me.xaxis.ultimatemoderationplus.player;
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
 import me.xaxis.ultimatemoderationplus.constants.PlayerNames;
+import me.xaxis.ultimatemoderationplus.infractions.Ban;
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.infractions.Note;
 import me.xaxis.ultimatemoderationplus.infractions.Warning;
@@ -27,25 +28,9 @@ public class PlayerProfileManager implements AutoCloseable {
             ConfigSettings configSettings,
             Logger logger
     ) {
-        Objects.requireNonNull(
-                playerProfiles,
-                "Player profiles cannot be null"
-        );
-
-        this.storage = Objects.requireNonNull(
-                storage,
-                "Storage cannot be null"
-        );
-
-        this.configSettings = Objects.requireNonNull(
-                configSettings,
-                "Config settings cannot be null"
-        );
-
-        this.logger = Objects.requireNonNull(
-                logger,
-                "Logger cannot be null"
-        );
+        this.storage = storage;
+        this.configSettings = configSettings;
+        this.logger = logger;
 
         playerProfiles.forEach(profile -> {
             PlayerProfile previous =
@@ -71,6 +56,28 @@ public class PlayerProfileManager implements AutoCloseable {
 
         return profile != null
                 && profile.getPlayerMute() != null;
+    }
+
+    public void banPlayer(PlayerProfile playerProfile, Ban ban) {
+        if (!playerProfile.playerId().equals(
+                ban.playerId()
+        )) {
+            throw new IllegalArgumentException(
+                    "Ban target UUID does not match profile UUID"
+            );
+        }
+
+        playerProfile.banPlayer(ban);
+        save(playerProfile);
+    }
+
+    public Ban getPlayerBan(PlayerProfile playerProfile) {
+        return playerProfile.getPlayerBan();
+    }
+
+    public void unbanPlayer(PlayerProfile playerProfile) {
+        playerProfile.unbanPlayer();
+        save(playerProfile);
     }
 
     public void removeWarningFromProfile(PlayerProfile profile, int index) {
@@ -133,15 +140,8 @@ public class PlayerProfileManager implements AutoCloseable {
     }
 
     public PlayerProfile getPlayerProfile(String playerName) {
-        Objects.requireNonNull(
-                playerName,
-                "Player name cannot be null"
-        );
 
-        UUID playerId =
-                idsByName.get(
-                        normalizeName(playerName)
-                );
+        UUID playerId = getUUIDFromName(playerName);
 
         if(playerId == null) {
             return null;
@@ -283,11 +283,6 @@ public class PlayerProfileManager implements AutoCloseable {
     }
 
     private UUID getUUIDFromName(String playerArgument) {
-        Objects.requireNonNull(
-                playerArgument,
-                "Player name cannot be null"
-        );
-
         return idsByName.get(
                 normalizeName(playerArgument)
         );
