@@ -52,3 +52,7 @@ messages:
   ban-must-have-reason: '&cYou must include a reason.'
   banned-player: '&aYou have banned {player} for {reason}.'
   player-already-banned: '&c{player} is already banned.'
+  unban-usage: '&cUsage: /unban <player>'
+  unbanned-player: '&a You have unbanned {player}.'
+  player-not-banned: '&c{player} is not banned.'
+  login-ban-message: '&cYou have been banned by {staff} for: {reason}'

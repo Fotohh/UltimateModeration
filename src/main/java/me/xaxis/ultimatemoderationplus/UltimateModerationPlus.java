@@ -6,6 +6,7 @@ import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.LangYml;
 import me.xaxis.ultimatemoderationplus.listener.PlayerJoin;
+import me.xaxis.ultimatemoderationplus.listener.PlayerLogin;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileLoader;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class UltimateModerationPlus extends JavaPlugin {
-
 
     private PlayerProfileLoader playerProfileLoader;
     private PlayerProfileManager playerProfileManager;
@@ -176,12 +176,14 @@ public class UltimateModerationPlus extends JavaPlugin {
         new Metrics(this, bstatsPluginId);
 
         getServer().getPluginManager().registerEvents(new PlayerJoin(playerProfileManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerLogin(playerProfileManager, langManager), this);
         getCommand("note").setExecutor(new NoteCommand(langManager, playerProfileManager, configSettings));
         getCommand("warn").setExecutor(new WarnCommand(configSettings, playerProfileManager, langManager));
         getCommand("kick").setExecutor(new KickCommand(langManager, playerProfileManager, configSettings));
         getCommand("mute").setExecutor(new MuteCommand(langManager, playerProfileManager, configSettings));
         getCommand("unmute").setExecutor(new UnmuteCommand(langManager, playerProfileManager));
         getCommand("ban").setExecutor(new BanCommand(langManager, playerProfileManager, configSettings));
+        getCommand("unban").setExecutor(new UnbanCommand(langManager, playerProfileManager));
         //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
     }
 

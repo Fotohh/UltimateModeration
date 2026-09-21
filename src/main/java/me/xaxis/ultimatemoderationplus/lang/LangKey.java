@@ -45,7 +45,12 @@ public enum LangKey {
     BAN_USAGE("messages.ban-usage"),
     BAN_MUST_HAVE_REASON("messages.ban-must-have-reason"),
     BANNED_PLAYER("messages.banned-player"),
-    PLAYER_ALREADY_BANNED("messages.player-already-banned");
+    PLAYER_ALREADY_BANNED("messages.player-already-banned"),
+    UNBAN_USAGE("messages.unban-usage"),
+    UNBANNED_PLAYER("messages.unbanned-player"),
+    PLAYER_NOT_BANNED("messages.player-not-banned"),
+    LOGIN_BAN_MESSAGE("messages.login-ban-message")
+    ;
     private final String path;
 
     LangKey(String path) {

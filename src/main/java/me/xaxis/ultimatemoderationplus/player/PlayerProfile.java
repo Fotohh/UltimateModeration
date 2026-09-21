@@ -72,7 +72,7 @@ public class PlayerProfile {
      * Do not access from here. Use {@link PlayerProfileManager#getWarningsFromProfile(PlayerProfile)}
      * @return immutable list of warnings
      */
-    public List<Warning> warnings() {
+    protected List<Warning> warnings() {
         return List.copyOf(warnings);
     }
 
@@ -80,7 +80,7 @@ public class PlayerProfile {
      * Do not access from here. Use {@link PlayerProfileManager#getNotesFromProfile(PlayerProfile)}
      * @return immutable list of notes
      */
-    public List<Note> notes() {
+    protected List<Note> notes() {
         return List.copyOf(notes);
     }
 
