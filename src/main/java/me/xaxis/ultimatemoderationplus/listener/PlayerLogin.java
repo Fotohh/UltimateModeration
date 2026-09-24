@@ -1,11 +1,13 @@
 package me.xaxis.ultimatemoderationplus.listener;
 
+import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.infractions.Ban;
 import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
+import me.xaxis.ultimatemoderationplus.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,19 +37,31 @@ public class PlayerLogin implements Listener {
         Ban ban = playerProfileManager.getPlayerBan(playerProfile);
         if (ban == null) return;
 
-        if (ban.timeUntil() != -1 && ban.timeUntil() <= System.currentTimeMillis()) {
+        long now = System.currentTimeMillis();
+        long expiresAt = ban.timeUntil();
+
+        if (expiresAt != -1 && expiresAt <= now) {
             Bukkit.getScheduler().runTask(
                     plugin,
-                    () -> playerProfileManager.unbanPlayer(playerProfile)
+                    () -> {
+                        if (playerProfileManager.getPlayerBan(playerProfile) == ban) {
+                            playerProfileManager.unbanPlayer(playerProfile);
+                        }
+                    }
             );
             return;
         }
+
+        String duration = expiresAt == -1
+                ? "never"
+                : Utils.formatDuration(expiresAt - now);
 
         String message = langManager.replacePlaceholders(
                 langManager.getMessage(Lang.LOGIN_BAN_MESSAGE),
                 Map.of(
                         Placeholders.STAFF, ban.staffName(),
-                        Placeholders.REASON, ban.reason() // todo
+                        Placeholders.REASON, ban.reason(),
+                        Placeholders.DURATION, duration
                 )
         );
 

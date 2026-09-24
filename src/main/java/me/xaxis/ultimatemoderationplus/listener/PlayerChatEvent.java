@@ -1,5 +1,6 @@
 package me.xaxis.ultimatemoderationplus.listener;
 
+import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
 import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
@@ -47,13 +48,24 @@ public class PlayerChatEvent implements Listener {
             return;
         }
 
-        if (mute.timeUntil() != -1 && mute.timeUntil() <= System.currentTimeMillis()) {
+        long now = System.currentTimeMillis();
+        long expiresAt = mute.timeUntil();
+
+        if (expiresAt != -1 && expiresAt <= now) {
             Bukkit.getScheduler().runTask(
                     plugin,
-                    () -> playerProfileManager.unmuteProfile(playerProfile)
+                    () -> {
+                        if (playerProfileManager.getMute(playerProfile) == mute) {
+                            playerProfileManager.unmuteProfile(playerProfile);
+                        }
+                    }
             );
             return;
         }
+
+        String duration = expiresAt == -1
+                ? "never"
+                : Utils.formatDuration(expiresAt - now);
 
         String message =
                 langManager.replacePlaceholders(
@@ -64,8 +76,7 @@ public class PlayerChatEvent implements Listener {
                                 Placeholders.REASON,
                                 mute.reason(),
                                 Placeholders.DURATION,
-                                mute.timeUntil() == -1
-                                ? "never" : Utils.formatDuration(mute.timeUntil())
+                                duration
                         )
                 );
 
