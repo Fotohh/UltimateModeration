@@ -7,9 +7,9 @@ import java.util.Objects;
 
 public class LangManager {
 
-    private final Map<LangKey, String> messages;
+    private final Map<Lang, String> messages;
 
-    public LangManager(Map<LangKey, String> messages) {
+    public LangManager(Map<Lang, String> messages) {
 
         this.messages = Map.copyOf(
                 Objects.requireNonNull(
@@ -20,7 +20,7 @@ public class LangManager {
 
     }
 
-    public String getMessage(LangKey key) {
+    public String getMessage(Lang key) {
         Objects.requireNonNull(
                 key,
                 "Language key cannot be null"

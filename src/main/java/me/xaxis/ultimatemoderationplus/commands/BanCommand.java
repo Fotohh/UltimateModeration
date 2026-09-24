@@ -1,9 +1,10 @@
 package me.xaxis.ultimatemoderationplus.commands;
 
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
+import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
 import me.xaxis.ultimatemoderationplus.infractions.Ban;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
@@ -39,17 +40,17 @@ public class BanCommand implements CommandExecutor {
 
         Tuple<UUID, String> identity = validateSender(sender);
         if(identity == null) {
-            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
+            sender.sendMessage(langManager.getMessage(Lang.SENDER_NOT_VALID));
             return true;
         }
 
         if(!sender.hasPermission(Permissions.BAN_COMMAND.getPermission())) {
-            sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+            sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
             return true;
         }
 
         if(args.length < 2) {
-            sender.sendMessage(langManager.getMessage(LangKey.BAN_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.BAN_USAGE));
             return true;
         }
 
@@ -59,7 +60,7 @@ public class BanCommand implements CommandExecutor {
         PlayerProfile playerProfile = playerProfileManager.getPlayerProfile(playerName);
         if(playerProfile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, playerName
                     )
@@ -71,7 +72,7 @@ public class BanCommand implements CommandExecutor {
             sender.sendMessage(
                     langManager.replacePlaceholders(
                             langManager.getMessage(
-                                    LangKey.PLAYER_ALREADY_BANNED
+                                    Lang.PLAYER_ALREADY_BANNED
                             ),
                             Map.of(
                                     Placeholders.PLAYER,
@@ -85,13 +86,13 @@ public class BanCommand implements CommandExecutor {
         Player targetPlayer = Bukkit.getPlayer(playerProfile.playerId());
 
         if(reason.isBlank()) {
-            sender.sendMessage(langManager.getMessage(LangKey.BAN_MUST_HAVE_REASON));
+            sender.sendMessage(langManager.getMessage(Lang.BAN_MUST_HAVE_REASON));
             return true;
         }
 
         if(reason.length() > configSettings.maxContentLength()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.CONTENT_TOO_LONG),
+                    langManager.getMessage(Lang.CONTENT_TOO_LONG),
                     Map.of(
                             Placeholders.CONTENT_MAX_LENGTH, String.valueOf(configSettings.maxContentLength())
                     )
@@ -104,7 +105,8 @@ public class BanCommand implements CommandExecutor {
                 identity.second(),
                 playerProfile.playerId(),
                 reason,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                ConfigConstants.PERMANENT_DURATION
         ));
 
         if(targetPlayer != null && targetPlayer.isOnline()) {
@@ -112,7 +114,7 @@ public class BanCommand implements CommandExecutor {
         }
 
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.BANNED_PLAYER),
+                langManager.getMessage(Lang.BANNED_PLAYER),
                 Map.of(
                         Placeholders.PLAYER, playerName,
                         Placeholders.REASON, reason

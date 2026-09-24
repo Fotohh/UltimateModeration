@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderationplus.validation;
 
 import me.xaxis.ultimatemoderationplus.constants.ConfigConstants;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.nio.file.Path;
@@ -25,7 +25,7 @@ public class LangValidator extends YamlValidator {
             return;
         }
 
-        for (LangKey key : LangKey.values()) {
+        for (Lang key : Lang.values()) {
             if (!configuration.isSet(key.getPath())) {
                 errors.add("Missing message for key: " + key.name());
                 continue;

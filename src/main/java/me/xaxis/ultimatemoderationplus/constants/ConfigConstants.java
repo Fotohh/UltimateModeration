@@ -13,6 +13,7 @@ public final class ConfigConstants {
     public static final ConfigType MAIN = new ConfigType(1);
     public static final ConfigType LANG = new ConfigType(1);
     public static final long MAX_FUTURE_SKEW_MILLIS = Duration.ofHours(24).toMillis();
+    public static final long PERMANENT_DURATION = -1;
 
     public record ConfigType(
             int currentVersion

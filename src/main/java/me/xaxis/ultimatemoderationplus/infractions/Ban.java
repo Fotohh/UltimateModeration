@@ -7,6 +7,7 @@ public record Ban(
         String staffName,
         UUID playerId,
         String reason,
-        long timestamp
+        long timestamp,
+        long timeUntil
 ) { }
 //todo ban

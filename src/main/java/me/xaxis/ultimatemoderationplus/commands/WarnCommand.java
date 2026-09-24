@@ -2,7 +2,7 @@ package me.xaxis.ultimatemoderationplus.commands;
 
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
@@ -36,12 +36,12 @@ public class WarnCommand implements CommandExecutor {
 
         var identity = handleSender(sender);
         if (identity == null) {
-            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
+            sender.sendMessage(langManager.getMessage(Lang.SENDER_NOT_VALID));
             return true;
         }
 
         if (args.length < 1) {
-            sender.sendMessage(langManager.getMessage(LangKey.WARN_COMMAND_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.WARN_COMMAND_USAGE));
             return true;
         }
 
@@ -50,11 +50,11 @@ public class WarnCommand implements CommandExecutor {
         switch (type) {
             case "add" -> {
                 if (!sender.hasPermission(Permissions.WARN_COMMAND_EDIT.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return true;
                 }
                 if (args.length < 3) {
-                    sender.sendMessage(langManager.getMessage(LangKey.WARN_ADD_COMMAND_USAGE));
+                    sender.sendMessage(langManager.getMessage(Lang.WARN_ADD_COMMAND_USAGE));
                     return true;
                 }
 
@@ -63,11 +63,11 @@ public class WarnCommand implements CommandExecutor {
 
             case "delete" -> {
                 if (!sender.hasPermission(Permissions.WARN_COMMAND_DELETE.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return true;
                 }
                 if (args.length < 3) {
-                    sender.sendMessage(langManager.getMessage(LangKey.WARN_DELETE_COMMAND_USAGE));
+                    sender.sendMessage(langManager.getMessage(Lang.WARN_DELETE_COMMAND_USAGE));
                     return true;
                 }
 
@@ -76,18 +76,18 @@ public class WarnCommand implements CommandExecutor {
 
             case "list" -> {
                 if (!sender.hasPermission(Permissions.WARN_COMMAND_VIEW.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return true;
                 }
                 if (args.length < 2) {
-                    sender.sendMessage(langManager.getMessage(LangKey.WARN_LIST_COMMAND_USAGE));
+                    sender.sendMessage(langManager.getMessage(Lang.WARN_LIST_COMMAND_USAGE));
                     return true;
                 }
 
                 handleList(sender, args[1]);
             }
 
-            default -> sender.sendMessage(langManager.getMessage(LangKey.WARN_COMMAND_USAGE));
+            default -> sender.sendMessage(langManager.getMessage(Lang.WARN_COMMAND_USAGE));
         }
 
         return true;
@@ -97,7 +97,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (reason.isBlank()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.WARN_MUST_HAVE_REASON),
+                    langManager.getMessage(Lang.WARN_MUST_HAVE_REASON),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -107,7 +107,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (reason.length() > configSettings.maxContentLength()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.CONTENT_TOO_LONG),
+                    langManager.getMessage(Lang.CONTENT_TOO_LONG),
                     Map.of(
                             Placeholders.CONTENT_MAX_LENGTH,
                             String.valueOf(configSettings.maxContentLength())
@@ -120,7 +120,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (playerProfile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -140,7 +140,7 @@ public class WarnCommand implements CommandExecutor {
                 )
         );
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.WARN_ADDED),
+                langManager.getMessage(Lang.WARN_ADDED),
                 Map.of(
                         Placeholders.PLAYER, targetName
                 )
@@ -152,7 +152,7 @@ public class WarnCommand implements CommandExecutor {
         PlayerProfile profile = playerProfileManager.getPlayerProfile(targetName);
         if (profile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -166,7 +166,7 @@ public class WarnCommand implements CommandExecutor {
             displayIndex = Integer.parseInt(indexStr);
         } catch (NumberFormatException e) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.INVALID_NUMBER),
+                    langManager.getMessage(Lang.INVALID_NUMBER),
                     Map.of(
                             Placeholders.VALUE, indexStr
                     )
@@ -178,7 +178,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (actualIndex < 0) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.INVALID_WARN_INDEX),
+                    langManager.getMessage(Lang.INVALID_WARN_INDEX),
                     Map.of(
                             Placeholders.VALUE, String.valueOf(displayIndex),
                             Placeholders.PLAYER, targetName
@@ -191,7 +191,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (actualIndex >= size) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.INVALID_WARN_INDEX),
+                    langManager.getMessage(Lang.INVALID_WARN_INDEX),
                     Map.of(
                             Placeholders.VALUE, String.valueOf(displayIndex),
                             Placeholders.PLAYER, targetName
@@ -202,7 +202,7 @@ public class WarnCommand implements CommandExecutor {
 
         playerProfileManager.removeWarningFromProfile(profile, actualIndex);
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.WARN_DELETED),
+                langManager.getMessage(Lang.WARN_DELETED),
                 Map.of(
                         Placeholders.PLAYER, targetName,
                         Placeholders.VALUE, String.valueOf(displayIndex)
@@ -215,7 +215,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (profile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -227,7 +227,7 @@ public class WarnCommand implements CommandExecutor {
 
         if (warnings.isEmpty()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.NO_WARNS),
+                    langManager.getMessage(Lang.NO_WARNS),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -236,7 +236,7 @@ public class WarnCommand implements CommandExecutor {
         }
 
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.WARN_LIST_HEADER),
+                langManager.getMessage(Lang.WARN_LIST_HEADER),
                 Map.of(
                         Placeholders.PLAYER, targetName
                 )
@@ -247,7 +247,7 @@ public class WarnCommand implements CommandExecutor {
             String warnContent = warnings.get(i).reason();
             String authorName = warnings.get(i).moderatorName();
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.WARN_LIST_ENTRY),
+                    langManager.getMessage(Lang.WARN_LIST_ENTRY),
                     Map.of(
                             Placeholders.WARN_AUTHOR, authorName,
                             Placeholders.WARN_CONTENT, warnContent,

@@ -13,9 +13,9 @@ public enum Permissions {
     UNMUTE_COMMAND("ultimatemoderationplus.admin.unmute-command"),
     BAN_COMMAND("ultimatemoderationplus.admin.ban-command"),
     UNBAN_COMMAND("ultimatemoderationplus.admin.unban-command"),
-
+    TEMPBAN_COMMAND("ultimatemoderationplus.admin.tempban-command"),
+    TEMPMUTE_COMMAND("ultimatemoderationplus.admin.tempmute-command")
     ;
-
     private final String permission;
 
     Permissions(String permission) {

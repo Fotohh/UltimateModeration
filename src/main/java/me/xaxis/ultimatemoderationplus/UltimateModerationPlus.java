@@ -184,7 +184,8 @@ public class UltimateModerationPlus extends JavaPlugin {
         getCommand("unmute").setExecutor(new UnmuteCommand(langManager, playerProfileManager));
         getCommand("ban").setExecutor(new BanCommand(langManager, playerProfileManager, configSettings));
         getCommand("unban").setExecutor(new UnbanCommand(langManager, playerProfileManager));
-        //todo getCommand("noteuuid").setExecutor(new NoteUUIDCommand(langManager, playerProfileManager));
+        getCommand("tempban").setExecutor(new TempBanCommand(langManager, playerProfileManager, configSettings));
+        getCommand("tempmute").setExecutor(new TempMuteCommand(langManager, configSettings, playerProfileManager));
     }
 
     @Override

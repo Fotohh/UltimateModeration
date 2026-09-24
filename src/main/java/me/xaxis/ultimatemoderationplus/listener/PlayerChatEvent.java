@@ -1,11 +1,12 @@
 package me.xaxis.ultimatemoderationplus.listener;
 
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfile;
 import me.xaxis.ultimatemoderationplus.player.PlayerProfileManager;
+import me.xaxis.ultimatemoderationplus.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,14 +47,25 @@ public class PlayerChatEvent implements Listener {
             return;
         }
 
+        if (mute.timeUntil() != -1 && mute.timeUntil() <= System.currentTimeMillis()) {
+            Bukkit.getScheduler().runTask(
+                    plugin,
+                    () -> playerProfileManager.unmuteProfile(playerProfile)
+            );
+            return;
+        }
+
         String message =
                 langManager.replacePlaceholders(
                         langManager.getMessage(
-                                LangKey.PLAYER_MUTED
+                                Lang.PLAYER_MUTED
                         ),
                         Map.of(
                                 Placeholders.REASON,
-                                mute.reason()
+                                mute.reason(),
+                                Placeholders.DURATION,
+                                mute.timeUntil() == -1
+                                ? "never" : Utils.formatDuration(mute.timeUntil())
                         )
                 );
 

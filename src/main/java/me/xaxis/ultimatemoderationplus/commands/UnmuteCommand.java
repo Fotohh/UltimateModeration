@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderationplus.commands;
 
 import me.xaxis.ultimatemoderationplus.infractions.Mute;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
@@ -30,17 +30,17 @@ public class UnmuteCommand implements CommandExecutor {
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
 
         if(!(sender instanceof Player) && (!(sender instanceof ConsoleCommandSender))) {
-            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
+            sender.sendMessage(langManager.getMessage(Lang.SENDER_NOT_VALID));
             return true;
         }
 
         if(!sender.hasPermission(Permissions.MUTE_COMMAND.getPermission())) {
-            sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+            sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
             return true;
         }
 
         if(args.length < 1) {
-            sender.sendMessage(langManager.getMessage(LangKey.UNMUTE_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.UNMUTE_USAGE));
             return true;
         }
 
@@ -49,7 +49,7 @@ public class UnmuteCommand implements CommandExecutor {
         PlayerProfile playerProfile = playerProfileManager.getPlayerProfile(targetName);
         if(playerProfile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -60,13 +60,13 @@ public class UnmuteCommand implements CommandExecutor {
         Mute mute = playerProfileManager.getMute(playerProfile);
 
         if(mute == null) {
-            sender.sendMessage(langManager.getMessage(LangKey.PLAYER_NOT_MUTED));
+            sender.sendMessage(langManager.getMessage(Lang.PLAYER_NOT_MUTED));
             return true;
         }
 
         playerProfileManager.unmuteProfile(playerProfile);
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.PLAYER_UNMUTED),
+                langManager.getMessage(Lang.PLAYER_UNMUTED),
                 Map.of(
                         Placeholders.PLAYER, targetName
                 )

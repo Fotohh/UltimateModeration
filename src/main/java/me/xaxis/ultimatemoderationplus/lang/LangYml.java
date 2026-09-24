@@ -14,10 +14,10 @@ public final class LangYml {
         this.configuration = Objects.requireNonNull(configuration);
     }
 
-    public Map<LangKey, String> loadMessages() {
-        Map<LangKey, String> messages = new EnumMap<>(LangKey.class);
+    public Map<Lang, String> loadMessages() {
+        Map<Lang, String> messages = new EnumMap<>(Lang.class);
 
-        for(LangKey key : LangKey.values()) {
+        for(Lang key : Lang.values()) {
             messages.put(
                     key,
                     configuration.getString(key.getPath())

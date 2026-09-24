@@ -21,6 +21,7 @@ public class MuteCodec implements ProfileEntryCodec<Mute> {
         values.put(PlayerProfileSchema.MUTE_REASON, value.reason());
         values.put(PlayerProfileSchema.MUTE_TIMESTAMP, value.timestamp());
         values.put(PlayerProfileSchema.MUTE_TARGET_ID, value.targetId().toString());
+        values.put(PlayerProfileSchema.TIME_UNTIL, value.timeUntil());
 
         return values;
     }
@@ -34,7 +35,8 @@ public class MuteCodec implements ProfileEntryCodec<Mute> {
                 (String) values.get(PlayerProfileSchema.MUTE_STAFF_NAME),
                 (String) values.get(PlayerProfileSchema.MUTE_REASON),
                 ((Number) values.get(PlayerProfileSchema.MUTE_TIMESTAMP)).longValue(),
-                UUID.fromString((String) values.get(PlayerProfileSchema.MUTE_TARGET_ID))
+                UUID.fromString((String) values.get(PlayerProfileSchema.MUTE_TARGET_ID)),
+                ((Number) values.get(PlayerProfileSchema.TIME_UNTIL)).longValue()
         );
     }
 }

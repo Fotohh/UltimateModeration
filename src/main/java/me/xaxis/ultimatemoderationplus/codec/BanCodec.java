@@ -17,6 +17,7 @@ public class BanCodec implements ProfileEntryCodec<Ban>{
         entries.put(PlayerProfileSchema.BAN_TARGET_ID, value.playerId());
         entries.put(PlayerProfileSchema.BAN_STAFF_ID, value.staffId());
         entries.put(PlayerProfileSchema.BAN_TIMESTAMP, value.timestamp());
+        entries.put(PlayerProfileSchema.TIME_UNTIL, value.timeUntil());
         return entries;
     }
 
@@ -27,7 +28,8 @@ public class BanCodec implements ProfileEntryCodec<Ban>{
                 (String) values.get(PlayerProfileSchema.BAN_STAFF_NAME),
                 UUID.fromString((String) values.get(PlayerProfileSchema.BAN_TARGET_ID)),
                 (String) values.get(PlayerProfileSchema.BAN_REASON),
-                ((Number) values.get(PlayerProfileSchema.BAN_TIMESTAMP)).longValue()
+                ((Number) values.get(PlayerProfileSchema.BAN_TIMESTAMP)).longValue(),
+                ((Number) values.get(PlayerProfileSchema.TIME_UNTIL)).longValue()
         );
     }
 }

@@ -1,7 +1,7 @@
 package me.xaxis.ultimatemoderationplus.commands;
 
 import me.xaxis.ultimatemoderationplus.infractions.Ban;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
@@ -28,12 +28,12 @@ public class UnbanCommand implements CommandExecutor {
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
 
         if(!sender.hasPermission(Permissions.UNBAN_COMMAND.getPermission())) {
-            sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+            sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
             return true;
         }
 
         if(args.length < 1) {
-            sender.sendMessage(langManager.getMessage(LangKey.UNBAN_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.UNBAN_USAGE));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class UnbanCommand implements CommandExecutor {
         PlayerProfile playerProfile = playerProfileManager.getPlayerProfile(targetName);
         if(playerProfile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -53,7 +53,7 @@ public class UnbanCommand implements CommandExecutor {
         Ban ban = playerProfileManager.getPlayerBan(playerProfile);
         if(ban == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_BANNED),
+                    langManager.getMessage(Lang.PLAYER_NOT_BANNED),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -63,7 +63,7 @@ public class UnbanCommand implements CommandExecutor {
 
         playerProfileManager.unbanPlayer(playerProfile);
         sender.sendMessage(langManager.replacePlaceholders(
-                langManager.getMessage(LangKey.UNBANNED_PLAYER),
+                langManager.getMessage(Lang.UNBANNED_PLAYER),
                 Map.of(
                         Placeholders.PLAYER, targetName
                 )

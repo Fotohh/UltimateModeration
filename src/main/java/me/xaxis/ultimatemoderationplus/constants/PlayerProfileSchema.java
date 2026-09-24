@@ -39,6 +39,7 @@ public final class PlayerProfileSchema {
     public static final String BAN_REASON = "reason";
     public static final String BAN_TIMESTAMP = "timestamp";
     public static final String BAN_TARGET_ID = "player-id";
+    public static final String TIME_UNTIL = "time-until";
 
     public static final Set<String> NOTE_FIELDS = Set.of(
             NOTE_AUTHOR_ID,

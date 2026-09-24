@@ -11,7 +11,8 @@ public enum Placeholders {
     WARN_CONTENT("warn-content"),
     WARN_AUTHOR("warn-author"),
     REASON("reason"),
-    STAFF("staff");
+    STAFF("staff"),
+    DURATION("duration");
 
     private final String placeholder;
 

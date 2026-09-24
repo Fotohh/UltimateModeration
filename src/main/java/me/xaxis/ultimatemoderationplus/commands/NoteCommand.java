@@ -2,7 +2,7 @@ package me.xaxis.ultimatemoderationplus.commands;
 
 import me.xaxis.ultimatemoderationplus.config.ConfigSettings;
 import me.xaxis.ultimatemoderationplus.constants.ModerationConstants;
-import me.xaxis.ultimatemoderationplus.lang.LangKey;
+import me.xaxis.ultimatemoderationplus.lang.Lang;
 import me.xaxis.ultimatemoderationplus.lang.LangManager;
 import me.xaxis.ultimatemoderationplus.lang.Placeholders;
 import me.xaxis.ultimatemoderationplus.permissions.Permissions;
@@ -49,12 +49,12 @@ public class NoteCommand implements CommandExecutor {
                 && !sender.hasPermission(Permissions.NOTE_COMMAND_VIEW.getPermission())
                 && !sender.hasPermission(Permissions.NOTE_COMMAND_DELETE.getPermission())
         ) {
-            sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+            sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
             return true;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(langManager.getMessage(LangKey.NOTE_COMMAND_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.NOTE_COMMAND_USAGE));
             return true;
         }
 
@@ -62,7 +62,7 @@ public class NoteCommand implements CommandExecutor {
 
         if (!subcommand.equals("add") && !subcommand.equals("list") && !subcommand.equals("delete")) {
 
-            sender.sendMessage(langManager.getMessage(LangKey.NOTE_COMMAND_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.NOTE_COMMAND_USAGE));
 
             return true;
         }
@@ -73,7 +73,7 @@ public class NoteCommand implements CommandExecutor {
 
         if (targetProfile == null) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.PLAYER_NOT_FOUND),
+                    langManager.getMessage(Lang.PLAYER_NOT_FOUND),
                     Map.of(
                             Placeholders.PLAYER, targetName
                     )
@@ -86,7 +86,7 @@ public class NoteCommand implements CommandExecutor {
         } else if (sender instanceof ConsoleCommandSender) {
             handleConsoleNoteCommand(sender, targetProfile, args);
         } else {
-            sender.sendMessage(langManager.getMessage(LangKey.SENDER_NOT_VALID));
+            sender.sendMessage(langManager.getMessage(Lang.SENDER_NOT_VALID));
         }
 
         return true;
@@ -110,43 +110,43 @@ public class NoteCommand implements CommandExecutor {
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "add" -> {
                 if (!sender.hasPermission(Permissions.NOTE_COMMAND_EDIT.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return;
                 }
                 handleAddSubcommand(authorId, authorName, sender, target, args);
             }
             case "list" -> {
                 if (!sender.hasPermission(Permissions.NOTE_COMMAND_VIEW.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return;
                 }
                 handleListSubcommand(sender, target);
             }
             case "delete" -> {
                 if (!sender.hasPermission(Permissions.NOTE_COMMAND_DELETE.getPermission())) {
-                    sender.sendMessage(langManager.getMessage(LangKey.NO_PERMISSION));
+                    sender.sendMessage(langManager.getMessage(Lang.NO_PERMISSION));
                     return;
                 }
                 handleDeleteSubcommand(sender, target, args);
             }
-            default -> sender.sendMessage(langManager.getMessage(LangKey.NOTE_COMMAND_USAGE));
+            default -> sender.sendMessage(langManager.getMessage(Lang.NOTE_COMMAND_USAGE));
         }
     }
 
     private void handleAddSubcommand(UUID authorId, String authorName, CommandSender sender, PlayerProfile target, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(langManager.getMessage(LangKey.NOTE_ADD_COMMAND_USAGE));
+            sender.sendMessage(langManager.getMessage(Lang.NOTE_ADD_COMMAND_USAGE));
             return;
         }
 
         String noteContent = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         if (noteContent.isBlank()) {
-            sender.sendMessage(langManager.getMessage(LangKey.NOTE_MUST_HAVE_CONTENT));
+            sender.sendMessage(langManager.getMessage(Lang.NOTE_MUST_HAVE_CONTENT));
             return;
         }
         if (noteContent.length() > configSettings.maxContentLength()) {
             sender.sendMessage(langManager.replacePlaceholders(
-                    langManager.getMessage(LangKey.CONTENT_TOO_LONG),
+                    langManager.getMessage(Lang.CONTENT_TOO_LONG),
                     Map.of(
                             Placeholders.CONTENT_MAX_LENGTH,
                             String.valueOf(configSettings.maxContentLength())
@@ -158,7 +158,7 @@ public class NoteCommand implements CommandExecutor {
         playerProfileManager.addNoteToProfile(target, note);
         sender.sendMessage(
                 langManager.replacePlaceholders(
-                        langManager.getMessage(LangKey.NOTE_ADDED),
+                        langManager.getMessage(Lang.NOTE_ADDED),
                         Map.of(
                                 Placeholders.PLAYER, target.playerName()
                         )
@@ -175,7 +175,7 @@ public class NoteCommand implements CommandExecutor {
             sender.sendMessage(
                     langManager.replacePlaceholders(
                             langManager.getMessage(
-                                    LangKey.NO_NOTES
+                                    Lang.NO_NOTES
                             ),
                             Map.of(
                                     Placeholders.PLAYER,
@@ -188,7 +188,7 @@ public class NoteCommand implements CommandExecutor {
         sender.sendMessage(
                 langManager.replacePlaceholders(
                         langManager.getMessage(
-                                LangKey.NOTE_LIST_HEADER
+                                Lang.NOTE_LIST_HEADER
                         ),
                         Map.of(
                                 Placeholders.PLAYER,
@@ -201,7 +201,7 @@ public class NoteCommand implements CommandExecutor {
             sender.sendMessage(
                     langManager.replacePlaceholders(
                             langManager.getMessage(
-                                    LangKey.NOTE_LIST_ENTRY
+                                    Lang.NOTE_LIST_ENTRY
                             ),
                             Map.of(
                                     Placeholders.PLAYER,
@@ -221,7 +221,7 @@ public class NoteCommand implements CommandExecutor {
     private void handleDeleteSubcommand(CommandSender sender, PlayerProfile target, String[] args) {
         if (args.length < 3) {
             //todo maybe paginated gui with delete buttons?
-            sender.sendMessage(langManager.getMessage(LangKey.NO_DELETE_MESSAGE_INDEX));
+            sender.sendMessage(langManager.getMessage(Lang.NO_DELETE_MESSAGE_INDEX));
             return;
         }
 
@@ -238,7 +238,7 @@ public class NoteCommand implements CommandExecutor {
                     displayIndex - 1;
             List<Note> notes = playerProfileManager.getNotesFromProfile(target);
             if (noteIndex < 0 || noteIndex >= notes.size()) {
-                sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(LangKey.INVALID_NOTE_INDEX),
+                sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(Lang.INVALID_NOTE_INDEX),
                         Map.of(
                                 Placeholders.PLAYER, target.playerName(),
                                 Placeholders.NOTE_INDEX, String.valueOf(displayIndex)
@@ -248,14 +248,14 @@ public class NoteCommand implements CommandExecutor {
             }
 
             playerProfileManager.removeNoteFromProfile(target, noteIndex);
-            sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(LangKey.NOTE_DELETED),
+            sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(Lang.NOTE_DELETED),
                     Map.of(
                             Placeholders.PLAYER, target.playerName(),
                             Placeholders.NOTE_INDEX, String.valueOf(displayIndex)
                     )
             ));
         } catch (NumberFormatException e) {
-            sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(LangKey.INVALID_NOTE_INDEX),
+            sender.sendMessage(langManager.replacePlaceholders(langManager.getMessage(Lang.INVALID_NOTE_INDEX),
                     Map.of(
                             Placeholders.PLAYER, target.playerName(),
                             Placeholders.NOTE_INDEX, args[2]
